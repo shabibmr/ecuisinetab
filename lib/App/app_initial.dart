@@ -33,7 +33,7 @@ class _Init_AppState extends State<Init_App> {
         child: Text('Hello!!! $state'),
       );
     }, listener: (context, state) {
-      print('new state $state');
+      print('new state ${state.authState}');
       // if (state is AuthenticationFailiure) {
       //   print('Pop Navigation from init page');
       //   Navigator.pop(context);
@@ -45,16 +45,16 @@ class _Init_AppState extends State<Init_App> {
             builder: (contextRoute) => MultiBlocProvider(
               providers: [
                 BlocProvider.value(
-                  value: context.read<SyncServiceBloc>()
-                    // ..add(FetchUIConfigEvent())
-                    ..add(FetchItemsEvent())
-                    ..add(FetchItemGroupsEvent())
-                    ..add(FetchLedgersEvent())
-                    ..add(FetchUOMEvent())
-                    ..add(FetchAccGroupsEvent())
-                    ..add(FetchGodownsEvent())
-                    ..add(FetchEmployeesEvent()),
-                ),
+                    value: context.read<SyncServiceBloc>()
+                      // ..add(FetchUIConfigEvent())
+                      ..add(FetchItemsEvent())
+                      ..add(FetchItemGroupsEvent())
+                    // ..add(FetchLedgersEvent())
+                    // ..add(FetchUOMEvent())
+                    // ..add(FetchAccGroupsEvent())
+                    // ..add(FetchGodownsEvent())
+                    // ..add(FetchEmployeesEvent()),
+                    ),
                 BlocProvider.value(value: context.read<AuthenticationBloc>()),
               ],
               child: POSScreen(),
@@ -63,25 +63,5 @@ class _Init_AppState extends State<Init_App> {
         );
       }
     });
-  }
-}
-
-class MastersSync extends StatelessWidget {
-  const MastersSync({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      lazy: false,
-      create: (contextQ) => SyncServiceBloc()
-        ..add(FetchUIConfigEvent())
-        ..add(FetchItemsEvent())
-        ..add(FetchItemGroupsEvent())
-        ..add(FetchLedgersEvent())
-        ..add(FetchUOMEvent())
-        ..add(FetchAccGroupsEvent())
-        ..add(FetchGodownsEvent())
-        ..add(FetchEmployeesEvent()),
-    );
   }
 }

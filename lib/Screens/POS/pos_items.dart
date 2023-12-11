@@ -38,13 +38,13 @@ class POSItemsListWidget extends StatefulWidget {
 class _POSItemsListWidgetState extends State<POSItemsListWidget> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: BlocConsumer<VoucherBloc, VoucherState>(
-        listener: (context, state) {
-          // TODO: implement listener
-        },
-        builder: (context, state) {
-          print('v rebuil');
+    return BlocConsumer<VoucherBloc, VoucherState>(
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        print('v rebuil');
+        if (state.status == VoucherEditorStatus.loaded) {
           return BlocConsumer<PosBloc, PosState>(
             builder: (context, state) {
               print('new State emit ${state.itemsLoadStaus}');
@@ -58,7 +58,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
                 }
               } else if (state.itemsLoadStaus ==
                   ItemsLoadingStatus.ItemsLoading) {
-                return Center(
+                return const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     mainAxisSize: MainAxisSize.min,
@@ -69,19 +69,27 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
                   ),
                 );
               } else if (state.status == POSStatus.NEW) {
-                return Center(
+                return const Center(
                   child: Text('Select Group'),
                 );
               } else {
                 return Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1)),
                   child: Text(state.toString()),
                 );
               }
             },
             listener: (context, state) {},
           );
-        },
-      ),
+        } else {
+          return Container(
+            decoration:
+                BoxDecoration(border: Border.all(color: Colors.red, width: 1)),
+            child: Text(state.toString()),
+          );
+        }
+      },
     );
   }
 
@@ -176,7 +184,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
     return InkWell(
       onTap: () async {
         var newval = await getQtyValue(val.toDouble());
-        if (newval != null)
+        if (newval != null) {
           context.read<VoucherBloc>().add(UpdateItemQty(
                 item: InventoryItemDataModel(
                   ItemID: item.Item_ID,
@@ -186,6 +194,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
                 ),
                 qty: newval,
               ));
+        }
       },
       child: Container(
         color: Colors.blue.shade100,
@@ -193,8 +202,8 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
           child: Padding(
             padding: const EdgeInsets.all(1.0),
             child: AutoSizeText(
-              val > 0 ? '${val.toStringAsFixed(2)}' : '',
-              style: TextStyle(
+              val > 0 ? val.toStringAsFixed(2) : '',
+              style: const TextStyle(
                 fontSize: 8,
               ),
               textAlign: TextAlign.right,

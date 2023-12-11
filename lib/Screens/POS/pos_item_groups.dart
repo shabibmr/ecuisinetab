@@ -16,9 +16,19 @@ class POSInvGroups extends StatefulWidget {
 class _POSInvGroupsState extends State<POSInvGroups> {
   late Box<InventorygroupHiveModel> gBox;
 
+  final List<InventorygroupHiveModel> _groups = [];
+
   @override
   void initState() {
+    print('init state');
     gBox = Hive.box(HiveTagNames.ItemGroups_Hive_Tag);
+    // filter gBox with Group_Type=2 to create _groups;
+    for (var item in gBox.values) {
+      print('> > > ${item.Group_Name} is ${item.Group_Type}');
+      if (item.Group_Type == '2') {
+        _groups.add(item);
+      }
+    }
     super.initState();
   }
 
@@ -26,9 +36,10 @@ class _POSInvGroupsState extends State<POSInvGroups> {
   Widget build(BuildContext context) {
     return BlocBuilder<PosBloc, PosState>(
       builder: (context, state) {
+        print('>> len : ${_groups.length}');
         return ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: gBox.length,
+          itemCount: _groups.length,
           itemBuilder: (listContext, index) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -44,12 +55,12 @@ class _POSInvGroupsState extends State<POSInvGroups> {
                     width: 120,
                     child: ElevatedButton(
                       onPressed: () {
-                        print('Selected ${gBox.getAt(index)!.Group_ID}');
-                        context.read<PosBloc>().add(GroupSelected(
-                            groupID: gBox.getAt(index)!.Group_ID!));
+                        print('Selected ${_groups[index].Group_ID}');
+                        context.read<PosBloc>().add(
+                            GroupSelected(groupID: _groups[index].Group_ID!));
                       },
                       child: AutoSizeText(
-                        gBox.getAt(index)!.Group_Name!,
+                        _groups[index].Group_Name!,
                         textAlign: TextAlign.center,
                       ),
                     ),

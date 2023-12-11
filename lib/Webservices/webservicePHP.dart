@@ -1318,4 +1318,25 @@ class WebservicePHPHelper {
       print(e);
     }
   }
+
+  Future<dynamic> getCurrentOrders({
+    String vPrefix = '%',
+  }) async {
+    String url =
+        "${getBaseURL()}transactions_webservice.php?action=getCurrentOrders&vPrefix=$vPrefix";
+
+    print('QC URL : $url');
+
+    String dBName = getDBName();
+    Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));
+
+    Response response;
+    try {
+      response = await dio.get(url);
+    } catch (e) {
+      return false;
+    }
+
+    return response.data;
+  }
 }

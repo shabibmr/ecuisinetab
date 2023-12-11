@@ -41,11 +41,12 @@ class AuthenticationBloc
 
   void authStarted(event, emit) {
     print('Auth Started');
-    emit(state.copyWith(authState: AuthState.loading));
+    emit(state.copyWith(authState: AuthState.success));
     try {
       String login = state.authDetail?.username ?? '';
       String password = state.authDetail?.password ?? '';
-
+      print('Auth Success');
+      emit(state.copyWith(authState: AuthState.success));
       // check login info;
     } catch (e) {
       if (kDebugMode) {

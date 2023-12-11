@@ -74,7 +74,7 @@ class InventorygroupHiveModel extends HiveObject with EquatableMixin {
       Group_ID: map['Group_Id'],
       Group_Name: map['Group_Name'],
       Parent_ID: map['Parent_ID'],
-      Group_Type: map['Group_Type'],
+      Group_Type: map['Group_Type'] ?? '0',
       GroupNameArabic: map['GroupNameArabic'],
       Group_Name_Arabic: map['Group_Name_Arabic'],
     );

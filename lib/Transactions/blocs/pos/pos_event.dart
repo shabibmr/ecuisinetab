@@ -12,3 +12,23 @@ class GroupSelected extends PosEvent {
 
   GroupSelected({required this.groupID});
 }
+
+class ItemsLoaded extends PosEvent {}
+
+class ItemsLoading extends PosEvent {}
+
+class ItemsLoadFailed extends PosEvent {
+  final String? msg;
+
+  const ItemsLoadFailed({this.msg});
+}
+
+class GroupsLoaded extends PosEvent {}
+
+class GroupsLoading extends PosEvent {}
+
+class GroupsLoadFailed extends PosEvent {
+  final String? msg;
+
+  const GroupsLoadFailed({this.msg});
+}

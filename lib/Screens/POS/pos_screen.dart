@@ -38,19 +38,22 @@ class _POSScreenState extends State<POSScreen> {
         ),
         BlocProvider(
           create: (context) => VoucherBloc()
-            ..add(SetVoucher(
+            ..add(
+              SetVoucher(
                 voucher: GeneralVoucherDataModel(
-              VoucherDate: DateTime.now(),
-              InventoryItems: [],
-              ledgersList: [],
-              voucherNumber: '1',
-              VoucherPrefix: Hive.box(HiveTagNames.Settings_Hive_Tag)
-                  .get(Config_Tag_Names.Voucher_Prefix),
-              voucherType: GMVoucherTypes.SalesOrder,
-              ledgerObject: LedgerMasterDataModel(
-                LedgerID: '0x5x23x1',
+                  VoucherDate: DateTime.now(),
+                  InventoryItems: [],
+                  ledgersList: [],
+                  voucherNumber: '1',
+                  VoucherPrefix: Hive.box(HiveTagNames.Settings_Hive_Tag)
+                      .get(Config_Tag_Names.Voucher_Prefix),
+                  voucherType: GMVoucherTypes.SalesOrder,
+                  ledgerObject: LedgerMasterDataModel(
+                    LedgerID: '0x5x23x1',
+                  ),
+                ),
               ),
-            )))
+            )
             ..add(
               SetTransactionType(transactionType: TransactionType.outward),
             ),
@@ -77,11 +80,20 @@ class _POSScreenState extends State<POSScreen> {
     );
   }
 
+  Widget getBodyList() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ListView(),
+    );
+  }
+
   Widget getBody() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Flexible(
+        Expanded(
           flex: 1,
           child: POSInvGroups(),
         ),
