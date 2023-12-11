@@ -19,7 +19,7 @@ class WebservicePHPHelper {
 
     // String url = 'https://www.algoray.in/test_app_water';
 
-    url = 'https://gm.algoray.in/test_app_water';
+    url = 'http://192.168.0.107/test_app_water';
     // print('Url : $url/');
     return '$url/';
   }
@@ -29,7 +29,7 @@ class WebservicePHPHelper {
 
     // return 'aawater';
 
-    return settings.get('DBName', defaultValue: 'dineout2');
+    return settings.get('DBName', defaultValue: 'cake_studio_mukkam');
   }
 
   static Future<GeneralVoucherDataModel> getVoucherByVoucherNo({
@@ -1319,11 +1319,11 @@ class WebservicePHPHelper {
     }
   }
 
-  Future<dynamic> getCurrentOrders({
+  static Future<dynamic> getCurrentOrders({
     String vPrefix = '%',
   }) async {
     String url =
-        "${getBaseURL()}transactions_webservice.php?action=getCurrentOrders&vPrefix=$vPrefix";
+        "${getBaseURL()}transactions_webservice.php?action=getPendingOrders&Voucher_Prefix=$vPrefix";
 
     print('QC URL : $url');
 

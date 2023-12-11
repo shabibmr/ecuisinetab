@@ -1,11 +1,14 @@
 import 'package:ecuisinetab/Login/login_page.dart';
 import 'package:ecuisinetab/Screens/POS/pos_screen.dart';
+import 'package:ecuisinetab/Utils/voucher_types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../Services/Sync/bloc/sync_ui_config_bloc.dart';
+import '../Transactions/blocs/pos/pos_bloc.dart';
+import '../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import '../auth/bloc/authentication_bloc.dart';
 
 class Init_App extends StatefulWidget {
@@ -56,6 +59,14 @@ class _Init_AppState extends State<Init_App> {
                     // ..add(FetchEmployeesEvent()),
                     ),
                 BlocProvider.value(value: context.read<AuthenticationBloc>()),
+                BlocProvider(
+                  create: (context) => PosBloc(),
+                ),
+                BlocProvider(
+                    create: (context) => VoucherBloc()
+                      ..add(SetEmptyVoucher(
+                        voucherType: GMVoucherTypes.SalesOrder,
+                      )))
               ],
               child: POSScreen(),
             ),

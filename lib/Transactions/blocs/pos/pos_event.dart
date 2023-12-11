@@ -32,3 +32,13 @@ class GroupsLoadFailed extends PosEvent {
 
   const GroupsLoadFailed({this.msg});
 }
+
+class OrderSelected extends PosEvent {
+  final String voucherNo;
+  final String vPrefix;
+
+  const OrderSelected({
+    required this.voucherNo,
+    required this.vPrefix,
+  });
+}

@@ -16,7 +16,7 @@ import 'Login/constants.dart';
 import 'Services/Sync/bloc/sync_ui_config_bloc.dart';
 
 Future<void> main() async {
-  HiveTagNames.setDB('dineout2');
+  HiveTagNames.setDB('cake_studio_mukkam');
   await initHiveBoxes();
   initSettings();
 
@@ -25,9 +25,9 @@ Future<void> main() async {
 
 void initSettings() {
   Map<String, dynamic> item = {};
-  item['dbName'] = 'dineout2';
+  item['dbName'] = 'cake_studio_mukkam';
   Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
-  sett.put('url', item['baseURL'] ?? 'https://gm.algoray.in/test_app_water');
+  sett.put('url', item['baseURL'] ?? 'http://192.168.0.107/test_app_water');
   sett.put('CompanyName', item['CompanyName'] ?? '');
   sett.put('branch', item['branch'] ?? '');
   sett.put('addressLine', item['addressline'] ?? '');

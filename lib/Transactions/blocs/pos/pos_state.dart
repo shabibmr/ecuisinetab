@@ -4,9 +4,13 @@ part of 'pos_bloc.dart';
 
 enum POSStatus {
   NEW,
+  FetchingOrders,
+  OrdersFetched,
+  OrderFetchError,
+  OrderSelected,
 }
 
-enum ItemsLoadingStatus {
+enum SyncStatus {
   ItemsLoading,
   ItemsLoaded,
 }
@@ -16,11 +20,17 @@ class PosState extends Equatable {
     required this.status,
     this.items,
     this.itemsLoadStaus,
+    this.currentOrders,
+    this.vID,
+    this.vPrefix,
   });
 
   final POSStatus status;
   final List<InventoryItemHive>? items;
-  final ItemsLoadingStatus? itemsLoadStaus;
+  final SyncStatus? itemsLoadStaus;
+  final List<Map>? currentOrders;
+  final String? vID;
+  final String? vPrefix;
 
   @override
   List<Object?> get props => [status, items, itemsLoadStaus];
@@ -28,12 +38,18 @@ class PosState extends Equatable {
   PosState copyWith({
     POSStatus? status,
     List<InventoryItemHive>? items,
-    ItemsLoadingStatus? itemsLoadStaus,
+    SyncStatus? itemsLoadStaus,
+    List<Map>? currentOrders,
+    String? vID,
+    String? vPrefix,
   }) {
     return PosState(
       status: status ?? this.status,
       items: items ?? this.items,
       itemsLoadStaus: itemsLoadStaus ?? this.itemsLoadStaus,
+      currentOrders: currentOrders ?? this.currentOrders,
+      vID: vID ?? this.vID,
+      vPrefix: vPrefix ?? this.vPrefix,
     );
   }
 

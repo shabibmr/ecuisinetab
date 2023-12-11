@@ -49,15 +49,14 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
             builder: (context, state) {
               print('new State emit ${state.itemsLoadStaus}');
 
-              if (state.itemsLoadStaus == ItemsLoadingStatus.ItemsLoaded) {
+              if (state.itemsLoadStaus == SyncStatus.ItemsLoaded) {
                 if (state.items != null) {
                   print('items len : ${state.items!.length}');
                   return getItemTable(state);
                 } else {
                   return Text('List null');
                 }
-              } else if (state.itemsLoadStaus ==
-                  ItemsLoadingStatus.ItemsLoading) {
+              } else if (state.itemsLoadStaus == SyncStatus.ItemsLoading) {
                 return const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

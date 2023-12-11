@@ -32,33 +32,7 @@ class _POSScreenState extends State<POSScreen> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => PosBloc(),
-        ),
-        BlocProvider(
-          create: (context) => VoucherBloc()
-            ..add(
-              SetVoucher(
-                voucher: GeneralVoucherDataModel(
-                  VoucherDate: DateTime.now(),
-                  InventoryItems: [],
-                  ledgersList: [],
-                  voucherNumber: '1',
-                  VoucherPrefix: Hive.box(HiveTagNames.Settings_Hive_Tag)
-                      .get(Config_Tag_Names.Voucher_Prefix),
-                  voucherType: GMVoucherTypes.SalesOrder,
-                  ledgerObject: LedgerMasterDataModel(
-                    LedgerID: '0x5x23x1',
-                  ),
-                ),
-              ),
-            )
-            ..add(
-              SetTransactionType(transactionType: TransactionType.outward),
-            ),
-        ),
-      ],
+      providers: [],
       child: Scaffold(
         appBar: AppBar(title: const Text('POS')),
         floatingActionButton: FloatingActionButton(
