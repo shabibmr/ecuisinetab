@@ -1,3 +1,5 @@
+import 'package:ecuisinetab/Screens/POS/pos_cart.dart';
+
 import '../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 
 import '../../Datamodels/HiveModels/UOM/UOMHiveModel.dart';
@@ -123,53 +125,58 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
     );
   }
 
-  Expanded itemDetail(InventoryItemHive item) {
-    return Expanded(
-        flex: 8,
-        child: Container(
-          color: Colors.amber.shade50,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: AutoSizeText(
-                  item.Item_Name ?? '',
-                  style: TextStyle(
-                    fontSize: 12,
+  Widget itemDetail(InventoryItemHive item) {
+    return InkWell(
+      onTap: () async {
+        await openItemDetailPage(item);
+      },
+      child: Expanded(
+          flex: 8,
+          child: Container(
+            color: Colors.amber.shade50,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: AutoSizeText(
+                    item.Item_Name ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: AutoSizeText(
-                      '@${item.Price?.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 8,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: AutoSizeText(
+                        '@${item.Price?.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 8,
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: AutoSizeText(
-                      ' MRP : ${item.Price_2?.toStringAsFixed(2) ?? ''}',
-                      style: TextStyle(
-                        fontSize: 8,
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: AutoSizeText(
+                        ' MRP : ${item.Price_2?.toStringAsFixed(2) ?? ''}',
+                        style: TextStyle(
+                          fontSize: 8,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ));
+                  ],
+                ),
+              ],
+            ),
+          )),
+    );
   }
 
   Widget getQty(InventoryItemHive item) {
@@ -201,7 +208,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
           child: Padding(
             padding: const EdgeInsets.all(1.0),
             child: AutoSizeText(
-              val > 0 ? val.toStringAsFixed(2) : '',
+              val > 0 ? val.toStringAsFixed(2) : 'BLA',
               style: const TextStyle(
                 fontSize: 8,
               ),
@@ -251,5 +258,20 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
       },
     );
     return val;
+  }
+
+  Future<void> openItemDetailPage(InventoryItemHive item) async {
+    print('openItemDetailPage');
+    await showDialog(
+      context: context,
+      builder: (context2) => BlocProvider.value(
+        value: context.read<VoucherBloc>(),
+        child: Dialog(
+          elevation: 3,
+          alignment: Alignment.center,
+          child: POSCartPage(),
+        ),
+      ),
+    );
   }
 }

@@ -42,3 +42,5 @@ class OrderSelected extends PosEvent {
     required this.vPrefix,
   });
 }
+
+class OrderSent extends PosEvent {}

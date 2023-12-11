@@ -48,25 +48,26 @@ class _Init_AppState extends State<Init_App> {
             builder: (contextRoute) => MultiBlocProvider(
               providers: [
                 BlocProvider.value(
-                    value: context.read<SyncServiceBloc>()
-                      // ..add(FetchUIConfigEvent())
-                      ..add(FetchItemsEvent())
-                      ..add(FetchItemGroupsEvent())
+                  value: context.read<SyncServiceBloc>()
+                    // ..add(FetchUIConfigEvent())
+                    ..add(FetchItemsEvent())
+                    ..add(FetchItemGroupsEvent())
                     // ..add(FetchLedgersEvent())
                     // ..add(FetchUOMEvent())
                     // ..add(FetchAccGroupsEvent())
                     // ..add(FetchGodownsEvent())
-                    // ..add(FetchEmployeesEvent()),
-                    ),
+                    ..add(FetchEmployeesEvent()),
+                ),
                 BlocProvider.value(value: context.read<AuthenticationBloc>()),
                 BlocProvider(
                   create: (context) => PosBloc(),
                 ),
                 BlocProvider(
-                    create: (context) => VoucherBloc()
-                      ..add(SetEmptyVoucher(
-                        voucherType: GMVoucherTypes.SalesOrder,
-                      )))
+                  create: (context) => VoucherBloc()
+                    ..add(SetEmptyVoucher(
+                      voucherType: GMVoucherTypes.SalesOrder,
+                    )),
+                )
               ],
               child: POSScreen(),
             ),

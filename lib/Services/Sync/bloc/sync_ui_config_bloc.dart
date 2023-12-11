@@ -43,7 +43,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     });
     on<FetchEmployeesEvent>((event, emit) async {
       await syncEmployees();
-      await syncUserGroups();
+      // await syncUserGroups();
     });
     on<FetchGodownsEvent>((event, emit) async {
       await syncGodowns();

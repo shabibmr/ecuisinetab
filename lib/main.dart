@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'App/app_initial.dart';
+import 'Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
 import 'Datamodels/HiveModels/InventoryGroups/InventorygroupHiveModel.dart';
 import 'Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 import 'Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
@@ -31,7 +32,7 @@ void initSettings() {
   sett.put('CompanyName', item['CompanyName'] ?? '');
   sett.put('branch', item['branch'] ?? '');
   sett.put('addressLine', item['addressline'] ?? '');
-  sett.put('vPref', item['VoucherPrefix']);
+  sett.put('vPref', item['VoucherPrefix'] ?? 'A');
   sett.put('Salesman_ID', item['Emp_ID']);
   sett.put('Warehouse', item['Godown_ID'] ?? 'GODOWN');
   sett.put('defaultGodown', item['defaultGodown'] ?? 'GODOWN');
@@ -65,7 +66,7 @@ Future<void> initHiveBoxes() async {
   Hive.registerAdapter<InventorygroupHiveModel>(
       InventorygroupHiveModelAdapter());
   Hive.registerAdapter<UOMHiveMOdel>(UOMHiveMOdelAdapter());
-  // Hive.registerAdapter<EmployeeHiveModel>(EmployeeHiveModelAdapter());
+  Hive.registerAdapter<EmployeeHiveModel>(EmployeeHiveModelAdapter());
   Hive.registerAdapter<PriceListEntriesHive>(PriceListEntriesHiveAdapter());
   // Hive.registerAdapter<UserGroupDataModel>(UserGroupDataModelAdapter());
   // Hive.registerAdapter<ContactsDataModel>(ContactsDataModelAdapter());
@@ -98,8 +99,8 @@ Future<void> initHiveBoxes() async {
   // Box<GodownHiveModel> godowns =
   //     await Hive.openBox(HiveTagNames.Godowns_Hive_Tag);
   Box<UOMHiveMOdel> uoms = await Hive.openBox(HiveTagNames.Uom_Hive_Tag);
-  // Box<EmployeeHiveModel> emps =
-  //     await Hive.openBox(HiveTagNames.Employee_Hive_Tag);
+  Box<EmployeeHiveModel> emps =
+      await Hive.openBox(HiveTagNames.Employee_Hive_Tag);
   // Box<UserGroupDataModel> userGrps =
   //     await Hive.openBox(HiveTagNames.UserGroups_Hive_Tag);
   // Box<ContactsDataModel> contactBox =

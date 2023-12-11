@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ecuisinetab/Utils/voucher_types.dart';
+
 import '/Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
 import '/Datamodels/HiveModels/InventoryGroups/InventorygroupHiveModel.dart';
 import '/Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
@@ -1323,9 +1325,9 @@ class WebservicePHPHelper {
     String vPrefix = '%',
   }) async {
     String url =
-        "${getBaseURL()}transactions_webservice.php?action=getPendingOrders&Voucher_Prefix=$vPrefix";
+        "${getBaseURL()}transactions_webservice.php?action=getPendingOrders&Voucher_Prefix=$vPrefix&Voucher_Type=${GMVoucherTypes.SalesOrder}";
 
-    print('QC URL : $url');
+    print('Current ORders : $url');
 
     String dBName = getDBName();
     Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));

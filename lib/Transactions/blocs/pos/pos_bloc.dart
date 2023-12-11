@@ -37,14 +37,26 @@ class PosBloc extends Bloc<PosEvent, PosState> {
         status: POSStatus.OrderSelected,
       ));
     });
+    on<OrderSent>((event, emit) => emit(state.copyWith(
+          currentOrders: [],
+          status: POSStatus.NEW,
+        )));
   }
 
   Future<void> getCurrentOrders() async {
     try {
       print('Getting Orders');
-      final data = WebservicePHPHelper.getCurrentOrders();
+      final data = await WebservicePHPHelper.getCurrentOrders();
       if (data == false) {
         emit(state.copyWith(status: POSStatus.OrderFetchError));
+      } else {
+        // final List tables =
+        //     data['data_tables'][0]['data_tables'].toString().split('|');
+
+        emit(state.copyWith(
+          currentOrders: data['data'],
+          status: POSStatus.OrdersFetched,
+        ));
       }
     } catch (e) {
       print('error in getCurrentOrders : ${e.toString()}');

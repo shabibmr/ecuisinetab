@@ -18,13 +18,19 @@ class _PosTableSelectorState extends State<PosTableSelector> {
         body: BlocConsumer<PosBloc, PosState>(
       listener: (context, state) {
         if (state.status == POSStatus.OrderSelected) {
+          if (state.vID == null || state.vID == '') {
+            context.read<VoucherBloc>().add(SetEmptyVoucher(
+                  voucherType: GMVoucherTypes.SalesOrder,
+                ));
+          } else {
+            context.read<VoucherBloc>().add(FetchVoucher(
+                  voucherID: state.vID!,
+                  voucherPref: state.vPrefix!,
+                  link: '',
+                  vType: GMVoucherTypes.SalesOrder,
+                ));
+          }
           // Remove widget from the screen
-          context.read<VoucherBloc>().add(FetchVoucher(
-                voucherID: state.vID!,
-                voucherPref: state.vPrefix!,
-                link: '',
-                vType: GMVoucherTypes.SalesOrder,
-              ));
           Navigator.of(context).pop();
         }
       },

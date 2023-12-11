@@ -45,7 +45,7 @@ class _POSInvGroupsState extends State<POSInvGroups> {
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: 40,
                     minHeight: 30,
                     maxWidth: 120,

@@ -31,26 +31,23 @@ class _POSScreenState extends State<POSScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [],
-      child: Scaffold(
-        appBar: AppBar(title: const Text('POS')),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            var inv = await showSearch(
-              context: context,
-              delegate: InvItemSearchDelegate(
-                Hive.box<InventoryItemHive>(HiveTagNames.Items_Hive_Tag),
-              ),
-            );
-            if (inv != null) {
-              print('Selected :L ${inv.Item_Name}');
-            }
-          },
-          child: Icon(Icons.send_rounded),
-        ),
-        body: getBody(),
+    return Scaffold(
+      appBar: AppBar(title: const Text('POS')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          var inv = await showSearch(
+            context: context,
+            delegate: InvItemSearchDelegate(
+              Hive.box<InventoryItemHive>(HiveTagNames.Items_Hive_Tag),
+            ),
+          );
+          if (inv != null) {
+            print('Selected :L ${inv.Item_Name}');
+          }
+        },
+        child: Icon(Icons.send_rounded),
       ),
+      body: getBody(),
     );
   }
 
