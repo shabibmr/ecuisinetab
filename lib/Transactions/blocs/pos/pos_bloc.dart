@@ -38,25 +38,50 @@ class PosBloc extends Bloc<PosEvent, PosState> {
       ));
     });
     on<OrderSent>((event, emit) => emit(state.copyWith(
-          currentOrders: [],
+          currentOrders: {},
           status: POSStatus.NEW,
         )));
+    on<FetchCurrentOrders>((event, emit) async => await getCurrentOrders());
   }
 
   Future<void> getCurrentOrders() async {
     try {
       print('Getting Orders');
+      emit(state.copyWith(status: POSStatus.FetchingOrders));
       final data = await WebservicePHPHelper.getCurrentOrders();
       if (data == false) {
         emit(state.copyWith(status: POSStatus.OrderFetchError));
       } else {
         // final List tables =
         //     data['data_tables'][0]['data_tables'].toString().split('|');
+        List<String> tables =
+            data['data_tables'][0]['Tables'].toString().split('|');
+        print('Tables : $tables');
+        Map<String, dynamic> ordersMap = {};
+        if (data['success'].toString() == "1") {
+          print('Type : ${data['data'].runtimeType}');
+          final List orders = data['data'];
+          orders.forEach((element) {
+            String ref = element['reference'] ?? '';
+            print('Ref : ${element['reference']}');
+            if (!tables.contains(ref)) {
+              tables.add(ref);
+            }
+            ordersMap[ref] = element;
+          });
 
-        emit(state.copyWith(
-          currentOrders: data['data'],
-          status: POSStatus.OrdersFetched,
-        ));
+          emit(state.copyWith(
+            tables: tables,
+            currentOrders: ordersMap,
+            status: POSStatus.OrdersFetched,
+          ));
+        } else {
+          emit(state.copyWith(
+            tables: tables,
+            currentOrders: {},
+            status: POSStatus.OrdersFetched,
+          ));
+        }
       }
     } catch (e) {
       print('error in getCurrentOrders : ${e.toString()}');

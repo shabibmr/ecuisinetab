@@ -14,7 +14,9 @@ part 'inventory_item_detail_state.dart';
 class InventoryItemDetailBloc
     extends Bloc<InventoryItemDetailEvent, InventoryItemDetailState> {
   InventoryItemDetailBloc({InventoryItemDataModel? item})
-      : super(InventoryItemDetailState(status: ItemDetailStatus.init)) {
+      : super(const InventoryItemDetailState(
+          status: ItemDetailStatus.init,
+        )) {
     // print(' item Price : ${item!.rate} - Uom : ${item.uomObject!.uom_Name}');
     on<SetItem>((event, emit) {
       setItem(event.item, emit);
@@ -125,7 +127,7 @@ class InventoryItemDetailBloc
   void setQuantity(qty, emit) {
     if (qty < 0) return;
 
-    print('BLCO Rate : ${state.item!.rate}');
+    print('BLCO Qty : ${state.item!.quantity}');
 
     emit(state.copyWith(
         item: state.item

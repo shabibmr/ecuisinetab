@@ -38,31 +38,24 @@ class _POSInvGroupsState extends State<POSInvGroups> {
       builder: (context, state) {
         print('>> len : ${_groups.length}');
         return ListView.builder(
-          scrollDirection: Axis.horizontal,
+          // scrollDirection: Axis.horizontal,
           itemCount: _groups.length,
           itemBuilder: (listContext, index) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 40,
-                    minHeight: 30,
-                    maxWidth: 120,
-                  ),
-                  child: SizedBox(
-                    // height: 25,
-                    width: 120,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print('Selected ${_groups[index].Group_ID}');
-                        context.read<PosBloc>().add(
-                            GroupSelected(groupID: _groups[index].Group_ID!));
-                      },
-                      child: AutoSizeText(
-                        _groups[index].Group_Name!,
-                        textAlign: TextAlign.center,
-                      ),
+              child: InkWell(
+                onTap: () {
+                  print('Selected ${_groups[index].Group_ID}');
+                  context
+                      .read<PosBloc>()
+                      .add(GroupSelected(groupID: _groups[index].Group_ID!));
+                  Navigator.of(context).pop();
+                },
+                child: Card(
+                  child: ListTile(
+                    title: AutoSizeText(
+                      _groups[index].Group_Name!,
+                      textAlign: TextAlign.left,
                     ),
                   ),
                 ),

@@ -829,6 +829,17 @@ class GeneralVoucherDataModel extends Equatable {
     return val;
   }
 
+  num getItemPrevCount(String itemID) {
+    num val = 0;
+
+    for (int i = 0; i < InventoryItems!.length; i++) {
+      if (itemID == InventoryItems![i].BaseItem.ItemID) {
+        val += InventoryItems![i].BaseItem.prevQty ?? 0;
+      }
+    }
+    return val;
+  }
+
   void calculateVoucherSales() {
     num subTotal = 0;
     num vatTotal = 0;

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Transactions/blocs/pos/pos_bloc.dart';
 import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import 'package:ecuisinetab/Utils/voucher_types.dart';
@@ -76,25 +77,52 @@ class TablesGrid extends StatefulWidget {
 class _TablesGridState extends State<TablesGrid> {
   @override
   Widget build(BuildContext context) {
-    List<Map>? tables =
-        context.select((PosBloc bloc) => bloc.state.currentOrders);
+    Map orders =
+        context.select((PosBloc bloc) => bloc.state.currentOrders) ?? {};
+    List<String>? tables =
+        context.select((PosBloc bloc) => bloc.state.tables! ?? []);
 
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
+        mainAxisExtent: 80,
       ),
       itemCount: tables?.length ?? 0,
       itemBuilder: (BuildContext context, int index) {
-        return InkWell(
-          child: Container(
-            color: Colors.blue,
-            child: Text(tables?[index]['tableNumber'].toString() ?? ''),
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            child: Card(
+              child: Container(
+                height: 80,
+                color: Colors.blue,
+                child: AutoSizeText(tables?[index].toString() ?? ''),
+              ),
+            ),
+            onTap: () {
+              print('Table change to ${tables?[index].toString() ?? ''}');
+              if (orders.keys.contains(tables?[index].toString())) {
+                String vNo =
+                    orders[tables?[index].toString()]['Voucher_No'].toString();
+                String vPref = orders[tables?[index].toString()]
+                        ['Voucher_Prefix']
+                    .toString();
+                context.read<VoucherBloc>().add(FetchVoucher(
+                      voucherID: vNo,
+                      voucherPref: vPref,
+                      link: '',
+                      vType: GMVoucherTypes.SalesOrder,
+                    ));
+              } else {
+                context.read<VoucherBloc>().add(SwitchReference(
+                    newReference: tables?[index].toString() ?? ''));
+              }
+              Navigator.of(context).pop();
+              // context.read<PosBloc>().add(OrderSelected(
+              //     voucherNo: tables?[index]['tableNumber'].toString() ?? '',
+              //     vPrefix: tables?[index]['tableNumber'].toString() ?? ''));
+            },
           ),
-          onTap: () {
-            context.read<PosBloc>().add(OrderSelected(
-                voucherNo: tables?[index]['tableNumber'].toString() ?? '',
-                vPrefix: tables?[index]['tableNumber'].toString() ?? ''));
-          },
         );
       },
     );

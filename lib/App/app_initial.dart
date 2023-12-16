@@ -50,13 +50,7 @@ class _Init_AppState extends State<Init_App> {
                 BlocProvider.value(
                   value: context.read<SyncServiceBloc>()
                     // ..add(FetchUIConfigEvent())
-                    ..add(FetchItemsEvent())
-                    ..add(FetchItemGroupsEvent())
-                    // ..add(FetchLedgersEvent())
-                    // ..add(FetchUOMEvent())
-                    // ..add(FetchAccGroupsEvent())
-                    // ..add(FetchGodownsEvent())
-                    ..add(FetchEmployeesEvent()),
+                    ..add(FetchAllMastersEvent()),
                 ),
                 BlocProvider.value(value: context.read<AuthenticationBloc>()),
                 BlocProvider(

@@ -52,14 +52,19 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       await syncPrices();
     });
     on<FetchAllMastersEvent>((event, emit) async {
-      await syncItems();
+      emit(state.copyWith(status: SyncUiConfigStatus.fetching));
+      bool itemsSync = await syncItems();
+      if (itemsSync) {
+        emit(state.copyWith(itemsSynced: true));
+      }
       await syncItemGroups();
-      await syncGodowns();
-      await syncLedgers();
-      await syncAccGroups();
+      // await syncGodowns();
+      // await syncLedgers();
+      // await syncAccGroups();
       await syncUOMs();
       await syncEmployees();
-      await syncUserGroups();
+      // await syncUserGroups();
+      emit(state.copyWith(status: SyncUiConfigStatus.fetched));
     });
 
     on<FetchUIConfigEvent>((event, emit) async {
@@ -117,7 +122,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
 
   Future<bool> syncItems() async {
     print('Fetching Inventory items');
-    bool flag = false;
+    bool flag = true;
     String qry = "";
     DateTime last = DateTime(2021);
     final dataResponse = await WebservicePHPHelper.getAllInventoryItems(
@@ -138,10 +143,12 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
           await box.put(item.Item_ID, item);
         } catch (e) {
           print('Conv error : ${e.toString()}');
+          return false;
         }
       });
     } catch (e) {
       print('Erro : ${e.toString()}  ${box.getAt(0) ?? 'null'}');
+      return false;
     }
     print('Inventory Items FETCHED : ${box.length}');
     return flag;

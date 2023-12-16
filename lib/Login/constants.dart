@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -137,42 +137,42 @@ class Config_Tag_Names {
   static String get Salesmain_ID => "Salesman_ID";
 }
 
-class DefaultFirebaseConfig {
-  static FirebaseOptions get platformOptions {
-    if (kIsWeb) {
-      // Web
-      return const FirebaseOptions(
-          apiKey: "AIzaSyA78eYaMfEeXWI4ni65aDy6s08U9wq5iao",
-          authDomain: "algopro-7e2c2.firebaseapp.com",
-          projectId: "algopro-7e2c2",
-          storageBucket: "algopro-7e2c2.appspot.com",
-          messagingSenderId: "809126656444",
-          appId: "1:809126656444:web:67b21f619392ae2bb353b9",
-          measurementId: "G-5T56W5XE33");
-    } else if (Platform.isIOS || Platform.isMacOS) {
-      // iOS and MacOS
-      return const FirebaseOptions(
-        apiKey: 'AIzaSyA78eYaMfEeXWI4ni65aDy6s08U9wq5iao',
-        appId: '1:448618578101:ios:0b11ed8263232715ac3efc',
-        messagingSenderId: '809126656444',
-        projectId: 'football-academy-e9c1d',
-        authDomain: 'algopro-7e2c2.firebaseapp.com',
-        iosBundleId: 'io.flutter.plugins.firebase.messaging',
-        iosClientId:
-            '448618578101-evbjdqq9co9v29pi8jcua8bm7kr4smuu.apps.googleusercontent.com',
-        databaseURL: 'https://react-native-firebase-testing.firebaseio.com',
-      );
-    } else {
-      // Android
-      return const FirebaseOptions(
-        appId: '1:809126656444:android:3f3e6e4020ad1fa1b353b9',
-        apiKey: 'AIzaSyA78eYaMfEeXWI4ni65aDy6s08U9wq5iao',
-        projectId: 'algopro-7e2c2',
-        messagingSenderId: '809126656444',
-        authDomain: 'algopro-7e2c2.firebaseapp.com',
-        // androidClientId:
-        //     '448618578101-sg12d2qin42cpr00f8b0gehs5s7inm0v.apps.googleusercontent.com',
-      );
-    }
-  }
-}
+// class DefaultFirebaseConfig {
+//   static FirebaseOptions get platformOptions {
+//     if (kIsWeb) {
+//       // Web
+//       return const FirebaseOptions(
+//           apiKey: "AIzaSyA78eYaMfEeXWI4ni65aDy6s08U9wq5iao",
+//           authDomain: "algopro-7e2c2.firebaseapp.com",
+//           projectId: "algopro-7e2c2",
+//           storageBucket: "algopro-7e2c2.appspot.com",
+//           messagingSenderId: "809126656444",
+//           appId: "1:809126656444:web:67b21f619392ae2bb353b9",
+//           measurementId: "G-5T56W5XE33");
+//     } else if (Platform.isIOS || Platform.isMacOS) {
+//       // iOS and MacOS
+//       return const FirebaseOptions(
+//         apiKey: 'AIzaSyA78eYaMfEeXWI4ni65aDy6s08U9wq5iao',
+//         appId: '1:448618578101:ios:0b11ed8263232715ac3efc',
+//         messagingSenderId: '809126656444',
+//         projectId: 'football-academy-e9c1d',
+//         authDomain: 'algopro-7e2c2.firebaseapp.com',
+//         iosBundleId: 'io.flutter.plugins.firebase.messaging',
+//         iosClientId:
+//             '448618578101-evbjdqq9co9v29pi8jcua8bm7kr4smuu.apps.googleusercontent.com',
+//         databaseURL: 'https://react-native-firebase-testing.firebaseio.com',
+//       );
+//     } else {
+//       // Android
+//       return const FirebaseOptions(
+//         appId: '1:809126656444:android:3f3e6e4020ad1fa1b353b9',
+//         apiKey: 'AIzaSyA78eYaMfEeXWI4ni65aDy6s08U9wq5iao',
+//         projectId: 'algopro-7e2c2',
+//         messagingSenderId: '809126656444',
+//         authDomain: 'algopro-7e2c2.firebaseapp.com',
+//         // androidClientId:
+//         //     '448618578101-sg12d2qin42cpr00f8b0gehs5s7inm0v.apps.googleusercontent.com',
+//       );
+//     }
+//   }
+// }

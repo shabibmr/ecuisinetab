@@ -32,34 +32,18 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
           status: VoucherEditorStatus.loaded,
         )));
     on<SetEmptyVoucher>(((event, emit) async {
-      final GeneralVoucherDataModel voucher = GeneralVoucherDataModel(
-        voucherType: event.voucherType,
-        VoucherDate: DateTime.now(),
-        VoucherPrefix: settingsBox.get("vPref"),
-        voucherNumber: '',
-        SalesmanID: settingsBox.get('Salesman_ID'),
-        AddedById: settingsBox.get('Salesman_ID'),
-        ledgerObject: null,
-        DeliveryDate: DateTime.now(),
-        fromGodownID: settingsBox.get('defaultGodown'),
-        status: 0,
-        kotNumber: '',
-        TransactionId: const Uuid().v4(),
-        RequirementVoucherNo: const Uuid().v4(),
-        ledgersList: [],
-        InventoryItems: [],
-        deletedItems: [],
-      );
-      emit(state.copyWith(
-        voucher: voucher,
-        status: VoucherEditorStatus.loaded,
-        vStatus: ViewStatus.create,
-      ));
-      await fetchNextVoucherNumber(event, emit);
+      await setEmptyVoucher(event.voucherType, emit);
     }));
     on<SetContact>((event, emit) {
       setContact(event, emit);
     });
+    on<SwitchReference>(
+      (event, emit) {
+        print('Changed');
+        emit(state.copyWith(
+            voucher: state.voucher!.copyWith(reference: event.newReference)));
+      },
+    );
     on<SetMainLedger>((event, emit) => emit(state.copyWith(
           voucher: state.voucher?.copyWith(
             ledgerObject: event.ledger,
@@ -133,12 +117,39 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
           Location: event.customerAddress,
         )))));
     on<FetchNextVoucherNumber>((event, emit) async {
-      await fetchNextVoucherNumber(event, emit);
+      await fetchNextVoucherNumber(emit);
     });
     on<ExportToVoucher>((event, emit) {});
   }
 
-  Future<void> fetchNextVoucherNumber(event, emit) async {
+  Future<void> setEmptyVoucher(voucherType, emit) async {
+    final GeneralVoucherDataModel voucher = GeneralVoucherDataModel(
+      voucherType: voucherType,
+      VoucherDate: DateTime.now(),
+      VoucherPrefix: settingsBox.get("vPref"),
+      voucherNumber: '',
+      SalesmanID: settingsBox.get('Salesman_ID'),
+      AddedById: settingsBox.get('Salesman_ID'),
+      ledgerObject: null,
+      DeliveryDate: DateTime.now(),
+      fromGodownID: settingsBox.get('defaultGodown'),
+      status: 0,
+      kotNumber: '',
+      TransactionId: const Uuid().v4(),
+      RequirementVoucherNo: const Uuid().v4(),
+      ledgersList: [],
+      InventoryItems: [],
+      deletedItems: [],
+    );
+    emit(state.copyWith(
+      voucher: voucher,
+      status: VoucherEditorStatus.loaded,
+      vStatus: ViewStatus.create,
+    ));
+    await fetchNextVoucherNumber(emit);
+  }
+
+  Future<void> fetchNextVoucherNumber(emit) async {
     final nextVoucherNumber = await WebservicePHPHelper.getNextVoucherNumber(
         state.voucher!.voucherType, state.voucher!.VoucherPrefix);
     if (nextVoucherNumber != null) {
@@ -205,14 +216,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
 
     emit(state.copyWith(status: VoucherEditorStatus.sent));
 
-    emit(state.copyWith(
-      voucher: state.voucher!.copyWith(
-        InventoryItems: [],
-        ledgersList: [],
-        ledgerObject: LedgerMasterDataModel(),
-      ),
-      status: VoucherEditorStatus.loaded,
-    ));
+    setEmptyVoucher(state.voucher!.voucherType, emit);
 
     //Save Data;
   }

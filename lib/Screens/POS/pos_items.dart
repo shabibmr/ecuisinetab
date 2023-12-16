@@ -1,4 +1,6 @@
 import 'package:ecuisinetab/Screens/POS/pos_cart.dart';
+import 'package:ecuisinetab/Screens/POS/pos_item_detail.dart';
+import 'package:ecuisinetab/Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
 
 import '../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 
@@ -262,14 +264,29 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
 
   Future<void> openItemDetailPage(InventoryItemHive item) async {
     print('openItemDetailPage');
+    num count = context
+            .read<VoucherBloc>()
+            .state
+            .voucher!
+            .getItemCount(item.Item_ID!) ??
+        0;
+        
     await showDialog(
       context: context,
-      builder: (context2) => BlocProvider.value(
-        value: context.read<VoucherBloc>(),
+      builder: (context2) => MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: context.read<VoucherBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => InventoryItemDetailBloc()
+              ..add(SetItem(item: InventoryItemDataModel.fromHive(item))),
+          ),
+        ],
         child: Dialog(
           elevation: 3,
           alignment: Alignment.center,
-          child: POSCartPage(),
+          child: POSItemDetailPage(),
         ),
       ),
     );

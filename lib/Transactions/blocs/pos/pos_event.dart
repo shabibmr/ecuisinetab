@@ -44,3 +44,5 @@ class OrderSelected extends PosEvent {
 }
 
 class OrderSent extends PosEvent {}
+
+class FetchCurrentOrders extends PosEvent {}

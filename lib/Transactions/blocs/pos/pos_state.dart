@@ -23,12 +23,14 @@ class PosState extends Equatable {
     this.currentOrders,
     this.vID,
     this.vPrefix,
+    this.tables,
   });
 
   final POSStatus status;
   final List<InventoryItemHive>? items;
   final SyncStatus? itemsLoadStaus;
-  final List<Map>? currentOrders;
+  final Map<String, dynamic>? currentOrders;
+  final List<String>? tables;
   final String? vID;
   final String? vPrefix;
 
@@ -39,7 +41,8 @@ class PosState extends Equatable {
     POSStatus? status,
     List<InventoryItemHive>? items,
     SyncStatus? itemsLoadStaus,
-    List<Map>? currentOrders,
+    Map<String, dynamic>? currentOrders,
+    List<String>? tables,
     String? vID,
     String? vPrefix,
   }) {
@@ -48,6 +51,7 @@ class PosState extends Equatable {
       items: items ?? this.items,
       itemsLoadStaus: itemsLoadStaus ?? this.itemsLoadStaus,
       currentOrders: currentOrders ?? this.currentOrders,
+      tables: tables ?? this.tables,
       vID: vID ?? this.vID,
       vPrefix: vPrefix ?? this.vPrefix,
     );

@@ -933,6 +933,7 @@ class InventoryItemDataModel extends Equatable {
       drQty: double.parse(map['drQty'] ?? '0'),
       crQty: double.parse(map['crQty'] ?? '0'),
       quantity: double.parse(map['Quantity'] ?? '0'),
+      prevQty: double.parse(map['Quantity'] ?? '0'),
       rate: double.parse(map['Price'] ?? '0'),
       taxRate: double.parse(map['Vat_Rate'] ?? '0'),
       subTotal: double.parse(map['subTotal'] ?? '0'),
@@ -958,6 +959,7 @@ class InventoryItemDataModel extends Equatable {
       toGodownID: map['toGodownId'],
     );
     print('Item Converted');
+
     return item;
   }
 

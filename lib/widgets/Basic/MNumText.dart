@@ -75,7 +75,7 @@ class _MNumFieldState extends State<MNumField> {
 
     // print('init State ${widget.label}');
 
-    controller = widget.controller ?? TextEditingController();
+    // controller = widget.controller ?? TextEditingController();
 
     // controller.text = widget.textData ?? '';
 
@@ -96,8 +96,8 @@ class _MNumFieldState extends State<MNumField> {
         widget.focusNode?.unfocus();
       }
     });
-    // controller =
-    //     widget.controller ?? TextEditingController(text: widget.textData ?? '');
+    controller =
+        widget.controller ?? TextEditingController(text: widget.textData ?? '');
     inputDecoration = widget.inputDecoration ??
         InputDecoration(
           border: widget.showBorder ? null : InputBorder.none,

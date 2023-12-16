@@ -283,6 +283,7 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
       isBatchProcessed: (map['isBatchProcessed'] ?? "0") == "1" ? true : false,
       isSerialNumbered: (map['isSerailNumbered'] ?? "0") == "1" ? true : false,
       isActive: (map['isActive'] ?? "1") == "1" ? true : false,
+      Item_Name_Arabic: map['Item_Name_Arabic'],
     );
   }
 
