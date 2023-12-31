@@ -5,6 +5,7 @@ import 'package:ecuisinetab/Datamodels/HiveModels/PriceList/PriceListMasterHive.
 import 'package:ecuisinetab/Login/constants.dart';
 import 'package:ecuisinetab/Transactions/blocs/pos/pos_bloc.dart';
 import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
+import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
 import 'package:ecuisinetab/Utils/voucher_types.dart';
 import 'package:ecuisinetab/widgets/Search/price_list_search.dart';
 import 'package:flutter/material.dart';
@@ -275,12 +276,28 @@ class _TablesGridState extends State<TablesGrid> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 0, 4, 4),
-                                child: ClockWidget(
-                                    timeStamp: DateTime.parse(
-                                        orders[tables?[index].toString()]
-                                            ['timestamp'])),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(4, 0, 0, 4),
+                                    child: Text(double.parse(
+                                            orders[tables?[index].toString()]
+                                                    ['Total'] ??
+                                                "0.0")
+                                        .inCurrency),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 4, 4),
+                                    child: ClockWidget(
+                                        timeStamp: DateTime.parse(
+                                            orders[tables?[index].toString()]
+                                                ['timestamp'])),
+                                  ),
+                                ],
                               ),
                             ],
                           )
