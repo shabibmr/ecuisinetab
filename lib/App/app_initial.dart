@@ -113,6 +113,9 @@ class _Init_AppState extends State<Init_App> {
           BlocProvider.value(
             value: context.read<AuthenticationBloc>(),
           ),
+          BlocProvider.value(
+            value: context.read<SyncServiceBloc>(),
+          ),
         ],
         child: ConfigurationPage(),
       ),
