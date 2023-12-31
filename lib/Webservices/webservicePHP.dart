@@ -22,7 +22,7 @@ class WebservicePHPHelper {
 
     // String url = 'https://www.algoray.in/test_app_water';
 
-    url = 'http://192.168.0.107/test_app_water';
+    url = 'http://192.168.0.105/test_app_water';
     // print('Url : $url/');
     return '$url/';
   }
