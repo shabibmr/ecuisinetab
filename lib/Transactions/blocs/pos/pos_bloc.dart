@@ -35,13 +35,20 @@ class PosBloc extends Bloc<PosEvent, PosState> {
     on<OrderSelected>((event, emit) {
       emit(state.copyWith(
         status: POSStatus.OrderSelected,
+        vID: event.voucherNo,
+        vPrefix: event.vPrefix,
       ));
     });
-    on<OrderSent>((event, emit) => emit(state.copyWith(
-          currentOrders: {},
-          status: POSStatus.NEW,
-        )));
-    on<FetchCurrentOrders>((event, emit) async => await getCurrentOrders());
+    on<OrderSent>((event, emit) async {
+      emit(state.copyWith(
+        currentOrders: {},
+        status: POSStatus.NEW,
+      ));
+      await getCurrentOrders();
+    });
+    on<FetchCurrentOrders>((event, emit) async {
+      await getCurrentOrders();
+    });
   }
 
   Future<void> getCurrentOrders() async {

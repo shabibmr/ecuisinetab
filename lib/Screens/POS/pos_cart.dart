@@ -1,11 +1,13 @@
 import 'package:ecuisinetab/Screens/POS/voucher_editor.dart';
 import 'package:ecuisinetab/Transactions/blocs/pos/pos_bloc.dart';
 import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
+import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
 import '../../Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
+import '../../widgets/Basic/MText.dart';
 import 'pos_item_detail.dart';
 
 class POSCartPage extends StatefulWidget {
@@ -21,7 +23,8 @@ class _POSCartPageState extends State<POSCartPage> {
     return BlocConsumer<VoucherBloc, VoucherState>(
       builder: (context, state) {
         if (state.status == VoucherEditorStatus.sending) {
-          return Column(
+          return const Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text('Sending Order'),
               CircularProgressIndicator(),
@@ -35,29 +38,65 @@ class _POSCartPageState extends State<POSCartPage> {
               Column(
                 children: [
                   Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        )),
                     height: 50,
-                    color: Colors.green,
-                    child: const Center(
-                      child: Text('Cart'),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final table = context.select((VoucherBloc bloc) =>
+                                bloc.state.voucher?.reference);
+                            return Text(table ?? '');
+                          },
+                        ),
+                        const Center(
+                          child: Text('Cart'),
+                        ),
+                        VoucherTotalWidget(),
+                      ],
                     ),
                   ),
                   Expanded(
-                      flex: 8,
-                      child: VoucherItemsListing(ItemClicked: (index) async {
+                    flex: 8,
+                    child: VoucherItemsListing(
+                      ItemClicked: (index) async {
                         await openItemDetail(index);
-                      })),
+                      },
+                    ),
+                  ),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: BillCopyCheckBox()),
                 ],
               ),
               Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      print('sending');
-                      context.read<VoucherBloc>().add(VoucherRequestSave());
-                    },
-                  ))
+                right: 0,
+                bottom: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () {
+                    print('sending');
+                    context.read<VoucherBloc>().add(VoucherRequestSave());
+                  },
+                ),
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () {
+                    print('sending');
+                    context.read<VoucherBloc>().add(VoucherRequestSave());
+                  },
+                ),
+              ),
             ],
           );
         }
@@ -132,6 +171,9 @@ class _POSCartPageState extends State<POSCartPage> {
                   SetItem(
                     item: item,
                   ),
+                )
+                ..add(
+                  SetIndex(index: index),
                 ),
             ),
           ],
@@ -151,5 +193,57 @@ class _POSCartPageState extends State<POSCartPage> {
             ),
           );
     }
+  }
+}
+
+class VoucherTotalWidget extends StatelessWidget {
+  const VoucherTotalWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      double? total = context
+          .select((VoucherBloc element) => element.state.voucher!.grandTotal);
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+              child: MText(
+            (total?.inCurrency ?? (0 as double).inCurrency),
+            textStyle: Theme.of(context).textTheme.titleLarge,
+            textAlign: TextAlign.end,
+          )),
+        ),
+      );
+    });
+  }
+}
+
+class BillCopyCheckBox extends StatelessWidget {
+  const BillCopyCheckBox({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      final bool printCopy =
+          context.select((VoucherBloc bloc) => bloc.state.printCopy ?? false);
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Checkbox(
+              value: printCopy,
+              onChanged: (bool? value) {
+                context
+                    .read<VoucherBloc>()
+                    .add(SetPrintCopy(printCopy: value!));
+              },
+            ),
+            Text('Print Copy'),
+          ],
+        ),
+      );
+    });
   }
 }

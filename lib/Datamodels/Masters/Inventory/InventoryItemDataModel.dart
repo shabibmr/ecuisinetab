@@ -136,6 +136,8 @@ class InventoryItemDataModel extends Equatable {
   Map? flags;
 
   final bool? isStockItem;
+  final bool? isActive;
+
   final String? category;
   final String? defaultLedgerId;
   final String? location;
@@ -307,6 +309,7 @@ class InventoryItemDataModel extends Equatable {
     this.defaultLedgerId,
     this.location,
     this.weight = 0,
+    this.isActive,
   });
 
   InventoryItemDataModel copyWith({
@@ -416,6 +419,7 @@ class InventoryItemDataModel extends Equatable {
     String? defaultLedgerId,
     String? location,
     double? weight,
+    bool? isActive,
   }) {
     return InventoryItemDataModel(
       ItemName: ItemName ?? this.ItemName,
@@ -527,6 +531,7 @@ class InventoryItemDataModel extends Equatable {
       defaultLedgerId: defaultLedgerId ?? this.defaultLedgerId,
       location: location ?? this.location,
       weight: weight ?? this.weight,
+      isActive: isActive ?? isActive,
     );
   }
 
@@ -635,6 +640,7 @@ class InventoryItemDataModel extends Equatable {
       'defaultLedgerId': defaultLedgerId,
       'location': location,
       'weight': weight,
+      'isActive': isActive,
     };
   }
 
@@ -764,6 +770,7 @@ class InventoryItemDataModel extends Equatable {
       defaultLedgerId: map['defaultLedgerId'],
       location: map['location'],
       weight: map['weight']?.toDouble(),
+      isActive: map['isActive'] ?? true,
     );
   }
 
@@ -918,6 +925,7 @@ class InventoryItemDataModel extends Equatable {
       'batches': batchList?.map((e) => e.toMap()).toList(),
       'fromGodownId': fromGodownID,
       'toGodownId': toGodownID,
+      'isActive': isActive,
     };
   }
 
@@ -957,6 +965,7 @@ class InventoryItemDataModel extends Equatable {
           : null,
       fromGodownID: map['tromGodownId'],
       toGodownID: map['toGodownId'],
+      isActive: map['isActive'] ?? true,
     );
     print('Item Converted');
 
@@ -964,11 +973,12 @@ class InventoryItemDataModel extends Equatable {
   }
 
   factory InventoryItemDataModel.fromHive(InventoryItemHive item) {
-    print(' Item UOm : ${item.uomObjects}');
-    print(item.uomObjects[0]);
+    // print(' Item UOm : ${item.uomObjects}');
+    // print(item.uomObjects[0]);
     return InventoryItemDataModel(
       ItemID: item.Item_ID,
       ItemName: item.Item_Name,
+      ItemNameArabic: item.Item_Name_Arabic,
       taxRate: item.Vat_Rate,
       GroupID: item.Group_Id,
       GroupName: item.Group_Name,
@@ -987,6 +997,7 @@ class InventoryItemDataModel extends Equatable {
       isSerailNumbered: item.isSerialNumbered,
       hsnCode: item.HSN_CODE,
       brandID: item.Brand_Id,
+      isActive: item.isActive,
     );
   }
 }

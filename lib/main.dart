@@ -17,64 +17,63 @@ import 'Login/constants.dart';
 import 'Services/Sync/bloc/sync_ui_config_bloc.dart';
 
 Future<void> main() async {
-  HiveTagNames.setDB('cake_studio_mukkam');
-  await initHiveBoxes();
-  initSettings();
+  // HiveTagNames.setDB('cake_studio_mukkam');
 
+  await initSettings();
+  await initHiveBoxes();
   runApp(const MyApp());
 }
 
-void initSettings() {
-  Map<String, dynamic> item = {};
-  item['dbName'] = 'cake_studio_mukkam';
-  Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
-  sett.put('url', item['baseURL'] ?? 'http://192.168.0.107/test_app_water');
-  sett.put('CompanyName', item['CompanyName'] ?? '');
-  sett.put('branch', item['branch'] ?? '');
-  sett.put('addressLine', item['addressline'] ?? '');
-  sett.put('vPref', item['VoucherPrefix'] ?? 'A');
-  sett.put('Salesman_ID', item['Emp_ID']);
-  sett.put('Warehouse', item['Godown_ID'] ?? 'GODOWN');
-  sett.put('defaultGodown', item['defaultGodown'] ?? 'GODOWN');
-  sett.put('defaultCash', item['defaultCash'] ?? '');
-  sett.put('defaultbank', item['defaultBank'] ?? '');
-  sett.put('defaultPO', item['defaultPO'] ?? '');
-  sett.put('strictCreditLimit', item['strictCreditLimit'] ?? false);
-  sett.put('TRN', item['GSTRN'] ?? '');
-  sett.put('FSSAI', item['FSSAI'] ?? '');
-  sett.put('DBName', item['dbName'] ?? '');
-  sett.put('admin', item['admin'] ?? false);
+Future<void> initSettings() async {
+  // Map<String, dynamic> item = {};
+  // item['dbName'] = 'cake_studio_mukkam';
 
-  sett.put('type', item['type'] ?? 'App');
-  sett.put('allowSave', item['allowSave'] ?? false);
-  sett.put('showVoucherSplit', item['showVoucherSplit'] ?? false);
-  sett.put('printOnSave', item['printOnSave'] ?? false);
-  sett.put('showRates', item['showRates'] ?? true);
-  sett.put('allowPrint', item['allowPrint'] ?? false);
-  sett.put('showReceiptWithSales', item['showReceiptWithSales'] ?? false);
-  sett.put('showAllVoucherPrefix', item['showAllVoucherPrefix'] ?? false);
+  await Hive.initFlutter();
+  Box sett = await Hive.openBox(HiveTagNames.Settings_Hive_Tag);
+  String dbname = sett.get('DBName', defaultValue: 'cake_studio_mukkam');
 
-  HiveTagNames.setDB(item['dbName'].toString());
+  String url =
+      sett.get('url', defaultValue: 'http://192.168.0.107/test_app_water');
+
+  sett.put('url', url);
+  String billPrinter = sett.get('BillPrinter', defaultValue: 'Counter');
+  sett.put('BillPrinter', billPrinter);
+  // sett.put('CompanyName', item['CompanyName'] ?? '');
+  // sett.put('branch', item['branch'] ?? '');
+  // sett.put('addressLine', item['addressline'] ?? '');
+  // sett.put('vPref', item['VoucherPrefix'] ?? 'A');
+  // sett.put('Salesman_ID', item['Emp_ID']);
+  // sett.put('Warehouse', item['Godown_ID'] ?? 'GODOWN');
+  // sett.put('defaultGodown', item['defaultGodown'] ?? 'GODOWN');
+  // sett.put('defaultCash', item['defaultCash'] ?? '');
+  // sett.put('defaultbank', item['defaultBank'] ?? '');
+  // sett.put('defaultPO', item['defaultPO'] ?? '');
+  // sett.put('strictCreditLimit', item['strictCreditLimit'] ?? false);
+  // sett.put('TRN', item['GSTRN'] ?? '');
+  // sett.put('FSSAI', item['FSSAI'] ?? '');
+  // sett.put('DBName', item['dbName'] ?? '');
+  // sett.put('admin', item['admin'] ?? false);
+
+  HiveTagNames.setDB(dbname);
 
   print('Tag : ${HiveTagNames.ItemGroups_Hive_Tag}');
 }
 
 Future<void> initHiveBoxes() async {
-  await Hive.initFlutter();
-
   Hive.registerAdapter<InventoryItemHive>(InventoryItemHiveAdapter());
   Hive.registerAdapter<InventorygroupHiveModel>(
       InventorygroupHiveModelAdapter());
   Hive.registerAdapter<UOMHiveMOdel>(UOMHiveMOdelAdapter());
   Hive.registerAdapter<EmployeeHiveModel>(EmployeeHiveModelAdapter());
   Hive.registerAdapter<PriceListEntriesHive>(PriceListEntriesHiveAdapter());
+  Hive.registerAdapter<PriceListMasterHive>(PriceListMasterHiveAdapter());
+
   // Hive.registerAdapter<UserGroupDataModel>(UserGroupDataModelAdapter());
   // Hive.registerAdapter<ContactsDataModel>(ContactsDataModelAdapter());
 
   await Hive.openBox(HiveTagNames.UI_Config_Hive_Tag);
 
   Box box = await Hive.openBox(HiveTagNames.Values_Hive_Tag);
-  await Hive.openBox(HiveTagNames.Settings_Hive_Tag);
 
   String valKey = box.get(
     'UserKey',
@@ -113,14 +112,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'eCuisineTab',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          lazy: false,
+          create: (context) =>
+              SyncServiceBloc()..add(const FetchAllMastersEvent()),
+        ),
+        BlocProvider(
+            lazy: false,
+            create: (context) =>
+                AuthenticationBloc()..add(AuthenticationStarted())
+            // ..add(AuthSetUser(username: 'user'))
+            // ..add(AuthSetPass(password: '123456')),
+            ),
+      ],
+      child: MaterialApp(
+        title: 'eCuisineTab',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Color.fromARGB(255, 107, 233, 130)),
+          useMaterial3: true,
+        ),
+        home: ecuisineTabApp(title: 'eCuisineTab'),
       ),
-      home: ecuisineTabApp(title: 'eCuisineTab'),
     );
   }
 }
@@ -137,18 +153,164 @@ class ecuisineTabApp extends StatefulWidget {
 class _ecuisineTabAppState extends State<ecuisineTabApp> {
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          lazy: false,
-          create: (contextQ) => SyncServiceBloc(),
+    return Init_App();
+  }
+}
+
+class Just extends StatelessWidget {
+  const Just({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+      builder: (context, state) {
+        print(
+            '.................................................. .  JUST BUILDING   .................................................. .  ');
+        return Init_App();
+      },
+    );
+  }
+}
+
+class TestScreen extends StatelessWidget {
+  const TestScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        print('Listening to New State : $state : ${state.authState}');
+      },
+      listenWhen: (previous, current) {
+        print('prev : ${previous.authState}');
+
+        print('Curr : ${current.authState}');
+        return true;
+      },
+      child: Scaffold(
+        body: Builder(
+          builder: (context) {
+            var status = context
+                .select((AuthenticationBloc bloc) => bloc.state.authState);
+            print('New Status Changed at Scaffold Body  Build: $status');
+            return Center(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text('State is : $status'),
+                      IconButton(
+                        onPressed: () {
+                          print(
+                              '........................................................................................');
+                          print(
+                              'pressed ${context.read<AuthenticationBloc>().state.authState}');
+                          context
+                              .read<AuthenticationBloc>()
+                              .add(AuthPrintState());
+                          print(
+                              '........................................................................................');
+                        },
+                        icon: Icon(Icons.print),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthenticationStarted());
+                    },
+                    icon: Icon(Icons.cleaning_services),
+                  ),
+                  Text('to Failure '),
+                  IconButton(
+                    onPressed: () {
+                      print(
+                          'pressed ${context.read<AuthenticationBloc>().state.username}');
+                      context.read<AuthenticationBloc>().add(AuthPrintState());
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthSetStat(authState: AuthState.failure));
+                    },
+                    icon: Icon(Icons.family_restroom),
+                  ),
+                  Text('to Loading '),
+                  IconButton(
+                    onPressed: () {
+                      print(
+                          'pressed ${context.read<AuthenticationBloc>().state.username}');
+                      context.read<AuthenticationBloc>().add(AuthPrintState());
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthSetStat(authState: AuthState.loading));
+                    },
+                    icon: Icon(Icons.cleaning_services),
+                  ),
+                  Text('to Auth Started'),
+                  IconButton(
+                    onPressed: () {
+                      print(
+                          'pressed ${context.read<AuthenticationBloc>().state.username}');
+                      context.read<AuthenticationBloc>().add(AuthPrintState());
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthSetStat(authState: AuthState.started));
+                    },
+                    icon: Icon(Icons.cleaning_services),
+                  ),
+                  Text('To Initial'),
+                  IconButton(
+                    onPressed: () {
+                      print('pressed to intitial');
+                      context
+                          .read<AuthenticationBloc>()
+                          .add(AuthSetStat(authState: AuthState.intitial));
+                      context.read<AuthenticationBloc>().add(AuthPrintState());
+                    },
+                    icon: Icon(Icons.cleaning_services),
+                  ),
+                  Row(
+                    children: [
+                      Text('To New USer'),
+                      IconButton(
+                        onPressed: () {
+                          print('pressed to intitial');
+                          context
+                              .read<AuthenticationBloc>()
+                              .add(AuthSetUser(username: 'New User'));
+                          context
+                              .read<AuthenticationBloc>()
+                              .add(AuthPrintState());
+                        },
+                        icon: Icon(Icons.verified_user),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('To X USer'),
+                      IconButton(
+                        onPressed: () {
+                          print('pressed to intitial');
+                          context
+                              .read<AuthenticationBloc>()
+                              .add(AuthSetUser(username: 'XXX User'));
+                          context
+                              .read<AuthenticationBloc>()
+                              .add(AuthPrintState());
+                        },
+                        icon: Icon(Icons.verified_user),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
         ),
-        BlocProvider(
-          create: (context) =>
-              AuthenticationBloc()..add(AuthenticationStarted()),
-        ),
-      ],
-      child: Init_App(),
+      ),
     );
   }
 }

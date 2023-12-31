@@ -10,6 +10,7 @@ import '../../Login/constants.dart';
 
 import '../../Screens/POS/pos_item_groups.dart';
 import '../../Screens/POS/pos_items.dart';
+import '../../Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
 import '../../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import '../../Utils/voucher_types.dart';
 
@@ -22,6 +23,7 @@ import 'package:hive/hive.dart';
 import '../../Datamodels/Masters/Accounts/LedgerMasterDataModel.dart';
 import '../../Datamodels/Transactions/general_voucher_datamodel.dart';
 import '../../Transactions/blocs/pos/pos_bloc.dart';
+import 'pos_item_detail.dart';
 
 class POSScreen extends StatefulWidget {
   POSScreen({Key? key}) : super(key: key);
@@ -44,84 +46,141 @@ class _POSScreenState extends State<POSScreen> {
       },
       builder: (context, state) {
         if (state.status == SyncUiConfigStatus.fetched) {
-          return BlocBuilder<VoucherBloc, VoucherState>(
-            builder: (context, state) {
-              if (state.status == VoucherEditorStatus.sending) {
+          return Builder(
+            builder: (context) {
+              final status =
+                  context.select((VoucherBloc bloc) => bloc.state.status);
+              if (status == VoucherEditorStatus.sending) {
                 return Container(
                   child: Text('state : ${state.status} <<<'),
                 );
-              } else if (state.status == VoucherEditorStatus.loaded) {
-                // ignore: curly_braces_in_flow_control_structures
-                print('items leng : ${state.voucher!.InventoryItems?.length}');
-                return Scaffold(
-                  bottomNavigationBar: Builder(
-                    builder: (contextQ) {
-                      int count = contextQ.select((VoucherBloc bloc) =>
-                          bloc.state.voucher?.InventoryItems?.length ?? 0);
-                      return Visibility(
-                        visible: count > 0,
-                        child: SizedBox(
-                          height: 80,
-                          child: InkWell(
-                              onTap: () async {
-                                await showDialog(
-                                  context: context,
-                                  builder: (contextB) => Dialog(
-                                    elevation: 5,
-                                    child: MultiBlocProvider(
-                                      providers: [
-                                        BlocProvider.value(
-                                          value: context.read<VoucherBloc>(),
-                                        ),
-                                        BlocProvider.value(
-                                          value: context.read<PosBloc>(),
-                                        ),
-                                      ],
-                                      child: POSCartPage(),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: VoucherFooter()),
-                        ),
-                      );
-                    },
-                  ),
-                  drawer: GroupsDrawer(),
-                  appBar: AppBar(
-                    title: const Text('POS'),
-                    actions: [TableButton()],
-                  ),
-                  floatingActionButton: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: FloatingActionButton(
-                          onPressed: () async {
-                            await openSearch();
-                          },
-                          child: Icon(Icons.search),
-                        ),
-                      ),
-                    ],
-                  ),
-                  body: getBody(),
+              } else if (status == VoucherEditorStatus.loaded) {
+                final status =
+                    context.select((PosBloc bloc) => bloc.state.status);
+                return Builder(
+                  builder: (contextBx) {
+                    if (status == POSStatus.OrderSelected) {
+                      return getPOSScreen(context);
+                    } else {
+                      return PosTableSelector();
+                    }
+                  },
                 );
+              } else if (status == VoucherEditorStatus.loading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (status == VoucherEditorStatus.fetcherror) {
+                return Center(child: Text('${state.status}'));
               } else {
-                return Container(
-                  child: Center(
-                    child: Text('${state.status}'),
-                  ),
-                );
+                return Center(child: Text('${state.status}'));
               }
             },
           );
         } else {
-          return Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         }
       },
     );
+  }
+
+  Widget getPOSScreen(BuildContext context) {
+    print('POS SCreen Build');
+    return Scaffold(
+      bottomNavigationBar: Builder(
+        builder: (context) {
+          int count = context.select((VoucherBloc bloc) =>
+              bloc.state.voucher?.InventoryItems?.length ?? 0);
+          print('Count Changed');
+          return Visibility(
+            visible: count > 0,
+            child: SizedBox(
+              height: 80,
+              child: InkWell(
+                  onTap: () async {
+                    await showDialog(
+                      context: context,
+                      builder: (contextB) => Dialog(
+                        elevation: 5,
+                        child: MultiBlocProvider(
+                          providers: [
+                            BlocProvider.value(
+                              value: context.read<VoucherBloc>(),
+                            ),
+                            BlocProvider.value(
+                              value: context.read<PosBloc>(),
+                            ),
+                          ],
+                          child: POSCartPage(),
+                        ),
+                      ),
+                    );
+                  },
+                  child: VoucherFooter()),
+            ),
+          );
+        },
+      ),
+      drawer: GroupsDrawer(),
+      appBar: AppBar(
+        title: const Text('eCuisineTab'),
+        actions: [TableButton()],
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+            child: FloatingActionButton(
+              onPressed: () async {
+                await openSearch();
+              },
+              child: const Icon(Icons.search),
+            ),
+          ),
+        ],
+      ),
+      body: getBody(),
+    );
+  }
+
+  Future<void> openItemDetailAdd(InventoryItemHive item) async {
+    final InventoryItemDataModel? itemX =
+        await showDialog<InventoryItemDataModel>(
+      context: context,
+      builder: (context2) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(
+              value: context.read<VoucherBloc>(),
+            ),
+            BlocProvider(
+              create: (context) => InventoryItemDetailBloc()
+                ..add(
+                  SetItem(
+                    item: InventoryItemDataModel.fromHive(item)
+                        .copyWith(ItemReqUuid: 'X'),
+                  ),
+                )
+                ..add(const SetIndex(index: -1))
+                ..add(SetItemQuantity(1)),
+            ),
+          ],
+          child: Dialog(
+            elevation: 3,
+            alignment: Alignment.center,
+            child: POSItemDetailPage(),
+          ),
+        );
+      },
+    );
+    if (itemX != null) {
+      context.read<VoucherBloc>().add(
+            AddInventoryItem(
+              inventoryItem: itemX,
+            ),
+          );
+    }
   }
 
   Widget getBodyList() {
@@ -141,19 +200,16 @@ class _POSScreenState extends State<POSScreen> {
       ),
     );
     if (inv != null) {
-      print('Selected :L ${inv.Item_Name}');
-      // ignore: use_build_context_synchronously
-      context.read<VoucherBloc>().add(
-            AddInventoryItem(
-              inventoryItem:
-                  InventoryItemDataModel.fromHive(inv).copyWith(quantity: 1),
-            ),
-          );
+      openItemDetailAdd(inv);
     }
   }
 
   Widget getBody() {
-    return POSInvItemsListByGroup();
+    return BlocBuilder<VoucherBloc, VoucherState>(
+      builder: (context, state) {
+        return InvGroupExpansionPanel();
+      },
+    );
   }
 }
 
@@ -163,30 +219,35 @@ class TableButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
-      return InkWell(onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (contextRoute) => MultiBlocProvider(
-            providers: [
-              BlocProvider.value(
-                value: context.read<PosBloc>()..add(FetchCurrentOrders()),
-              ),
-              BlocProvider.value(
-                value: context.read<VoucherBloc>(),
-              ),
-            ],
-            child: PosTableSelector(),
+      return InkWell(
+        onTap: () async {
+          context.read<PosBloc>().add(FetchCurrentOrders());
+
+          // await Navigator.of(context).push(MaterialPageRoute(
+          //   builder: (contextRoute) => MultiBlocProvider(
+          //     providers: [
+          //       BlocProvider.value(
+          //         value: context.read<PosBloc>()..add(FetchCurrentOrders()),
+          //       ),
+          //       BlocProvider.value(
+          //         value: context.read<VoucherBloc>(),
+          //       ),
+          //     ],
+          //     child: PosTableSelector(),
+          //   ),
+          // ));
+        },
+        child: Card(
+          child: Container(
+            child: Builder(builder: (context) {
+              final String ref = context.select(
+                  (VoucherBloc bloc) => bloc.state.voucher?.reference ?? '');
+              print('Ref : $ref');
+              return Text('$ref');
+            }),
           ),
-        ));
-      }, child: Card(
-        child: Container(
-          child: Builder(builder: (context) {
-            final String ref = context.select(
-                (VoucherBloc bloc) => bloc.state.voucher?.reference ?? 'NOO');
-            print('Ref : $ref');
-            return Text('Table : $ref');
-          }),
         ),
-      ));
+      );
     });
   }
 }

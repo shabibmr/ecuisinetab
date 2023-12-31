@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:ecuisinetab/Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
+import 'package:ecuisinetab/Login/constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../models/authentication_detail.dart';
 
 part 'authentication_event.dart';
@@ -11,42 +14,91 @@ part 'authentication_state.dart';
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc()
-      : super(AuthenticationState(
-            authDetail: AuthenticationDetail(),
-            authState: AuthState.intitial)) {
-    on<AuthenticationStarted>((event, emit) {
-      authStarted(event, emit);
+      : super(const AuthenticationState(
+          authState: AuthState.intitial,
+          msg: "hi!",
+        )) {
+    on<AuthenticationStarted>((event, emit) async {
+      print(
+          'STARTING AUTH FIRED---------------------- -------------- --------------------------');
+      await authStarted(event, emit);
     });
     on<AuthenticationStateChanged>((event, emit) async {
       await authStateChanged(event, emit);
     });
     on<AuthSetUser>(
       (event, emit) {
-        emit(state.copyWith(
-            authDetail: state.authDetail?.copyWith(username: event.username)));
+        print('------------------ ----------------> Upd L: ${event.username}');
+        emit(
+          state.copyWith(
+            username: event.username,
+          ),
+        );
+        print('Updated User : ${state.username}');
       },
     );
     on<AuthSetPass>(
       (event, emit) {
-        emit(state.copyWith(
-            authDetail: state.authDetail?.copyWith(password: event.password)));
+        print('Upd P: ${event.password}');
+        emit(state.copyWith(password: event.password));
+        print('New P: ${state.password}');
       },
+    );
+    on<AuthSetStat>(
+      (event, emit) {
+        print('Current State : ${state.authState}');
+        print(
+            'Emitting New State : ${event.authState}   user : ${state.username} ');
+        emit(state.copyWith(authState: event.authState));
+        print('New (Current) State Emitted : ${state.authState}');
+      },
+    );
+    on<AuthPrintState>(
+      (event, emit) =>
+          print('Current Sta : ${state.authState} User : ${state.username}'),
     );
   }
 
-  @override
-  Future<void> close() {
-    return super.close();
-  }
-
-  void authStarted(event, emit) {
-    print('Auth Started');
-    emit(state.copyWith(authState: AuthState.success));
+  Future<void> authStarted(event, emit) async {
+    print('46. Auth Started');
     try {
-      String login = state.authDetail?.username ?? '';
-      String password = state.authDetail?.password ?? '';
-      print('Auth Success');
-      emit(state.copyWith(authState: AuthState.success));
+      String? login = state.username;
+      String? password = state.password;
+      Box<EmployeeHiveModel> emp = Hive.box(HiveTagNames.Employee_Hive_Tag);
+      if (emp.length == 0) {
+        print('emp Empty');
+        emit(state.copyWith(authState: AuthState.dataEmpty));
+      }
+      print('52. Login : $login : ${password}');
+      if (login == null || login.isEmpty) {
+        print('Auth Failure No Login : 56');
+        emit(state.copyWith(authState: AuthState.failure));
+        return;
+      }
+      print('l');
+      print('emp : ${emp.length}');
+      emit(state.copyWith(authState: AuthState.loading));
+
+      emp.values.forEach((element) {
+        print('${element.UserName} : ${element.Password}');
+      });
+      EmployeeHiveModel empL = emp.values.firstWhere(
+        (element) => element.UserName == login && element.Password == password,
+        orElse: () => EmployeeHiveModel(),
+      );
+
+      print('Login : ${empL.UserName} : ${empL.Password}');
+      if (empL.id != null) {
+        Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
+        await sett.put('Salesman_ID', empL.id);
+        emit(state.copyWith(authState: AuthState.success));
+        return;
+      } else {
+        print('Auth Failure emitting : 63');
+        emit(state.copyWith(authState: AuthState.failure));
+        return;
+      }
+
       // check login info;
     } catch (e) {
       if (kDebugMode) {

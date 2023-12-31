@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Utils/extensions/string_extension.dart';
 
 import '../../../../../Datamodels/HiveModels/UOM/UOMHiveModel.dart';
@@ -107,19 +108,25 @@ class ItemsListItemWidget extends StatelessWidget {
         },
         child: Card(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(2.0),
             child: Stack(
               children: [
-                Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(0.0),
-                      child: Text(
-                        '${index + 1}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${index + 1}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     )),
+                // Positioned(
+                //     left: 0,
+                //     top: 0,
+                //     child: Padding(
+                //       padding: const EdgeInsets.all(0.0),
+                //       child: Text(
+                //         '${index + 1}',
+                //         style: TextStyle(fontWeight: FontWeight.bold),
+                //       ),
+                //     )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -130,15 +137,22 @@ class ItemsListItemWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(8.0, 4, 4, 8),
+                            padding: const EdgeInsets.fromLTRB(12.0, 0, 4, 0),
                             child: Builder(builder: (context) {
-                              final String? name = context
-                                  .select((VoucherBloc value) =>
-                                      value.state.voucher!.InventoryItems)!
-                                  .elementAt(index)
-                                  .BaseItem
-                                  .ItemName;
-                              return Text(
+                              bool flag =
+                                  Hive.box(HiveTagNames.Settings_Hive_Tag)
+                                      .get('isArabic', defaultValue: false);
+                              final String? name = context.select(
+                                  (VoucherBloc value) => flag
+                                      ? (value.state.voucher!.InventoryItems)!
+                                          .elementAt(index)
+                                          .BaseItem
+                                          .ItemNameArabic
+                                      : (value.state.voucher!.InventoryItems)!
+                                          .elementAt(index)
+                                          .BaseItem
+                                          .ItemName);
+                              return AutoSizeText(
                                 name ?? '',
                                 style: TextStyle(fontSize: 18),
                               );
@@ -149,7 +163,7 @@ class ItemsListItemWidget extends StatelessWidget {
                             children: [
                               Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(8.0, 4, 4, 0),
+                                    const EdgeInsets.fromLTRB(8.0, 0, 4, 0),
                                 child: Builder(builder: (context) {
                                   final rate = context
                                       .select((VoucherBloc value) =>
@@ -158,7 +172,7 @@ class ItemsListItemWidget extends StatelessWidget {
                                       .BaseItem
                                       .rate!
                                       .inCurrency;
-                                  return Text('@ $rate');
+                                  return AutoSizeText('@ $rate');
                                 }),
                               ),
                             ],
@@ -193,7 +207,7 @@ class ItemsListItemWidget extends StatelessWidget {
                               ?.uom_symbol;
                           final quantity =
                               qty?.toStringAsFixed(decimalPoints ?? 0);
-                          return Text('${quantity} ${uomSymbol ?? ''}');
+                          return AutoSizeText('${quantity} ${uomSymbol ?? ''}');
                         }),
                       ),
                     ),
@@ -212,8 +226,8 @@ class ItemsListItemWidget extends StatelessWidget {
                                   .BaseItem
                                   .grandTotal!
                                   .inCurrency;
-                              return Text(
-                                gt.inCurrency,
+                              return AutoSizeText(
+                                gt,
                                 style: TextStyle(fontSize: 18),
                               );
                             }),
@@ -247,7 +261,7 @@ class _VoucherFooterState extends State<VoucherFooter> {
       // color: Colors.black,
       child: Card(
         elevation: 5,
-        color: Colors.blue,
+        // color: const Color.fromARGB(255, 19, 56, 83),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -265,6 +279,18 @@ class _VoucherFooterState extends State<VoucherFooter> {
                   ),
                 ),
               ),
+              const Icon(
+                Icons.shopping_cart,
+                color: Colors.white,
+              ),
+              Builder(builder: (context) {
+                int count = context.select((VoucherBloc bloc) =>
+                    bloc.state.voucher!.InventoryItems!.length);
+                return Text(
+                  count > 0 ? count.toString() : '0',
+                  style: kTotalListStyle,
+                );
+              }),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
@@ -276,10 +302,6 @@ class _VoucherFooterState extends State<VoucherFooter> {
                     ),
                   ),
                 ),
-              ),
-              Icon(
-                Icons.shopping_cart,
-                color: Colors.white,
               ),
             ],
           ),

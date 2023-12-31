@@ -31,3 +31,11 @@ class AuthSetPass extends AuthenticationEvent {
 
   AuthSetPass({required this.password});
 }
+
+class AuthSetStat extends AuthenticationEvent {
+  final AuthState authState;
+
+  AuthSetStat({required this.authState});
+}
+
+class AuthPrintState extends AuthenticationEvent {}

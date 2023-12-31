@@ -360,3 +360,9 @@ class FetchNextVoucherNumber extends VoucherEvent {
     required this.voucherPref,
   });
 }
+
+class SetPrintCopy extends VoucherEvent {
+  final bool printCopy;
+
+  const SetPrintCopy({required this.printCopy});
+}

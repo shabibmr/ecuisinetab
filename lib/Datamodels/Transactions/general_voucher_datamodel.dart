@@ -149,6 +149,8 @@ class GeneralVoucherDataModel extends Equatable {
   final ShippingDetailDataModel? shippingInfo;
   final SaveStatus saveStatus;
 
+  final bool? requestPrint;
+
   GeneralVoucherDataModel({
     this.DisplayVoucherNumber,
     this.voucherNumber,
@@ -248,6 +250,7 @@ class GeneralVoucherDataModel extends Equatable {
     this.isCoupled,
     this.shippingInfo,
     this.saveStatus = SaveStatus.ready,
+    this.requestPrint,
   });
 
   GeneralVoucherDataModel copyWith({
@@ -349,6 +352,7 @@ class GeneralVoucherDataModel extends Equatable {
     bool? isCoupled,
     ShippingDetailDataModel? shippingInfo,
     SaveStatus? saveStatus,
+    bool? requestPrint,
   }) {
     return GeneralVoucherDataModel(
       DisplayVoucherNumber: DisplayVoucherNumber ?? this.DisplayVoucherNumber,
@@ -455,6 +459,7 @@ class GeneralVoucherDataModel extends Equatable {
       isCoupled: isCoupled ?? this.isCoupled,
       shippingInfo: shippingInfo ?? this.shippingInfo,
       saveStatus: saveStatus ?? this.saveStatus,
+      requestPrint: requestPrint ?? this.requestPrint,
     );
   }
 
@@ -829,14 +834,17 @@ class GeneralVoucherDataModel extends Equatable {
     return val;
   }
 
-  num getItemPrevCount(String itemID) {
+  num getItemCurrCount(String itemID) {
     num val = 0;
-
+    // print('item : $itemID');
     for (int i = 0; i < InventoryItems!.length; i++) {
-      if (itemID == InventoryItems![i].BaseItem.ItemID) {
-        val += InventoryItems![i].BaseItem.prevQty ?? 0;
+      // print('Prev : ${InventoryItems![i].BaseItem.prevQty}');
+      if (itemID == InventoryItems![i].BaseItem.ItemID &&
+          (InventoryItems![i].BaseItem.prevQty ?? 0) == 0) {
+        val += (InventoryItems![i].BaseItem.quantity ?? 0);
       }
     }
+    // print('Count : $val');
     return val;
   }
 
@@ -859,8 +867,8 @@ class GeneralVoucherDataModel extends Equatable {
             qDebug()<<"IGST Billing";
         }
 */
-    print('Leee');
-    print('Items le: ${InventoryItems!.length}');
+    // print('Leee');
+    print('Items length: ${InventoryItems!.length}');
     for (int i = 0; i < InventoryItems!.length; i++) {
       // num vatAmt = 0;
       num vatamtBy_2 = 0;
@@ -869,7 +877,7 @@ class GeneralVoucherDataModel extends Equatable {
       // num grandTotolItem = 0;
       // num itemCess = 0;
 
-      print('w : $totalWeight  q: ${InventoryItems![i].BaseItem.quantity}');
+      // print('w : $totalWeight  q: ${InventoryItems![i].BaseItem.quantity}');
       totalWeight = totalWeight! +
           InventoryItems![i].BaseItem.quantity! *
               InventoryItems![i].BaseItem.weight!;
@@ -1174,6 +1182,7 @@ class GeneralVoucherDataModel extends Equatable {
       'RequirementVoucherNo': RequirementVoucherNo,
       'isHidden': (QuotationDropped ?? false) ? 1 : 0,
       'Contact': Contact?.toJson(),
+      'Request_Print': requestPrint ?? false,
     };
   }
 

@@ -1,3 +1,5 @@
+import 'package:ecuisinetab/Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
+
 import '../../../Datamodels/HiveModels/AccountGroups/AccountGroupHiveModel.dart';
 import '../../../Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
 import '../../../Datamodels/HiveModels/Godown/GodownHiveModel.dart';
@@ -63,6 +65,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       // await syncAccGroups();
       await syncUOMs();
       await syncEmployees();
+      await syncPrices();
       // await syncUserGroups();
       emit(state.copyWith(status: SyncUiConfigStatus.fetched));
     });
@@ -315,7 +318,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     }
     Box<UOMHiveMOdel> box = Hive.box(HiveTagNames.Uom_Hive_Tag);
     await box.clear();
-    print('UOM Box cleared');
+    // print('UOM Box cleared');
     try {
       dataResponse.forEach((element) async {
         // print('${element}');
@@ -367,14 +370,16 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     DateTime last = DateTime(2021);
     final List dataResponse =
         await WebservicePHPHelper.getAllPriceList(lastUpdated: last);
-    Box box = Hive.box(HiveTagNames.PriceLists_Hive_Tag);
-    box.clear();
+    Box<PriceListMasterHive> box = Hive.box(HiveTagNames.PriceLists_Hive_Tag);
+    await box.clear();
 
     dataResponse.forEach((element) async {
-      // print('${element}');
-      await box.put(element['Item_ID'], element);
+      // print('>> ${element}');
+      final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
+      // print('Name : ${p.priceListName}');
+      await box.put(element['Price_List_ID'], p);
     });
-    print('Items : ${box.length}');
+    print('PRICES : ${box.length}');
     return flag;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ecuisinetab/Login/constants.dart';
 import 'package:ecuisinetab/Utils/voucher_types.dart';
 
 import '/Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
@@ -131,14 +132,19 @@ class WebservicePHPHelper {
   static Future<dynamic> sendVoucher(
       {required final GeneralVoucherDataModel voucher,
       String? link,
-      required String vType}) async {
+      required String vType,
+      bool? requestBillCopy}) async {
     // String url = '${baseURL}sales_order_webservice.php?action=upsertSalesOrder';
+
+    Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
+
+    String printer = sett.get('BillPrinter', defaultValue: 'Counter');
 
     String fullURl =
         '${getBaseURL()}transactions_webservice.php?action=upsertTransaction&Voucher_Type=$vType';
 
     // print("url : $fullURl");
-    print('BODY : ${voucher.toJsonTrans()}');
+    print('BODY : ${voucher.toMapForTransTest()}');
     Response? response;
 
     // print(voucher.toMapForTransTest()['ledgersList']);
@@ -147,6 +153,9 @@ class WebservicePHPHelper {
       // Hive.box('settings').get('DBName');
       Dio dio = Dio(); //BaseOptions(headers: {'dbname': dBName}));
       dio.options.headers['dbname'] = dBName;
+      dio.options.headers['request_copy'] = requestBillCopy ?? false;
+      dio.options.headers['printername'] = printer;
+
       print('dbName : $dBName');
       response = await dio.post(fullURl, data: voucher.toMapForTransTest());
     } catch (e) {
@@ -300,7 +309,7 @@ class WebservicePHPHelper {
     String fullURl =
         "${getBaseURL()}ledger_webservice.php?action=getAllLedgersNew&timestamp=$dateF"; //&timestamp=$dateF
 
-    print('Url for Led : $fullURl');
+    // print('Url for Led : $fullURl');
     dynamic data;
     Response? response;
     try {
@@ -338,7 +347,7 @@ class WebservicePHPHelper {
     print('Url : $fullURl');
     dynamic data;
     try {
-      print('DBNAME : ${Hive.box('settings').get('DBName')}');
+      // print('DBNAME : ${Hive.box('settings').get('DBName')}');
       String dBName = getDBName();
       Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));
       final Response response = await dio.get(
@@ -395,10 +404,10 @@ class WebservicePHPHelper {
     String fullURl =
         "${getBaseURL()}masters_webservice.php?action=getAllPriceLists&timestamp=$dateF";
 
-    print('Url : $fullURl');
+    // print('Url : $fullURl');
     dynamic data;
     try {
-      print('DBNAME : ${Hive.box('settings').get('DBName')}');
+      // print('DBNAME : ${Hive.box('settings').get('DBName')}');
       String dBName = getDBName();
       Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));
       final Response response = await dio.get(
@@ -407,7 +416,7 @@ class WebservicePHPHelper {
       );
       // data = json.decode(response.body);
       data = response.data;
-      print('Price List data (Webservice) : $data');
+      // print('Price List data (Webservice) : $data');
     } catch (ex) {
       print(ex.toString());
       return false;
@@ -453,7 +462,7 @@ class WebservicePHPHelper {
     String fullURl =
         "${getBaseURL()}masters_webservice.php?action=getAllUOM&offset=0&limit=10000&timestamp=$dateF";
 
-    print('Url : $fullURl');
+    // print('Url : $fullURl');
     dynamic data;
     Response? response;
     try {
@@ -548,14 +557,14 @@ class WebservicePHPHelper {
 
   static Future<dynamic> getAllInventoryItems(
       {required DateTime lastUpdatedTimestamp}) async {
-    print('DT : $lastUpdatedTimestamp');
+    // print('DT : $lastUpdatedTimestamp');
     final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
     String dateF = formatter.format(lastUpdatedTimestamp);
     String fullURl =
         "${getBaseURL()}inventory_webservice.php?action=getAllItemsNew&timestamp=$dateF";
 
     print('Url : $fullURl');
-    print('123');
+    // print('123');
     dynamic data;
     Response? response;
     try {

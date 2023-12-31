@@ -21,6 +21,15 @@ class InventoryItemDetailBloc
     on<SetItem>((event, emit) {
       setItem(event.item, emit);
     });
+    on<SetIndex>(
+      (event, emit) => emit(state.copyWith(
+        index: event.index,
+      )),
+    );
+    on<SetItemNarration>((event, emit) {
+      emit(state.copyWith(
+          item: state.item!.copyWith(narration: event.narration)));
+    });
     on<SetItemTransactionType>(
         (event, emit) => emit(state.copyWith(type: event.type)));
     on<SetItemQuantity>(((event, emit) => setQuantity(event.qty, emit)));

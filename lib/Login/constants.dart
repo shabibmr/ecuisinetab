@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-const String currency = "";
+const String currency = "Rs. ";
 
 final currencyFormat = NumberFormat.currency(
   locale: "en_IN",
@@ -20,6 +20,12 @@ const kHintTextStyle = TextStyle(
 
 const kLabelStyle = TextStyle(
   color: Colors.white,
+  fontWeight: FontWeight.bold,
+  fontFamily: 'OpenSans',
+);
+
+const kAppbarLabelStyle = TextStyle(
+  color: Colors.black,
   fontWeight: FontWeight.bold,
   fontFamily: 'OpenSans',
 );

@@ -65,7 +65,7 @@ class _MTextFieldState extends State<MTextField> {
 
     controller = widget.controller ?? TextEditingController();
 
-    controller.text = widget.textData ?? '';
+    // controller.text = widget.textData ?? '';
     // controller =
     //     widget.controller ?? TextEditingController(text: widget.textData ?? '');
     inputDecoration = widget.inputDecoration ??

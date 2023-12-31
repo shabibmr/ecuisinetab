@@ -14,6 +14,12 @@ class SetItem extends InventoryItemDetailEvent {
   SetItem({required this.item});
 }
 
+class SetIndex extends InventoryItemDetailEvent {
+  final int index;
+
+  const SetIndex({required this.index});
+}
+
 class SetItemTransactionType extends InventoryItemDetailEvent {
   final TransactionType type;
 

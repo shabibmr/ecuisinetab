@@ -39,9 +39,12 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     });
     on<SwitchReference>(
       (event, emit) {
-        print('Changed');
-        emit(state.copyWith(
-            voucher: state.voucher!.copyWith(reference: event.newReference)));
+        print('Changed voucher reference ${event.newReference}');
+        emit(VoucherState(
+          voucher: state.voucher?.copyWith(reference: event.newReference),
+          status: VoucherEditorStatus.loaded,
+        ));
+        print(state.voucher?.reference ?? 'Still NULl');
       },
     );
     on<SetMainLedger>((event, emit) => emit(state.copyWith(
@@ -65,6 +68,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     on<SetPriceList>((event, emit) => emit(state.copyWith(
             voucher: state.voucher?.copyWith(
           priceListId: event.priceListID,
+          ModeOfService: event.priceListID,
         ))));
     on<SetNarration>((event, emit) => emit(state.copyWith(
             voucher: state.voucher?.copyWith(
@@ -82,6 +86,9 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
         (event, emit) => deleteInventoryItem(event, emit));
     on<UpdateItemQty>(
       (event, emit) => updateItemQty(emit, event.item, event.qty),
+    );
+    on<SetPrintCopy>(
+      (event, emit) => emit(state.copyWith(printCopy: event.printCopy)),
     );
     on<FetchVoucher>(
       (event, emit) async => await fetchVoucher(event, emit),
@@ -123,9 +130,11 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   Future<void> setEmptyVoucher(voucherType, emit) async {
+    print('SETTING EMPTY VOUCHER');
     final GeneralVoucherDataModel voucher = GeneralVoucherDataModel(
       voucherType: voucherType,
       VoucherDate: DateTime.now(),
+      DateCreated: DateTime.now(),
       VoucherPrefix: settingsBox.get("vPref"),
       voucherNumber: '',
       SalesmanID: settingsBox.get('Salesman_ID'),
@@ -140,6 +149,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
       ledgersList: [],
       InventoryItems: [],
       deletedItems: [],
+      reference: '',
     );
     emit(state.copyWith(
       voucher: voucher,
@@ -203,7 +213,9 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     voucher.calculateVoucherSales();
 
     final result = await WebservicePHPHelper.sendVoucher(
-        vType: voucher.voucherType ?? "", voucher: voucher);
+        vType: voucher.voucherType ?? "",
+        voucher: voucher,
+        requestBillCopy: state.printCopy);
 
     print('Result : $result');
 
@@ -247,11 +259,17 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   void updateItemQty(emit, InventoryItemDataModel item, quantity) {
+    emit(state.copyWith(status: VoucherEditorStatus.loading));
     var voucher = state.voucher!;
-    if (voucher.getItemCount(item.ItemID!) == 0) {
+    voucher.InventoryItems?.forEach((element) {
+      print('${element.BaseItem.ItemName} - ${element.BaseItem.quantity} ');
+    });
+    print('qq : ${voucher.getItemCurrCount(item.ItemID!)}');
+    if (voucher.getItemCurrCount(item.ItemID!) == 0) {
       // if (quantity == 0) return;
 
       // item.prevQty = 0;
+      print('Adding Item quan : $quantity');
 
       voucher.InventoryItems!.add(CompoundItemDataModel(
           BaseItem: item.copyWith(
@@ -260,22 +278,33 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
         crQty: quantity,
       )));
     } else {
-      for (int i = 0; i < voucher.InventoryItems!.length; i++) {
-        if (voucher.InventoryItems![i].BaseItem.ItemID == item.ItemID) {
-          if (item.quantity == 0) {
+      int i = 0;
+      for (; i < voucher.InventoryItems!.length; i++) {
+        print(
+            '$i ::: ${voucher.InventoryItems![i].BaseItem.ItemName} : ${voucher.InventoryItems![i].BaseItem.quantity}');
+        if (voucher.InventoryItems![i].BaseItem.ItemID == item.ItemID &&
+            (voucher.InventoryItems![i].BaseItem.prevQty ?? 0) == 0) {
+          print(' New quanttity updated to $quantity');
+          voucher.InventoryItems?[i] = CompoundItemDataModel(
+              BaseItem: voucher.InventoryItems![i].BaseItem.copyWith(
+                  quantity: quantity, currQty: quantity, crQty: quantity));
+
+          if (voucher.InventoryItems![i].BaseItem.quantity == 0) {
+            print('Item Removed at index : $i');
             voucher.InventoryItems!.removeAt(i);
-          } else {
-            voucher.InventoryItems![i].BaseItem.copyWith(
-                quantity: quantity, currQty: quantity, crQty: quantity);
           }
           break;
         }
       }
+      print(' updated at index : $i');
     }
-
+    print('Item Updated Done');
     voucher.calculateVoucherSales();
     print('Calc Completed');
-    emit(state.copyWith(voucher: voucher));
+    emit(state.copyWith(
+      voucher: voucher,
+      status: VoucherEditorStatus.loaded,
+    ));
     print('Item count Increased');
     return;
   }
@@ -283,9 +312,12 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   void addInventoryItem(InventoryItemDataModel item, emit) {
     print("Add Inventory Item");
     emit(state.copyWith(status: VoucherEditorStatus.loading));
-    final GeneralVoucherDataModel? voucher = state.voucher;
-    voucher!.InventoryItems!.add(CompoundItemDataModel(BaseItem: item));
-    voucher.calculateVoucherSales();
+    final GeneralVoucherDataModel? voucher = state.voucher?.copyWith(
+        InventoryItems: state.voucher?.InventoryItems
+          ?..add(CompoundItemDataModel(BaseItem: item)));
+
+    // voucher!.InventoryItems!.add(CompoundItemDataModel(BaseItem: item));
+    voucher!.calculateVoucherSales();
     emit(state.copyWith(voucher: voucher, status: VoucherEditorStatus.loaded));
   }
 

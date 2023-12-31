@@ -22,6 +22,7 @@ class InventoryItemDetailState extends Equatable {
     this.showBatchEditor,
     this.type,
     this.batchFetchStatus,
+    this.index,
   });
 
   final InventoryItemDataModel? item;
@@ -33,6 +34,7 @@ class InventoryItemDetailState extends Equatable {
   final TransactionType? type;
 
   final FetchStatus? batchFetchStatus;
+  final int? index;
 
   @override
   List<Object?> get props => [
@@ -49,6 +51,7 @@ class InventoryItemDetailState extends Equatable {
     bool? showBatchEditor,
     TransactionType? type,
     FetchStatus? batchFetchStatus,
+    int? index,
   }) {
     return InventoryItemDetailState(
       item: item ?? this.item,
@@ -56,6 +59,7 @@ class InventoryItemDetailState extends Equatable {
       showBatchEditor: showBatchEditor ?? this.showBatchEditor,
       type: type ?? this.type,
       batchFetchStatus: batchFetchStatus ?? this.batchFetchStatus,
+      index: index ?? this.index,
     );
   }
 }

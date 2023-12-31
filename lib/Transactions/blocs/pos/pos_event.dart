@@ -34,12 +34,12 @@ class GroupsLoadFailed extends PosEvent {
 }
 
 class OrderSelected extends PosEvent {
-  final String voucherNo;
-  final String vPrefix;
+  final String? voucherNo;
+  final String? vPrefix;
 
   const OrderSelected({
-    required this.voucherNo,
-    required this.vPrefix,
+    this.voucherNo,
+    this.vPrefix,
   });
 }
 

@@ -58,6 +58,9 @@ class InvItemSearchDelegate extends SearchDelegate<InventoryItemHive> {
     return null;
   }
 
+  bool flag = Hive.box(HiveTagNames.Settings_Hive_Tag)
+      .get('isArabic', defaultValue: false);
+
   @override
   Widget buildResults(BuildContext context) {
     // Box<InventoryItemHive> itemsBox = Hive.box('items');
@@ -65,9 +68,10 @@ class InvItemSearchDelegate extends SearchDelegate<InventoryItemHive> {
     List<InventoryItemHive> ledList = query.isEmpty
         ? items.values.toList()
         : items.values.where((element) {
-            return element.Item_Name!
-                .toLowerCase()
-                .contains(query.replaceAll(RegExp('[^A-Za-z0-9]'), ''));
+            return (element.Item_Name!
+                    .toLowerCase()
+                    .contains(query.replaceAll(RegExp('[^A-Za-z0-9]'), '')) ||
+                (element.Item_Name_Arabic ?? '~~~~~~~').contains(query));
           }).toList();
     if (ledList.isEmpty) {
       return Container(
@@ -106,8 +110,9 @@ class InvItemSearchDelegate extends SearchDelegate<InventoryItemHive> {
         ? items.values.toList()
         : items.values.where((element) {
             return element.Item_Name!
-                .toLowerCase()
-                .contains(query.replaceAll(RegExp('[^A-Za-z0-9]'), ''));
+                    .toLowerCase()
+                    .contains(query.replaceAll(RegExp('[^A-Za-z0-9]'), '')) ||
+                (element.Item_Name_Arabic ?? '~~~~').contains(query);
           }).toList();
     if (ledList.isEmpty) {
       return Container(
