@@ -45,56 +45,58 @@ class _LoginPageState extends State<LoginPage> {
               icon: Icon(Icons.settings))
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-              flex: 1,
-              child: SizedBox(
-                width: 350,
-                height: 350,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(180)),
-                  child: Center(
-                    child: Image.asset(
-                      'assets/algoLogo.png',
-                      height: 200,
-                      width: 200,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+                flex: 1,
+                child: SizedBox(
+                  width: 350,
+                  height: 350,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(180)),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/algoLogo.png',
+                        height: 200,
+                        width: 200,
+                      ),
                     ),
                   ),
-                ),
-              )),
-          const Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              'Login',
-                              style: TextStyle(fontSize: 20),
+                )),
+            const Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ),
                           ),
-                        ),
-                        UserName(),
-                        LoginPassword(),
-                        LoginButton(),
-                      ],
+                          UserName(),
+                          LoginPassword(),
+                          LoginButton(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
