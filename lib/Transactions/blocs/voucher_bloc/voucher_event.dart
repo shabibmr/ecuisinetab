@@ -30,10 +30,32 @@ class SetVoucherDate extends VoucherEvent {
   List<Object> get props => [voucherDate];
 }
 
+class SetInvoiceDate extends VoucherEvent {
+  final DateTime invoiceDate;
+
+  const SetInvoiceDate({
+    required this.invoiceDate,
+  });
+
+  @override
+  List<Object> get props => [invoiceDate];
+}
+
+class SetInvoiceNumber extends VoucherEvent {
+  final String invoiceNo;
+
+  const SetInvoiceNumber({
+    required this.invoiceNo,
+  });
+
+  @override
+  List<Object> get props => [invoiceNo];
+}
+
 class SetVoucherSalesman extends VoucherEvent {
   final int salesmanID;
 
-  SetVoucherSalesman({
+  const SetVoucherSalesman({
     required this.salesmanID,
   });
 
@@ -44,7 +66,7 @@ class SetVoucherSalesman extends VoucherEvent {
 class SetAddedByID extends VoucherEvent {
   final int addedByID;
 
-  SetAddedByID({
+  const SetAddedByID({
     required this.addedByID,
   });
 
@@ -55,7 +77,7 @@ class SetAddedByID extends VoucherEvent {
 class SetPriceList extends VoucherEvent {
   final int priceListID;
 
-  SetPriceList({
+  const SetPriceList({
     required this.priceListID,
   });
 
@@ -66,7 +88,7 @@ class SetPriceList extends VoucherEvent {
 class SetNarration extends VoucherEvent {
   final String narration;
 
-  SetNarration({
+  const SetNarration({
     required this.narration,
   });
 
@@ -216,7 +238,7 @@ class SetCustomerName extends VoucherEvent {
 class SwitchReference extends VoucherEvent {
   final String newReference;
 
-  SwitchReference({
+  const SwitchReference({
     required this.newReference,
   });
 
@@ -348,7 +370,7 @@ class FetchCustomerByPhone extends VoucherEvent {
 
 class ExportToVoucher extends VoucherEvent {
   final String vType;
-  ExportToVoucher({
+  const ExportToVoucher({
     required this.vType,
   });
 }
