@@ -1,3 +1,6 @@
+import 'package:ecuisinetab/Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
+import 'package:ecuisinetab/Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
+
 import '../../../Datamodels/HiveModels/address_book/contacts_data_model.dart';
 import '../../../Datamodels/Masters/Accounts/LedgerMasterDataModel.dart';
 import '../../../Datamodels/Masters/Inventory/CompoundItemDataModel.dart';
@@ -37,6 +40,13 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     on<SetContact>((event, emit) {
       setContact(event, emit);
     });
+    on<RecalculateVoucher>(
+      (event, emit) {
+        final voucher = state.voucher;
+        voucher!.calculateVoucherSales();
+        emit(state.copyWith(voucher: voucher));
+      },
+    );
     on<SwitchReference>(
       (event, emit) {
         print('Changed voucher reference ${event.newReference}');
@@ -65,11 +75,9 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
             voucher: state.voucher?.copyWith(
           AddedById: event.addedByID,
         ))));
-    on<SetPriceList>((event, emit) => emit(state.copyWith(
-            voucher: state.voucher?.copyWith(
-          priceListId: event.priceListID,
-          ModeOfService: event.priceListID,
-        ))));
+    on<SetPriceList>((event, emit) {
+      resetPrices(event, emit);
+    });
     on<SetNarration>((event, emit) => emit(state.copyWith(
             voucher: state.voucher?.copyWith(
           narration: event.narration,
@@ -260,7 +268,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
 
   void updateItemQty(emit, InventoryItemDataModel item, quantity) {
     emit(state.copyWith(status: VoucherEditorStatus.loading));
-    var voucher = state.voucher!;
+    final voucher = state.voucher!;
     voucher.InventoryItems?.forEach((element) {
       print('${element.BaseItem.ItemName} - ${element.BaseItem.quantity} ');
     });
@@ -353,5 +361,30 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
             Location: event.contact.address ?? state.voucher?.Location,
           )),
     );
+  }
+
+  void resetPrices(SetPriceList event, emit) {
+    Box<InventoryItemHive> itemsBox = Hive.box(HiveTagNames.Items_Hive_Tag);
+    Box<PriceListEntriesHive> pbox =
+        Hive.box(HiveTagNames.PriceListsEntries_Hive_Tag);
+    print('prices count  :: ${pbox.length}');
+    final voucher = state.voucher!.copyWith(
+        priceListId: event.priceListID, ModeOfService: event.priceListID);
+
+    for (int i = 0; i < voucher.InventoryItems!.length; i++) {
+      print(itemsBox.get(voucher.InventoryItems![i].BaseItem.ItemID)?.prices);
+      final double? pRate = itemsBox
+          .get(voucher.InventoryItems![i].BaseItem.ItemID)
+          ?.prices?[voucher.priceListId]
+          ?.rate;
+
+      if (pRate != null) {
+        voucher.InventoryItems![i] = voucher.InventoryItems![i].copyWith(
+            BaseItem:
+                voucher.InventoryItems?[i].BaseItem.copyWith(rate: pRate));
+      }
+    }
+    voucher.calculateVoucherSales();
+    emit(state.copyWith(voucher: voucher));
   }
 }

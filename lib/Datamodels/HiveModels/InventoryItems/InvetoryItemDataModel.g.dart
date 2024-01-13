@@ -62,7 +62,7 @@ class InventoryItemHiveAdapter extends TypeAdapter<InventoryItemHive> {
       Category: fields[42] as String?,
       DefaultLedgerID: fields[43] as String?,
       uomObjects: (fields[44] as List).cast<UOMHiveMOdel>(),
-      prices: (fields[45] as List).cast<PriceListEntriesHive>(),
+      prices: (fields[45] as Map?)?.cast<int, PriceListEntriesHive>(),
       isBatchProcessed: fields[46] as bool?,
       isSerialNumbered: fields[47] as bool?,
       isActive: fields[48] as bool?,
