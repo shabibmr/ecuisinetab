@@ -9,10 +9,8 @@ import '../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 import '../../Login/constants.dart';
 
 import '../../Screens/POS/pos_item_groups.dart';
-import '../../Screens/POS/pos_items.dart';
 import '../../Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
 import '../../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
-import '../../Utils/voucher_types.dart';
 
 import '../../widgets/Search/inventory_item_search.dart';
 
@@ -20,8 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
-import '../../Datamodels/Masters/Accounts/LedgerMasterDataModel.dart';
-import '../../Datamodels/Transactions/general_voucher_datamodel.dart';
 import '../../Transactions/blocs/pos/pos_bloc.dart';
 import 'pos_item_detail.dart';
 
@@ -238,12 +234,13 @@ class TableButton extends StatelessWidget {
           // ));
         },
         child: Card(
-          child: Container(
+          elevation: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Builder(builder: (context) {
               final String ref = context.select(
                   (VoucherBloc bloc) => bloc.state.voucher?.reference ?? '');
-              print('Ref : $ref');
-              return Text('$ref');
+              return Text(ref);
             }),
           ),
         ),
