@@ -4,8 +4,11 @@ import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
 import '../../Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
+import '../../Login/constants.dart';
 import '../../Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
 import '../../widgets/Basic/MText.dart';
 import 'pos_item_detail.dart';
@@ -18,6 +21,7 @@ class POSCartPage extends StatefulWidget {
 }
 
 class _POSCartPageState extends State<POSCartPage> {
+  Box<PriceListMasterHive> prices = Hive.box(HiveTagNames.PriceLists_Hive_Tag);
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<VoucherBloc, VoucherState>(
@@ -71,8 +75,26 @@ class _POSCartPageState extends State<POSCartPage> {
                     ),
                   ),
                   Align(
-                      alignment: Alignment.centerLeft,
-                      child: BillCopyCheckBox()),
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        BillCopyCheckBox(),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await showPrices();
+                          },
+                          child: Builder(builder: (context) {
+                            int plist = context.select((VoucherBloc bloc) =>
+                                bloc.state.voucher?.priceListId ?? 3);
+                            return Text(
+                                prices.get(plist.toString())?.priceListName ??
+                                    'Select :$plist');
+                          }),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
               Positioned(
@@ -81,7 +103,6 @@ class _POSCartPageState extends State<POSCartPage> {
                 child: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () {
-                    print('sending');
                     context.read<VoucherBloc>().add(VoucherRequestSave());
                   },
                 ),
@@ -142,9 +163,51 @@ class _POSCartPageState extends State<POSCartPage> {
                   ],
                 );
               });
-          if (confirm ?? false) context.read<VoucherBloc>().add(SaveVoucher());
+          if (confirm ?? false) {
+            context.read<VoucherBloc>().add(SaveVoucher());
+          }
           //Dialog to show error
         }
+      },
+    );
+  }
+
+  Future<void> showPrices() async {
+    Box<PriceListMasterHive> prices =
+        Hive.box(HiveTagNames.PriceLists_Hive_Tag);
+
+    await showDialog(
+      context: context,
+      builder: (context2) {
+        return BlocProvider.value(
+          value: context.read<VoucherBloc>(),
+          child: Dialog(
+            elevation: 5,
+            child: Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: prices.values
+                    .map((e) => Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Card(
+                            child: ListTile(
+                              title: Text(e.priceListName!),
+                              onTap: () {
+                                context.read<VoucherBloc>().add(
+                                    SetPriceList(priceListID: e.priceListID!));
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -204,6 +267,7 @@ class VoucherTotalWidget extends StatelessWidget {
     return Builder(builder: (context) {
       double? total = context
           .select((VoucherBloc element) => element.state.voucher!.grandTotal);
+
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

@@ -370,7 +370,7 @@ class _ClockWidgetState extends State<ClockWidget> {
   late Timer T;
 
   callTimer() async {
-    T = Timer.periodic(const Duration(seconds: 1), (timer) {
+    T = Timer.periodic(const Duration(minutes: 1), (timer) {
       setState(() {});
     });
   }
@@ -382,7 +382,6 @@ class _ClockWidgetState extends State<ClockWidget> {
         ? duration.inHours.toString().padLeft(2, '0') + ":"
         : '';
 
-    return Text(
-        '$hours${duration.inMinutes.remainder(60)}:${(duration.inSeconds.remainder(60))}');
+    return Text('$hours${duration.inMinutes.remainder(60)}');
   }
 }

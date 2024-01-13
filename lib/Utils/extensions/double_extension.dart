@@ -1,4 +1,9 @@
+// import 'dart:io';
+
+import 'package:intl/intl.dart';
+
 import '../../Login/constants.dart';
+import 'package:universal_io/io.dart';
 
 extension RoundOffExtension on double {
   double get roundToOne {
@@ -14,6 +19,16 @@ extension RoundOffExtension on double {
   }
 
   String get inCurrency {
+    try {
+      var format = NumberFormat.simpleCurrency(locale: Platform.localeName);
+      return '${format.currencySymbol}${toStringAsFixed(2)}';
+    } catch (e) {
+      print('Error : ${e.toString()}');
+    }
+    return "xxx";
+  }
+
+  String get inCurrency2 {
     return '$currency${toStringAsFixed(2)}';
   }
 

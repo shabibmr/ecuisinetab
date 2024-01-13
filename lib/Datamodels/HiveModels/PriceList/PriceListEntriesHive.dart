@@ -42,16 +42,18 @@ class PriceListEntriesHive extends HiveObject with EquatableMixin {
   }
 
   factory PriceListEntriesHive.fromMap(Map<String, dynamic> map) {
-    return PriceListEntriesHive(
-      rate: map['rate']?.toDouble(),
-      priceListID: map['priceListID']?.toInt(),
+    PriceListEntriesHive p = PriceListEntriesHive(
+      rate: double.parse(map['price'] ?? "0"),
+      priceListID: int.parse(map['Price_List_ID'] ?? '0'),
       timestamp: map['timestamp'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['timestamp'])
           : null,
-      percent: map['percent']?.toDouble(),
-      uomID: map['uomID']?.toInt(),
-      priceListName: map['priceListName'],
+      percent: double.parse(map['percent'] ?? '0'),
+      uomID: int.parse(map['Uom_id'] ?? "1"),
+      priceListName: map['Price_List_Name'],
     );
+
+    return p;
   }
 
   String toJson() => json.encode(toMap());

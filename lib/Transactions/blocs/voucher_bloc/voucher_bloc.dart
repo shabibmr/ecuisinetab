@@ -1,4 +1,5 @@
 import 'package:ecuisinetab/Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
+import 'package:ecuisinetab/Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
 
 import '../../../Datamodels/HiveModels/address_book/contacts_data_model.dart';
 import '../../../Datamodels/Masters/Accounts/LedgerMasterDataModel.dart';
@@ -39,6 +40,13 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     on<SetContact>((event, emit) {
       setContact(event, emit);
     });
+    on<RecalculateVoucher>(
+      (event, emit) {
+        final voucher = state.voucher;
+        voucher!.calculateVoucherSales();
+        emit(state.copyWith(voucher: voucher));
+      },
+    );
     on<SwitchReference>(
       (event, emit) {
         print('Changed voucher reference ${event.newReference}');
@@ -355,24 +363,28 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     );
   }
 
-  void resetPrices(event, emit) {
+  void resetPrices(SetPriceList event, emit) {
     Box<InventoryItemHive> itemsBox = Hive.box(HiveTagNames.Items_Hive_Tag);
-
+    Box<PriceListEntriesHive> pbox =
+        Hive.box(HiveTagNames.PriceListsEntries_Hive_Tag);
+    print('prices count  :: ${pbox.length}');
     final voucher = state.voucher!.copyWith(
-        priceListId: event.priceListId, ModeOfService: event.priceListId);
+        priceListId: event.priceListID, ModeOfService: event.priceListID);
 
-    for (int i = 0; i < voucher!.InventoryItems!.length; i++) {
+    for (int i = 0; i < voucher.InventoryItems!.length; i++) {
+      print(itemsBox.get(voucher.InventoryItems![i].BaseItem.ItemID)?.prices);
       final double? pRate = itemsBox
           .get(voucher.InventoryItems![i].BaseItem.ItemID)
-          ?.prices
-          .firstWhere((element) => element.priceListID == voucher.priceListId)
-          .rate;
+          ?.prices?[voucher.priceListId]
+          ?.rate;
+
       if (pRate != null) {
         voucher.InventoryItems![i] = voucher.InventoryItems![i].copyWith(
             BaseItem:
                 voucher.InventoryItems?[i].BaseItem.copyWith(rate: pRate));
       }
     }
+    voucher.calculateVoucherSales();
     emit(state.copyWith(voucher: voucher));
   }
 }

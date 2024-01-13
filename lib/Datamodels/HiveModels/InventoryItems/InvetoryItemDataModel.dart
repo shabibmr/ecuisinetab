@@ -102,7 +102,7 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
   @HiveField(44)
   List<UOMHiveMOdel> uomObjects;
   @HiveField(45)
-  List<PriceListEntriesHive> prices;
+  Map<int, PriceListEntriesHive>? prices;
   @HiveField(46)
   bool? isBatchProcessed;
   @HiveField(47)
@@ -156,7 +156,7 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
     this.Category,
     this.DefaultLedgerID,
     this.uomObjects = const [],
-    this.prices = const [],
+    this.prices = const {},
     this.isBatchProcessed,
     this.isSerialNumbered,
     this.isActive,
@@ -210,7 +210,7 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
         'Category': Category,
         'DefaultLedgerID': DefaultLedgerID,
         'uomObject': uomObjects[0].toMapMasters(),
-        'PriceLists': prices.map((x) => x.toMap()).toList(),
+        'PriceLists': prices,
         'isBatchProcessed': isBatchProcessed,
         'isSerailNumbered': isSerialNumbered,
       }
@@ -250,13 +250,16 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
           : map['uomObject'] != null
               ? [UOMHiveMOdel.fromMap(map['uomObject'])]
               : [],
-      prices: map['PriceLists'] != null
-          ? List<PriceListEntriesHive>.from(
-              (map['PriceLists'] as List<dynamic>).map<PriceListEntriesHive?>(
-                (x) => PriceListEntriesHive.fromMap(x as Map<String, dynamic>),
-              ),
-            )
-          : [],
+      // prices: map['PriceLists'] ??
+      //     (map['PriceLists'] as List<dynamic>)
+      //         .map((e) => {int.parse(e['Price_List_ID']), e}),
+      // prices1: map['PriceLists'] != null
+      //     ? List<PriceListEntriesHive>.from(
+      //         (map['PriceLists'] as List<dynamic>).map<PriceListEntriesHive?>(
+      //           (x) => PriceListEntriesHive.fromMap(x as Map<String, dynamic>),
+      //         ),
+      //       )
+      //     : [],
       // Last_Modified: DateTime.fromMillisecondsSinceEpoch(map['Last_Modified']),
       // Date_Created: DateTime.fromMillisecondsSinceEpoch(map['Date_Created']),
       // Timestamp: DateTime.fromMillisecondsSinceEpoch(map['Timestamp']),
@@ -338,7 +341,7 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
     String? Category,
     String? DefaultLedgerID,
     List<UOMHiveMOdel>? uomObjects,
-    List<PriceListEntriesHive>? prices,
+    Map<int, PriceListEntriesHive>? prices,
     bool? isBatchProcessed,
     bool? isSerialNumbered,
     bool? isActive,

@@ -105,6 +105,8 @@ class HiveTagNames {
 
   static String get Uom_Hive_Tag => '${dbname}uoms';
   static String get PriceLists_Hive_Tag => '${dbname}prices';
+  static String get PriceListsEntries_Hive_Tag => '${dbname}pricelist_entries';
+
   static String get Godowns_Hive_Tag => '${dbname}godowns';
 
   static String get Employee_Hive_Tag => '${dbname}employees';

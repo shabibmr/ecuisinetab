@@ -33,7 +33,7 @@ Future<void> initSettings() async {
   String dbname = sett.get('DBName', defaultValue: 'cake_studio_mukkam');
 
   String url =
-      sett.get('url', defaultValue: 'http://192.168.0.105/test_app_water');
+      sett.get('url', defaultValue: 'http://gm.algoray.in/test_app_water');
 
   sett.put('url', url);
   String billPrinter = sett.get('BillPrinter', defaultValue: 'Counter');
@@ -91,6 +91,8 @@ Future<void> initHiveBoxes() async {
       await Hive.openBox(HiveTagNames.ItemGroups_Hive_Tag);
   Box<PriceListMasterHive> prices =
       await Hive.openBox(HiveTagNames.PriceLists_Hive_Tag);
+  Box<PriceListEntriesHive> priceEntries =
+      await Hive.openBox(HiveTagNames.PriceListsEntries_Hive_Tag);
   // Box<LedgerMasterHiveModel> ledgers =
   //     await Hive.openBox(HiveTagNames.Ledgers_Hive_Tag);
   // Box<AccountGroupHiveModel> groups =

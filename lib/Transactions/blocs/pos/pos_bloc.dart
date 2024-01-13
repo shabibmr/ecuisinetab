@@ -63,14 +63,14 @@ class PosBloc extends Bloc<PosEvent, PosState> {
         //     data['data_tables'][0]['data_tables'].toString().split('|');
         List<String> tables =
             data['data_tables'][0]['Tables'].toString().split('|');
-        print('Tables : $tables');
+        // print('Tables : $tables');
         Map<String, dynamic> ordersMap = {};
         if (data['success'].toString() == "1") {
-          print('Type : ${data['data'].runtimeType}');
+          // print('Type : ${data['data'].runtimeType}');
           final List orders = data['data'];
           orders.forEach((element) {
             String ref = element['reference'] ?? '';
-            print('Ref : ${element['reference']}');
+            // print('Ref : ${element['reference']}');
             if (!tables.contains(ref)) {
               tables.add(ref);
             }
