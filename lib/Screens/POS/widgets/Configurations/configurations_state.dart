@@ -10,6 +10,7 @@ class ConfigurationsState extends Equatable {
     this.printerName,
     this.ready,
     this.arabic,
+    this.defaultPriceListID,
   });
 
   final String? serverIP;
@@ -18,10 +19,18 @@ class ConfigurationsState extends Equatable {
   final String? printerName;
   final bool? ready;
   final bool? arabic;
+  final int? defaultPriceListID;
 
   @override
-  List<Object?> get props =>
-      [serverIP, dBName, voucherPref, printerName, ready, arabic];
+  List<Object?> get props => [
+        serverIP,
+        dBName,
+        voucherPref,
+        printerName,
+        ready,
+        arabic,
+        defaultPriceListID
+      ];
 
   ConfigurationsState copyWith({
     String? ServerIP,
@@ -30,6 +39,7 @@ class ConfigurationsState extends Equatable {
     String? printerName,
     bool? arabic,
     bool? ready,
+    int? defaultPriceListID,
   }) {
     return ConfigurationsState(
       serverIP: ServerIP ?? this.serverIP,
@@ -38,6 +48,7 @@ class ConfigurationsState extends Equatable {
       printerName: printerName ?? this.printerName,
       ready: ready ?? this.ready,
       arabic: arabic ?? this.arabic,
+      defaultPriceListID: defaultPriceListID ?? this.defaultPriceListID,
     );
   }
 }

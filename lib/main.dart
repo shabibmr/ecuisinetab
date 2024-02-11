@@ -33,7 +33,7 @@ Future<void> initSettings() async {
   String dbname = sett.get('DBName', defaultValue: 'cake_studio_mukkam');
 
   String url =
-      sett.get('url', defaultValue: 'http://gm.algoray.in/test_app_water');
+      sett.get('url', defaultValue: 'http://192.168.0.105/test_app_water');
 
   sett.put('url', url);
   String billPrinter = sett.get('BillPrinter', defaultValue: 'Counter');
@@ -122,197 +122,193 @@ class MyApp extends StatelessWidget {
               SyncServiceBloc()..add(const FetchAllMastersEvent()),
         ),
         BlocProvider(
-            lazy: false,
-            create: (context) =>
-                AuthenticationBloc()..add(AuthenticationStarted())
-            // ..add(AuthSetUser(username: 'user'))
-            // ..add(AuthSetPass(password: '123456')),
-            ),
+          lazy: false,
+          create: (context) => AuthenticationBloc()
+            ..add(AuthenticationStarted())
+            ..add(AuthSetUser(username: 'user'))
+            ..add(AuthSetPass(password: '123456')),
+        ),
       ],
       child: MaterialApp(
         title: 'eCuisineTab',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: Color.fromARGB(255, 107, 233, 130)),
+              seedColor: const Color.fromARGB(255, 137, 233, 130)),
           useMaterial3: true,
         ),
-        home: ecuisineTabApp(title: 'eCuisineTab'),
+        home: const EcuisineTabApp(title: 'eCuisineTab'),
       ),
     );
   }
 }
 
-class ecuisineTabApp extends StatefulWidget {
-  ecuisineTabApp({Key? key, required this.title}) : super(key: key);
+class EcuisineTabApp extends StatelessWidget {
+  const EcuisineTabApp({super.key, required this.title});
 
   final String title;
 
   @override
-  State<ecuisineTabApp> createState() => _ecuisineTabAppState();
-}
-
-class _ecuisineTabAppState extends State<ecuisineTabApp> {
-  @override
   Widget build(BuildContext context) {
-    return Init_App();
+    return const Init_App();
   }
 }
+/*
+// class Just extends StatelessWidget {
+//   const Just({Key? key}) : super(key: key);
 
-class Just extends StatelessWidget {
-  const Just({Key? key}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+//       builder: (context, state) {
+//         print(
+//             '.................................................. .  JUST BUILDING   .................................................. .  ');
+//         return Init_App();
+//       },
+//     );
+//   }
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-      builder: (context, state) {
-        print(
-            '.................................................. .  JUST BUILDING   .................................................. .  ');
-        return Init_App();
-      },
-    );
-  }
-}
+// class TestScreen extends StatelessWidget {
+//   const TestScreen({Key? key}) : super(key: key);
 
-class TestScreen extends StatelessWidget {
-  const TestScreen({Key? key}) : super(key: key);
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocListener<AuthenticationBloc, AuthenticationState>(
+//       listener: (context, state) {
+//         print('Listening to New State : $state : ${state.authState}');
+//       },
+//       listenWhen: (previous, current) {
+//         print('prev : ${previous.authState}');
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocListener<AuthenticationBloc, AuthenticationState>(
-      listener: (context, state) {
-        print('Listening to New State : $state : ${state.authState}');
-      },
-      listenWhen: (previous, current) {
-        print('prev : ${previous.authState}');
-
-        print('Curr : ${current.authState}');
-        return true;
-      },
-      child: Scaffold(
-        body: Builder(
-          builder: (context) {
-            var status = context
-                .select((AuthenticationBloc bloc) => bloc.state.authState);
-            print('New Status Changed at Scaffold Body  Build: $status');
-            return Center(
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text('State is : $status'),
-                      IconButton(
-                        onPressed: () {
-                          print(
-                              '........................................................................................');
-                          print(
-                              'pressed ${context.read<AuthenticationBloc>().state.authState}');
-                          context
-                              .read<AuthenticationBloc>()
-                              .add(AuthPrintState());
-                          print(
-                              '........................................................................................');
-                        },
-                        icon: Icon(Icons.print),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(AuthenticationStarted());
-                    },
-                    icon: Icon(Icons.cleaning_services),
-                  ),
-                  Text('to Failure '),
-                  IconButton(
-                    onPressed: () {
-                      print(
-                          'pressed ${context.read<AuthenticationBloc>().state.username}');
-                      context.read<AuthenticationBloc>().add(AuthPrintState());
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(AuthSetStat(authState: AuthState.failure));
-                    },
-                    icon: Icon(Icons.family_restroom),
-                  ),
-                  Text('to Loading '),
-                  IconButton(
-                    onPressed: () {
-                      print(
-                          'pressed ${context.read<AuthenticationBloc>().state.username}');
-                      context.read<AuthenticationBloc>().add(AuthPrintState());
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(AuthSetStat(authState: AuthState.loading));
-                    },
-                    icon: Icon(Icons.cleaning_services),
-                  ),
-                  Text('to Auth Started'),
-                  IconButton(
-                    onPressed: () {
-                      print(
-                          'pressed ${context.read<AuthenticationBloc>().state.username}');
-                      context.read<AuthenticationBloc>().add(AuthPrintState());
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(AuthSetStat(authState: AuthState.started));
-                    },
-                    icon: Icon(Icons.cleaning_services),
-                  ),
-                  Text('To Initial'),
-                  IconButton(
-                    onPressed: () {
-                      print('pressed to intitial');
-                      context
-                          .read<AuthenticationBloc>()
-                          .add(AuthSetStat(authState: AuthState.intitial));
-                      context.read<AuthenticationBloc>().add(AuthPrintState());
-                    },
-                    icon: Icon(Icons.cleaning_services),
-                  ),
-                  Row(
-                    children: [
-                      Text('To New USer'),
-                      IconButton(
-                        onPressed: () {
-                          print('pressed to intitial');
-                          context
-                              .read<AuthenticationBloc>()
-                              .add(AuthSetUser(username: 'New User'));
-                          context
-                              .read<AuthenticationBloc>()
-                              .add(AuthPrintState());
-                        },
-                        icon: Icon(Icons.verified_user),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('To X USer'),
-                      IconButton(
-                        onPressed: () {
-                          print('pressed to intitial');
-                          context
-                              .read<AuthenticationBloc>()
-                              .add(AuthSetUser(username: 'XXX User'));
-                          context
-                              .read<AuthenticationBloc>()
-                              .add(AuthPrintState());
-                        },
-                        icon: Icon(Icons.verified_user),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
+//         print('Curr : ${current.authState}');
+//         return true;
+//       },
+//       child: Scaffold(
+//         body: Builder(
+//           builder: (context) {
+//             var status = context
+//                 .select((AuthenticationBloc bloc) => bloc.state.authState);
+//             print('New Status Changed at Scaffold Body  Build: $status');
+//             return Center(
+//               child: Column(
+//                 children: [
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                     children: [
+//                       Text('State is : $status'),
+//                       IconButton(
+//                         onPressed: () {
+//                           print(
+//                               '........................................................................................');
+//                           print(
+//                               'pressed ${context.read<AuthenticationBloc>().state.authState}');
+//                           context
+//                               .read<AuthenticationBloc>()
+//                               .add(AuthPrintState());
+//                           print(
+//                               '........................................................................................');
+//                         },
+//                         icon: Icon(Icons.print),
+//                       ),
+//                     ],
+//                   ),
+//                   IconButton(
+//                     onPressed: () {
+//                       context
+//                           .read<AuthenticationBloc>()
+//                           .add(AuthenticationStarted());
+//                     },
+//                     icon: Icon(Icons.cleaning_services),
+//                   ),
+//                   Text('to Failure '),
+//                   IconButton(
+//                     onPressed: () {
+//                       print(
+//                           'pressed ${context.read<AuthenticationBloc>().state.username}');
+//                       context.read<AuthenticationBloc>().add(AuthPrintState());
+//                       context
+//                           .read<AuthenticationBloc>()
+//                           .add(AuthSetStat(authState: AuthState.failure));
+//                     },
+//                     icon: Icon(Icons.family_restroom),
+//                   ),
+//                   Text('to Loading '),
+//                   IconButton(
+//                     onPressed: () {
+//                       print(
+//                           'pressed ${context.read<AuthenticationBloc>().state.username}');
+//                       context.read<AuthenticationBloc>().add(AuthPrintState());
+//                       context
+//                           .read<AuthenticationBloc>()
+//                           .add(AuthSetStat(authState: AuthState.loading));
+//                     },
+//                     icon: Icon(Icons.cleaning_services),
+//                   ),
+//                   Text('to Auth Started'),
+//                   IconButton(
+//                     onPressed: () {
+//                       print(
+//                           'pressed ${context.read<AuthenticationBloc>().state.username}');
+//                       context.read<AuthenticationBloc>().add(AuthPrintState());
+//                       context
+//                           .read<AuthenticationBloc>()
+//                           .add(AuthSetStat(authState: AuthState.started));
+//                     },
+//                     icon: Icon(Icons.cleaning_services),
+//                   ),
+//                   Text('To Initial'),
+//                   IconButton(
+//                     onPressed: () {
+//                       print('pressed to intitial');
+//                       context
+//                           .read<AuthenticationBloc>()
+//                           .add(AuthSetStat(authState: AuthState.intitial));
+//                       context.read<AuthenticationBloc>().add(AuthPrintState());
+//                     },
+//                     icon: Icon(Icons.cleaning_services),
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text('To New USer'),
+//                       IconButton(
+//                         onPressed: () {
+//                           print('pressed to intitial');
+//                           context
+//                               .read<AuthenticationBloc>()
+//                               .add(AuthSetUser(username: 'New User'));
+//                           context
+//                               .read<AuthenticationBloc>()
+//                               .add(AuthPrintState());
+//                         },
+//                         icon: Icon(Icons.verified_user),
+//                       ),
+//                     ],
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text('To X USer'),
+//                       IconButton(
+//                         onPressed: () {
+//                           print('pressed to intitial');
+//                           context
+//                               .read<AuthenticationBloc>()
+//                               .add(AuthSetUser(username: 'XXX User'));
+//                           context
+//                               .read<AuthenticationBloc>()
+//                               .add(AuthPrintState());
+//                         },
+//                         icon: Icon(Icons.verified_user),
+//                       ),
+//                     ],
+//                   )
+//                 ],
+//               ),
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
+*/

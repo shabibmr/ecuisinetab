@@ -243,6 +243,8 @@ class _POSCartPageState extends State<POSCartPage> {
           child: Dialog(
             elevation: 3,
             alignment: Alignment.center,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8))),
             child: POSItemDetailPage(),
           ),
         );

@@ -38,5 +38,10 @@ class ReadConfig extends ConfigurationsEvent {}
 class SetArabic extends ConfigurationsEvent {
   final bool isArabic;
 
-  SetArabic({required this.isArabic});
+  const SetArabic({required this.isArabic});
+}
+
+class SetDefaultPriceListID extends ConfigurationsEvent {
+  final int defaultPriceListId;
+  const SetDefaultPriceListID({required this.defaultPriceListId});
 }

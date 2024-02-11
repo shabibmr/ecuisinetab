@@ -35,7 +35,7 @@ class WebservicePHPHelper {
     return settings.get('DBName', defaultValue: 'gmdb');
   }
 
-  static Future<GeneralVoucherDataModel> getVoucherByVoucherNo({
+  static Future<GeneralVoucherDataModel?> getVoucherByVoucherNo({
     required String voucherID,
     required String voucherPrefix,
     required String link,

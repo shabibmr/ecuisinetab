@@ -205,3 +205,22 @@ class ArabicCheck extends StatelessWidget {
     });
   }
 }
+
+class DefaultPriceListWidget extends StatelessWidget {
+  const DefaultPriceListWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      final bool isArabic = context
+          .select((ConfigurationsBloc value) => value.state.arabic ?? false);
+      return CheckboxListTile(
+        value: isArabic,
+        title: const Text('Default Price List '),
+        onChanged: (bool? value) {
+          context.read<ConfigurationsBloc>().add(SetArabic(isArabic: value!));
+        },
+      );
+    });
+  }
+}

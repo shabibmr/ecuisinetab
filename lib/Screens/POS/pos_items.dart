@@ -1,6 +1,7 @@
 import 'package:ecuisinetab/Screens/POS/pos_cart.dart';
 import 'package:ecuisinetab/Screens/POS/pos_item_detail.dart';
 import 'package:ecuisinetab/Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
+import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
 
 import '../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 
@@ -119,8 +120,8 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            itemDetail(item),
-            Expanded(flex: 2, child: getQty(item)),
+            Expanded(flex: 7, child: itemDetail(item)),
+            Expanded(flex: 3, child: getQty(item)),
           ],
         ),
       ),
@@ -132,52 +133,44 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
       onTap: () async {
         await openItemDetailPage(item);
       },
-      child: Expanded(
-          flex: 8,
-          child: Container(
-            color: Colors.amber.shade50,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Container(
+        color: Colors.amber.shade50,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: AutoSizeText(
+                item.Item_Name ?? '',
+                style: kNormalStyle,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: AutoSizeText(
-                    item.Item_Name ?? '',
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
+                    '@${item.Price?.inCurrency}',
+                    style: kSmallStyle,
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: AutoSizeText(
-                        '@${item.Price?.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 8,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: AutoSizeText(
-                        ' MRP : ${item.Price_2?.toStringAsFixed(2) ?? ''}',
-                        style: TextStyle(
-                          fontSize: 8,
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(
+                  width: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: AutoSizeText(
+                    ' MRP : ${item.Price_2?.toStringAsFixed(2) ?? ''}',
+                    style: kSmallStyle,
+                  ),
                 ),
               ],
             ),
-          )),
+          ],
+        ),
+      ),
     );
   }
 
@@ -193,15 +186,17 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
       onTap: () async {
         var newval = await getQtyValue(val.toDouble());
         if (newval != null) {
-          context.read<VoucherBloc>().add(UpdateItemQty(
-                item: InventoryItemDataModel(
-                  ItemID: item.Item_ID,
-                  ItemName: item.Item_Name,
-                  taxRate: item.Vat_Rate,
-                  rate: item.Price,
+          context.read<VoucherBloc>().add(
+                UpdateItemQty(
+                  item: InventoryItemDataModel(
+                    ItemID: item.Item_ID,
+                    ItemName: item.Item_Name,
+                    taxRate: item.Vat_Rate,
+                    rate: item.Price,
+                  ),
+                  qty: newval,
                 ),
-                qty: newval,
-              ));
+              );
         }
       },
       child: Container(
@@ -237,7 +232,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
                 child: Center(
                   child: Container(
                     color: Colors.amber.shade100,
-                    child: Text('Enter Quantity'),
+                    child: const Text('Enter Quantity'),
                   ),
                 ),
               ),
@@ -252,8 +247,8 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
                   onPressed: () {
                     Navigator.pop(context, 23);
                   },
-                  icon: Icon(Icons.check),
-                  label: Text('OK'))
+                  icon: const Icon(Icons.check),
+                  label: const Text('OK'))
             ],
           ),
         );
@@ -270,7 +265,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
             .voucher!
             .getItemCount(item.Item_ID!) ??
         0;
-        
+
     await showDialog(
       context: context,
       builder: (context2) => MultiBlocProvider(
@@ -285,6 +280,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
         ],
         child: Dialog(
           elevation: 3,
+          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(8)),
           alignment: Alignment.center,
           child: POSItemDetailPage(),
         ),

@@ -9,8 +9,9 @@ abstract class PosEvent extends Equatable {
 
 class GroupSelected extends PosEvent {
   final String groupID;
+  final int? index;
 
-  GroupSelected({required this.groupID});
+  const GroupSelected({required this.groupID, this.index});
 }
 
 class ItemsLoaded extends PosEvent {}

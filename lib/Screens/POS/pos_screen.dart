@@ -83,6 +83,7 @@ class _POSScreenState extends State<POSScreen> {
   Widget getPOSScreen(BuildContext context) {
     print('POS SCreen Build');
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       bottomNavigationBar: Builder(
         builder: (context) {
           int count = context.select((VoucherBloc bloc) =>
@@ -165,6 +166,8 @@ class _POSScreenState extends State<POSScreen> {
           child: Dialog(
             elevation: 3,
             alignment: Alignment.center,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8))),
             child: POSItemDetailPage(),
           ),
         );
@@ -233,15 +236,21 @@ class TableButton extends StatelessWidget {
           //   ),
           // ));
         },
-        child: Card(
-          elevation: 5,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Builder(builder: (context) {
-              final String ref = context.select(
-                  (VoucherBloc bloc) => bloc.state.voucher?.reference ?? '');
-              return Text(ref);
-            }),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+          child: Card(
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Builder(builder: (context) {
+                final String ref = context.select(
+                    (VoucherBloc bloc) => bloc.state.voucher?.reference ?? '');
+                return Text(
+                  ref,
+                  style: k18lStyleBold,
+                );
+              }),
+            ),
           ),
         ),
       );

@@ -28,7 +28,7 @@ class _PosTableSelectorState extends State<PosTableSelector> {
       // backgroundColor: Colors.blue.shade50,
       body: getBody(),
       appBar: AppBar(
-        title: Text('Select Table'),
+        title: const Text('Select Table'),
         centerTitle: false,
         automaticallyImplyLeading: false,
         actions: [
@@ -36,9 +36,9 @@ class _PosTableSelectorState extends State<PosTableSelector> {
               onPressed: () {
                 context.read<PosBloc>().add(FetchCurrentOrders());
               },
-              icon: Icon(Icons.refresh)),
+              icon: const Icon(Icons.refresh)),
           PopupMenuButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             onSelected: (value) {},
             initialValue: 0,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
@@ -182,16 +182,20 @@ class _PosTableSelectorState extends State<PosTableSelector> {
                                       link: '',
                                       vType: GMVoucherTypes.SalesOrder,
                                     ));
-                                context.read<PosBloc>().add(OrderSelected(
-                                    voucherNo: vNo, vPrefix: vPref));
+                                context.read<PosBloc>().add(
+                                      OrderSelected(
+                                        voucherNo: vNo,
+                                        vPrefix: vPref,
+                                      ),
+                                    );
                               } else {
                                 context.read<VoucherBloc>()
-                                  ..add(SetEmptyVoucher(
+                                  ..add(SetVoucherType(
                                     voucherType: GMVoucherTypes.SalesOrder,
                                   ))
-                                  ..add(
-                                      SwitchReference(newReference: _ctrl.text))
-                                  ..add(SetPriceList(priceListID: 3));
+                                  ..add(SwitchReference(
+                                      newReference: _ctrl.text));
+
                                 context
                                     .read<PosBloc>()
                                     .add(const OrderSelected());
@@ -267,7 +271,7 @@ class _TablesGridState extends State<TablesGrid> {
                     child: Align(
                       alignment: Alignment.center,
                       child: AutoSizeText(tables?[index].toString() ?? '',
-                          style: TextStyle(fontSize: 18)),
+                          style: const TextStyle(fontSize: 18)),
                     ),
                   ),
                   Container(
@@ -287,7 +291,7 @@ class _TablesGridState extends State<TablesGrid> {
                                             orders[tables?[index].toString()]
                                                     ['Total'] ??
                                                 "0.0")
-                                        .inCurrency),
+                                        .inCurrencySmall),
                                   ),
                                   Padding(
                                     padding:
@@ -309,7 +313,8 @@ class _TablesGridState extends State<TablesGrid> {
           ),
           onTap: () {
             print('Table change to ${tables?[index].toString() ?? ''}');
-
+            int defPrice = Hive.box(HiveTagNames.Settings_Hive_Tag)
+                .get("Default_Pricelist_Id");
             if (orders.keys.contains(tables?[index].toString())) {
               String vNo =
                   orders[tables?[index].toString()]['Voucher_No'].toString();
@@ -328,7 +333,7 @@ class _TablesGridState extends State<TablesGrid> {
             } else {
               context.read<VoucherBloc>()
                 ..add(SetEmptyVoucher(voucherType: GMVoucherTypes.SalesOrder))
-                ..add(SetPriceList(priceListID: 3))
+                ..add(SetPriceList(priceListID: defPrice))
                 ..add(SwitchReference(
                     newReference: tables?[index].toString() ?? ''));
               context.read<PosBloc>().add(const OrderSelected());
@@ -347,7 +352,7 @@ class _TablesGridState extends State<TablesGrid> {
 }
 
 class ClockWidget extends StatefulWidget {
-  ClockWidget({Key? key, required this.timeStamp}) : super(key: key);
+  const ClockWidget({super.key, required this.timeStamp});
   final DateTime timeStamp;
 
   @override
@@ -370,7 +375,7 @@ class _ClockWidgetState extends State<ClockWidget> {
   late Timer T;
 
   callTimer() async {
-    T = Timer.periodic(const Duration(minutes: 1), (timer) {
+    T = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
     });
   }
@@ -379,7 +384,7 @@ class _ClockWidgetState extends State<ClockWidget> {
   Widget build(BuildContext context) {
     Duration duration = DateTime.now().difference(widget.timeStamp);
     String hours = duration.inHours > 0
-        ? duration.inHours.toString().padLeft(2, '0') + ":"
+        ? "${duration.inHours.toString().padLeft(2, '0')}:"
         : '';
 
     return Text('$hours${duration.inMinutes.remainder(60)}');

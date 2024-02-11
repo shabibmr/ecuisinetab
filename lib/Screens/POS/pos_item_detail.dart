@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
 import 'package:ecuisinetab/Login/constants.dart';
 import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
@@ -40,99 +41,97 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
       final status =
           context.select((InventoryItemDetailBloc bloc) => bloc.state.status);
       if (status == ItemDetailStatus.ready) {
-        return Scaffold(
-          appBar: AppBar(
-            title: ItemName(),
-            centerTitle: false,
-          ),
-          body: Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.transparent),
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Card(
-                    shadowColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        color: Colors.blue.shade50,
+        return SingleChildScrollView(
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(context.select((InventoryItemDetailBloc bloc) =>
+                  bloc.state.item?.ItemName ?? '')),
+              centerTitle: false,
+            ),
+            body: Container(
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.transparent),
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Card(
+                      shadowColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          color: Colors.blue.shade50,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  height: 3,
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    color: Colors.yellow.shade50,
-                    child: ListView(
-                      shrinkWrap: false,
-                      children: [
-                        ItemNameArabic(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Expanded(child: ItemRateWidget()),
-                            // Expanded(
-                            //     child: ItemQuantity(
-                            //   focusNode: _focusNode,
-                            // )),
-                            Expanded(child: const ItemQty()),
-                          ],
-                        ),
-                        ItemNarration(),
-                        ItemTotalWidget(),
-                      ],
+                  Container(
+                    height: 3,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      color: Colors.yellow.shade50,
+                      child: const Column(
+                        children: [
+                          ItemNameArabic(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(child: ItemRateWidget()),
+                              Expanded(child: ItemQty()),
+                            ],
+                          ),
+                          ItemNarration(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Container(
-                  color: Colors.amber.shade50,
-                  child: Builder(
-                    builder: (context) {
-                      final InventoryItemDataModel item = context.select(
-                          (InventoryItemDetailBloc blox) => blox.state.item!);
-                      return Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          FloatingActionButton(
-                            onPressed: () {
-                              print('Pressed');
-                              int index = context
-                                      .read<InventoryItemDetailBloc>()
-                                      .state
-                                      .index ??
-                                  -1;
-                              if (index >= 0) {
-                                context.read<VoucherBloc>().add(
-                                    RemoveInventoryItemAtIndex(index: index));
-                                Navigator.of(context).pop();
-                              }
-                            },
-                            child: const Icon(Icons.delete),
-                          ),
-                          FloatingActionButton(
-                            onPressed: () {
-                              print('Pressed');
-                              Navigator.of(context).pop(item);
-                            },
-                            child: const Icon(Icons.check),
-                          ),
-                        ],
-                      );
-                    },
+                  Container(
+                    color: Colors.amber.shade50,
+                    child: Builder(
+                      builder: (context) {
+                        final InventoryItemDataModel item = context.select(
+                            (InventoryItemDetailBloc blox) => blox.state.item!);
+                        return Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            FloatingActionButton(
+                              onPressed: () {
+                                print('Pressed');
+                                int index = context
+                                        .read<InventoryItemDetailBloc>()
+                                        .state
+                                        .index ??
+                                    -1;
+                                if (index >= 0) {
+                                  context.read<VoucherBloc>().add(
+                                      RemoveInventoryItemAtIndex(index: index));
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              child: const Icon(Icons.delete),
+                            ),
+                            const ItemTotalWidget(),
+                            FloatingActionButton(
+                              onPressed: () {
+                                print('Pressed');
+                                Navigator.of(context).pop(item);
+                              },
+                              child: const Icon(Icons.check),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -266,7 +265,7 @@ class ItemTotalWidget extends StatelessWidget {
 }
 
 class ItemName extends StatelessWidget {
-  ItemName({Key? key}) : super(key: key);
+  ItemName({super.key});
 
   Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
 
@@ -278,7 +277,7 @@ class ItemName extends StatelessWidget {
           flag ? bloc.state.item?.ItemNameArabic : bloc.state.item?.ItemName);
       return Text(
         itemName ?? '',
-        style: kAppbarLabelStyle,
+        // style: kAppbarLabelStyle,
       );
     });
   }

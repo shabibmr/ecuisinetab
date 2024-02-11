@@ -257,54 +257,53 @@ class _VoucherFooterState extends State<VoucherFooter> {
   @override
   Widget build(BuildContext context) {
     final voucher = context.select((VoucherBloc bloc) => bloc.state.voucher);
-    return Container(
-      // color: Colors.black,
-      child: Card(
-        elevation: 5,
-        // color: const Color.fromARGB(255, 19, 56, 83),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 4, 4, 8),
-                    child: Text(
-                      'Total',
-                      style: kTotalListStyle,
-                    ),
-                  ),
-                ),
-              ),
-              const Icon(
-                Icons.shopping_cart,
-                color: Colors.white,
-              ),
-              Builder(builder: (context) {
-                int count = context.select((VoucherBloc bloc) =>
-                    bloc.state.voucher!.InventoryItems!.length);
-                return Text(
-                  count > 0 ? count.toString() : '0',
+    return Card(
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Expanded(
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Padding(
+            //       padding: const EdgeInsets.fromLTRB(8.0, 4, 4, 8),
+            //       child: Text(
+            //         'Total',
+            //         style: kTotalListStyle,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  voucher!.grandTotal?.inCurrency ?? '0.00',
                   style: kTotalListStyle,
-                );
-              }),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      voucher!.grandTotal?.inCurrency ?? '0.00',
-                      style: kTotalListStyle,
-                    ),
-                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+            Row(
+              children: [
+                const Icon(
+                  Icons.shopping_cart,
+                  color: Colors.black,
+                ),
+                Builder(builder: (context) {
+                  int count = context.select((VoucherBloc bloc) =>
+                      bloc.state.voucher!.InventoryItems!.length);
+                  return Text(
+                    count > 0 ? count.toString() : '0',
+                    style: kTotalListStyle,
+                  );
+                }),
+              ],
+            ),
+          ],
         ),
       ),
     );

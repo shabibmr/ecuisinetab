@@ -1,3 +1,5 @@
+// ignore_for_file: camel_case_types
+
 import 'package:ecuisinetab/Login/login_page.dart';
 import 'package:ecuisinetab/Screens/POS/pos_screen.dart';
 import 'package:ecuisinetab/Screens/POS/widgets/Configurations/configurations.dart';
@@ -7,13 +9,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../Login/constants.dart';
 import '../Services/Sync/bloc/sync_ui_config_bloc.dart';
 import '../Transactions/blocs/pos/pos_bloc.dart';
 import '../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import '../auth/bloc/authentication_bloc.dart';
 
 class Init_App extends StatefulWidget {
-  const Init_App({Key? key}) : super(key: key);
+  const Init_App({super.key});
 
   @override
   State<Init_App> createState() => _Init_AppState();
@@ -36,7 +39,7 @@ class _Init_AppState extends State<Init_App> {
           print(
               'new state ${state.authState} ${context.read<AuthenticationBloc>().state.msg} ${context.read<AuthenticationBloc>().state.username}  ');
           if (state.authState == AuthState.failure) {
-            openLoginWidget();
+            openLoginWidget(msg: state.msg);
           } else if (state.authState == AuthState.success) {
             openPOSScreen(context);
           } else if (state.authState == AuthState.dataEmpty) {
@@ -93,7 +96,7 @@ class _Init_AppState extends State<Init_App> {
     );
   }
 
-  void openLoginWidget() {
+  void openLoginWidget({String? msg}) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => MultiBlocProvider(
         providers: [
@@ -123,6 +126,8 @@ class _Init_AppState extends State<Init_App> {
   }
 
   void openPOSScreen(BuildContext context) {
+    final int defaultPrice =
+        Hive.box(HiveTagNames.Settings_Hive_Tag).get("Default_Pricelist_Id");
     Navigator.of(context).pop();
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -138,7 +143,7 @@ class _Init_AppState extends State<Init_App> {
                 ..add(SetEmptyVoucher(
                   voucherType: GMVoucherTypes.SalesOrder,
                 ))
-                ..add(SetPriceList(priceListID: 3)),
+                ..add(SetPriceList(priceListID: defaultPrice)),
             )
           ],
           child: POSScreen(),

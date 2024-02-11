@@ -21,7 +21,7 @@ part 'voucher_state.dart';
 class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   final Box settingsBox = Hive.box(HiveTagNames.Settings_Hive_Tag);
   VoucherBloc()
-      : super(VoucherState(
+      : super(const VoucherState(
           status: VoucherEditorStatus.initial,
         )) {
     on<SetVoucher>((event, emit) => emit(VoucherState(
@@ -54,7 +54,6 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
           voucher: state.voucher?.copyWith(reference: event.newReference),
           status: VoucherEditorStatus.loaded,
         ));
-        print(state.voucher?.reference ?? 'Still NULl');
       },
     );
     on<SetMainLedger>((event, emit) => emit(state.copyWith(

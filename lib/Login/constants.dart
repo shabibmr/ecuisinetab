@@ -1,12 +1,10 @@
-import 'dart:io';
-
 // import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-const String currency = "Rs. ";
+const String currency = "\u20B9";
 
 final currencyFormat = NumberFormat.currency(
   locale: "en_IN",
@@ -24,16 +22,20 @@ const kLabelStyle = TextStyle(
   fontFamily: 'OpenSans',
 );
 
-const kAppbarLabelStyle = TextStyle(
+final kAppbarLabelStyle = GoogleFonts.roboto(
   color: Colors.black,
   fontWeight: FontWeight.bold,
-  fontFamily: 'OpenSans',
 );
 
-final kDashListStyle = GoogleFonts.roboto(
+final kSmallRate = GoogleFonts.roboto(
+  color: Colors.black,
+  fontStyle: FontStyle.italic,
+);
+
+final kDashListStyle = GoogleFonts.adventPro(
   color: Colors.black,
   fontSize: 22,
-  // fontWeight: FontWeight.bold,
+  fontWeight: FontWeight.bold,
 );
 
 final kadminDashListStyle = GoogleFonts.roboto(
@@ -43,13 +45,26 @@ final kadminDashListStyle = GoogleFonts.roboto(
 );
 
 final kTotalListStyle = GoogleFonts.roboto(
-  color: Colors.white,
-  fontSize: 20,
+  color: Colors.black,
+  fontSize: 23,
   fontWeight: FontWeight.bold,
 );
 
-final kNormalStyle = GoogleFonts.roboto(
+final kNormalStyle = GoogleFonts.roboto(fontSize: 12
+    // fontWeight: FontWeight.bold,
+    );
 
+final kNormalStyleBold = GoogleFonts.roboto(
+  fontSize: 12,
+  fontWeight: FontWeight.bold,
+);
+
+final k18lStyleBold = GoogleFonts.roboto(
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+);
+
+final kSmallStyle = GoogleFonts.roboto(fontSize: 8
     // fontWeight: FontWeight.bold,
     );
 
@@ -61,7 +76,7 @@ const kHeadStyle = TextStyle(
 );
 
 final kBoxDecorationStyle = BoxDecoration(
-  color: const Color(0xFF546e74),
+  // color: const Color(0xFF546e74),
   borderRadius: BorderRadius.circular(10.0),
   boxShadow: const [
     BoxShadow(

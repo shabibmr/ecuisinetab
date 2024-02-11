@@ -13,7 +13,7 @@ part 'configurations_state.dart';
 
 class ConfigurationsBloc
     extends Bloc<ConfigurationsEvent, ConfigurationsState> {
-  ConfigurationsBloc() : super(ConfigurationsState()) {
+  ConfigurationsBloc() : super(const ConfigurationsState()) {
     on<SetIPAddress>((event, emit) {
       emit(state.copyWith(ServerIP: event.str));
     });
@@ -29,6 +29,9 @@ class ConfigurationsBloc
     on<SetArabic>((event, emit) {
       emit(state.copyWith(arabic: event.isArabic));
     });
+    on<SetDefaultPriceListID>((event, emit) {
+      emit(state.copyWith(defaultPriceListID: event.defaultPriceListId));
+    });
     on<SaveConfiguration>((event, emit) {
       Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
       sett.put('url', state.serverIP);
@@ -36,6 +39,7 @@ class ConfigurationsBloc
       sett.put('BillPrinter', state.printerName);
       sett.put('vPref', state.voucherPref);
       sett.put('isArabic', state.arabic);
+      sett.put('Default_Pricelist_Id', state.defaultPriceListID);
     });
     on<ReadConfig>((event, emit) async {
       emit(state.copyWith(ready: false));
@@ -45,10 +49,11 @@ class ConfigurationsBloc
       emit(state.copyWith(
         ServerIP:
             sett.get('url', defaultValue: 'http://192.168.1.99/test_app_water'),
-        DBName: sett.get('DBName', defaultValue: 'gmdb'),
+        DBName: sett.get('DBName', defaultValue: 'cake_studio_mukkam'),
         voucherPref: sett.get('vPref', defaultValue: 'A'),
         printerName: sett.get('BillPrinter', defaultValue: 'Counter'),
         arabic: sett.get('isArabic', defaultValue: false),
+        defaultPriceListID: sett.get('Default_Pricelist_Id', defaultValue: 3),
         ready: true,
       ));
     });

@@ -11,7 +11,7 @@ abstract class VoucherEvent extends Equatable {
 class SetMainLedger extends VoucherEvent {
   final LedgerMasterDataModel? ledger;
 
-  SetMainLedger({
+  const SetMainLedger({
     required this.ledger,
   });
 
@@ -22,7 +22,7 @@ class SetMainLedger extends VoucherEvent {
 class SetVoucherDate extends VoucherEvent {
   final DateTime voucherDate;
 
-  SetVoucherDate({
+  const SetVoucherDate({
     required this.voucherDate,
   });
 
@@ -97,14 +97,14 @@ class SetNarration extends VoucherEvent {
 }
 
 class SaveVoucher extends VoucherEvent {
-  SaveVoucher();
+  const SaveVoucher();
 
   @override
   List<Object> get props => [];
 }
 
 class VoucherRequestSave extends VoucherEvent {
-  VoucherRequestSave();
+  const VoucherRequestSave();
 
   @override
   List<Object> get props => [];
@@ -113,7 +113,7 @@ class VoucherRequestSave extends VoucherEvent {
 class SetVoucherID extends VoucherEvent {
   final String voucherID;
 
-  SetVoucherID({
+  const SetVoucherID({
     required this.voucherID,
   });
 
@@ -124,7 +124,7 @@ class SetVoucherID extends VoucherEvent {
 class SetVoucher extends VoucherEvent {
   final GeneralVoucherDataModel voucher;
 
-  SetVoucher({
+  const SetVoucher({
     required this.voucher,
   });
 
@@ -133,7 +133,7 @@ class SetVoucher extends VoucherEvent {
 }
 
 class RefreshVoucher extends VoucherEvent {
-  RefreshVoucher();
+  const RefreshVoucher();
 
   @override
   List<Object> get props => [];
@@ -142,7 +142,7 @@ class RefreshVoucher extends VoucherEvent {
 class SetTransactionType extends VoucherEvent {
   final TransactionType transactionType;
 
-  SetTransactionType({
+  const SetTransactionType({
     required this.transactionType,
   });
 }
@@ -150,7 +150,7 @@ class SetTransactionType extends VoucherEvent {
 class SetDiscountPercentage extends VoucherEvent {
   final double discountPercentage;
 
-  SetDiscountPercentage({
+  const SetDiscountPercentage({
     required this.discountPercentage,
   });
 
@@ -161,7 +161,7 @@ class SetDiscountPercentage extends VoucherEvent {
 class SetDiscountAmount extends VoucherEvent {
   final double discountAmount;
 
-  SetDiscountAmount({
+  const SetDiscountAmount({
     required this.discountAmount,
   });
 
@@ -172,7 +172,7 @@ class SetDiscountAmount extends VoucherEvent {
 class SetEmptyVoucher extends VoucherEvent {
   final String voucherType;
 
-  SetEmptyVoucher({
+  const SetEmptyVoucher({
     required this.voucherType,
   });
 
@@ -180,10 +180,18 @@ class SetEmptyVoucher extends VoucherEvent {
   List<Object> get props => [voucherType];
 }
 
+class SetVoucherType extends VoucherEvent {
+  final String voucherType;
+
+  const SetVoucherType({
+    required this.voucherType,
+  });
+}
+
 class SetToGodownID extends VoucherEvent {
   final String toGodownID;
 
-  SetToGodownID({
+  const SetToGodownID({
     required this.toGodownID,
   });
 
@@ -194,7 +202,7 @@ class SetToGodownID extends VoucherEvent {
 class SetFromGodownID extends VoucherEvent {
   final String fromGodownID;
 
-  SetFromGodownID({
+  const SetFromGodownID({
     required this.fromGodownID,
   });
 
@@ -205,7 +213,7 @@ class SetFromGodownID extends VoucherEvent {
 class SetCustomerAddress extends VoucherEvent {
   final String customerAddress;
 
-  SetCustomerAddress({
+  const SetCustomerAddress({
     required this.customerAddress,
   });
 
@@ -216,7 +224,7 @@ class SetCustomerAddress extends VoucherEvent {
 class SetCustomerPhoneNumber extends VoucherEvent {
   final String phoneNumber;
 
-  SetCustomerPhoneNumber({
+  const SetCustomerPhoneNumber({
     required this.phoneNumber,
   });
 
@@ -227,7 +235,7 @@ class SetCustomerPhoneNumber extends VoucherEvent {
 class SetCustomerName extends VoucherEvent {
   final String name;
 
-  SetCustomerName({
+  const SetCustomerName({
     required this.name,
   });
 
@@ -247,7 +255,7 @@ class SwitchReference extends VoucherEvent {
 }
 
 class RecalculateVoucher extends VoucherEvent {
-  RecalculateVoucher();
+  const RecalculateVoucher();
 
   @override
   List<Object> get props => [];
@@ -256,7 +264,7 @@ class RecalculateVoucher extends VoucherEvent {
 class AddInventoryItem extends VoucherEvent {
   final InventoryItemDataModel inventoryItem;
 
-  AddInventoryItem({
+  const AddInventoryItem({
     required this.inventoryItem,
   });
 
@@ -268,7 +276,7 @@ class UpdateInventoryItemAtIndex extends VoucherEvent {
   final int index;
   final InventoryItemDataModel inventoryItem;
 
-  UpdateInventoryItemAtIndex({
+  const UpdateInventoryItemAtIndex({
     required this.index,
     required this.inventoryItem,
   });
@@ -280,7 +288,7 @@ class UpdateInventoryItemAtIndex extends VoucherEvent {
 class RemoveInventoryItemAtIndex extends VoucherEvent {
   final int index;
 
-  RemoveInventoryItemAtIndex({
+  const RemoveInventoryItemAtIndex({
     required this.index,
   });
 
@@ -291,7 +299,7 @@ class RemoveInventoryItemAtIndex extends VoucherEvent {
 class AddLedger extends VoucherEvent {
   final LedgerMasterDataModel ledger;
 
-  AddLedger({
+  const AddLedger({
     required this.ledger,
   });
 
@@ -303,7 +311,7 @@ class UpdateLedgerAtIndex extends VoucherEvent {
   final int index;
   final LedgerMasterDataModel ledger;
 
-  UpdateLedgerAtIndex({
+  const UpdateLedgerAtIndex({
     required this.index,
     required this.ledger,
   });
@@ -315,7 +323,7 @@ class UpdateLedgerAtIndex extends VoucherEvent {
 class DeleteLedgerAtIndex extends VoucherEvent {
   final int index;
 
-  DeleteLedgerAtIndex({
+  const DeleteLedgerAtIndex({
     required this.index,
   });
 
@@ -326,7 +334,7 @@ class DeleteLedgerAtIndex extends VoucherEvent {
 class SetContact extends VoucherEvent {
   final ContactsDataModel contact;
 
-  SetContact({
+  const SetContact({
     required this.contact,
   });
 
@@ -338,7 +346,7 @@ class UpdateItemQty extends VoucherEvent {
   final num qty;
   final InventoryItemDataModel item;
 
-  UpdateItemQty({
+  const UpdateItemQty({
     required this.item,
     required this.qty,
   });
@@ -349,7 +357,7 @@ class FetchVoucher extends VoucherEvent {
   final String voucherPref;
   final String link;
   final String vType;
-  FetchVoucher({
+  const FetchVoucher({
     required this.voucherID,
     required this.voucherPref,
     required this.link,
@@ -378,7 +386,7 @@ class ExportToVoucher extends VoucherEvent {
 class FetchNextVoucherNumber extends VoucherEvent {
   final String voucherPref;
 
-  FetchNextVoucherNumber({
+  const FetchNextVoucherNumber({
     required this.voucherPref,
   });
 }
