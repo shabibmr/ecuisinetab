@@ -30,11 +30,9 @@ class _POSInvGroupsState extends State<POSInvGroups> {
 
   @override
   void initState() {
-    print('init state');
     gBox = Hive.box(HiveTagNames.ItemGroups_Hive_Tag);
     // filter gBox with Group_Type=2 to create _groups;
     for (var item in gBox.values) {
-      print('> > > ${item.Group_Name} is ${item.Group_Type}');
       if (item.Group_Type == '2') {
         _groups.add(item);
       }
@@ -46,7 +44,6 @@ class _POSInvGroupsState extends State<POSInvGroups> {
   Widget build(BuildContext context) {
     return BlocBuilder<PosBloc, PosState>(
       builder: (context, state) {
-        print('>> len : ${_groups.length}');
         return ListView.builder(
           // scrollDirection: Axis.horizontal,
           itemCount: _groups.length,
@@ -55,7 +52,6 @@ class _POSInvGroupsState extends State<POSInvGroups> {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                 onTap: () {
-                  print('Selected ${_groups[index].Group_ID}');
                   context.read<PosBloc>().add(GroupSelected(
                       groupID: _groups[index].Group_ID!, index: index));
                   Navigator.of(context).pop();
@@ -103,28 +99,22 @@ class _InvGroupExpansionPanelState extends State<InvGroupExpansionPanel> {
   }
 
   final Map<String, bool> _exp = {};
+  final scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
-    print('Build this Groups.. ');
-
     return SingleChildScrollView(
       child: ExpansionPanelList(
         expansionCallback: (panelIndex, isExpanded) {
-          print('expaned :? ${isExpanded}');
           setState(() {
             _exp[_groups[panelIndex].Group_ID!] = isExpanded;
             // _exp.putIfAbsent(panelIndex, () => !isExpanded);
-            print(_groups[panelIndex].Group_ID!);
-            print(_exp[_groups[panelIndex].Group_ID!]);
           });
         },
         children: _groups.map<ExpansionPanel>(
           (e) {
-            print('e');
-            print(e.Group_ID);
-            print(_exp[e.Group_ID]);
             return ExpansionPanel(
               canTapOnHeader: true,
+
               headerBuilder: (context, isExpanded) {
                 return Container(
                   decoration: kBoxDecorationStyle,
@@ -217,9 +207,7 @@ class InvItemListExp extends StatelessWidget {
           // final voucher = context.read<VoucherBloc>().state.voucher;
           // num qty = voucher?.getItemCurrCount(widget.item.Item_ID!) ?? 0;
           // int dec = widget.item.uomObjects[0].UOM_decimal_Points ?? 0;
-          if (qty > 0) {
-            print(' Qty is $qty');
-          }
+
           if (qty == 0) {
             qty = 1;
           }
@@ -256,7 +244,6 @@ class InvItemListExp extends StatelessWidget {
 
   Future<void> openItemDetail(BuildContext context,
       final GeneralVoucherDataModel? voucher, double qty) async {
-    print('>>>>>>> >>>>>>>>>>>>>> QQQ : $qty');
     final InventoryItemDataModel? itemX =
         await showDialog<InventoryItemDataModel>(
       context: context,
@@ -278,13 +265,7 @@ class InvItemListExp extends StatelessWidget {
                 ..add(SetItemQuantity(qty)),
             ),
           ],
-          child: Dialog(
-            elevation: 3,
-            alignment: Alignment.center,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8))),
-            child: POSItemDetailPage(),
-          ),
+          child: POSItemDetailPage(),
         );
       },
     );

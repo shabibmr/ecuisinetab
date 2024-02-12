@@ -14,7 +14,7 @@ import '../../widgets/Basic/MText.dart';
 import 'pos_item_detail.dart';
 
 class POSCartPage extends StatefulWidget {
-  POSCartPage({Key? key}) : super(key: key);
+  const POSCartPage({super.key});
 
   @override
   State<POSCartPage> createState() => _POSCartPageState();
@@ -62,7 +62,7 @@ class _POSCartPageState extends State<POSCartPage> {
                         const Center(
                           child: Text('Cart'),
                         ),
-                        VoucherTotalWidget(),
+                        const VoucherTotalWidget(),
                       ],
                     ),
                   ),
@@ -79,7 +79,7 @@ class _POSCartPageState extends State<POSCartPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        BillCopyCheckBox(),
+                        const BillCopyCheckBox(),
                         ElevatedButton(
                           onPressed: () async {
                             await showPrices();
@@ -240,13 +240,7 @@ class _POSCartPageState extends State<POSCartPage> {
                 ),
             ),
           ],
-          child: Dialog(
-            elevation: 3,
-            alignment: Alignment.center,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8))),
-            child: POSItemDetailPage(),
-          ),
+          child: POSItemDetailPage(),
         );
       },
     );

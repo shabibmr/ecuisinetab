@@ -33,7 +33,7 @@ Future<void> initSettings() async {
   String dbname = sett.get('DBName', defaultValue: 'cake_studio_mukkam');
 
   String url =
-      sett.get('url', defaultValue: 'http://192.168.0.105/test_app_water');
+      sett.get('url', defaultValue: 'http://192.168.0.106/test_app_water');
 
   sett.put('url', url);
   String billPrinter = sett.get('BillPrinter', defaultValue: 'Counter');

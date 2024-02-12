@@ -32,7 +32,109 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return getBody();
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 3,
+      child: getB2(),
+    );
+  }
+
+  Widget getB2() {
+    return Builder(builder: (context) {
+      // status: ItemDetailStatus.ready,
+      final status =
+          context.select((InventoryItemDetailBloc bloc) => bloc.state.status);
+      if (status == ItemDetailStatus.ready) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 80,
+              child: Container(
+                  decoration: BoxDecoration(
+                color: Colors.green.shade100,
+              )),
+            ),
+            Expanded(
+              flex: 1,
+              child: Card(
+                shadowColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    color: Colors.blue.shade50,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              height: 3,
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                color: Colors.yellow.shade50,
+                child: const Column(
+                  children: [
+                    ItemNameArabic(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(child: ItemRateWidget()),
+                        Expanded(child: ItemQty()),
+                      ],
+                    ),
+                    ItemNarration(),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              color: Colors.amber.shade50,
+              child: Builder(
+                builder: (context) {
+                  final InventoryItemDataModel item = context.select(
+                      (InventoryItemDetailBloc blox) => blox.state.item!);
+                  return Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      FloatingActionButton(
+                        onPressed: () {
+                          int index = context
+                                  .read<InventoryItemDetailBloc>()
+                                  .state
+                                  .index ??
+                              -1;
+                          if (index >= 0) {
+                            context
+                                .read<VoucherBloc>()
+                                .add(RemoveInventoryItemAtIndex(index: index));
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Icon(Icons.delete),
+                      ),
+                      const ItemTotalWidget(),
+                      FloatingActionButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(item);
+                        },
+                        child: const Icon(Icons.check),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      } else {
+        return Text('${status}');
+      }
+    });
   }
 
   Widget getBody() {
@@ -103,7 +205,6 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                           children: [
                             FloatingActionButton(
                               onPressed: () {
-                                print('Pressed');
                                 int index = context
                                         .read<InventoryItemDetailBloc>()
                                         .state
@@ -120,7 +221,6 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                             const ItemTotalWidget(),
                             FloatingActionButton(
                               onPressed: () {
-                                print('Pressed');
                                 Navigator.of(context).pop(item);
                               },
                               child: const Icon(Icons.check),
@@ -157,17 +257,14 @@ class ItemQty extends StatelessWidget {
                   element.state.item?.quantity ?? 0);
               int dec = context.select((InventoryItemDetailBloc element) =>
                   element.state.item?.uomObject?.UOM_decimal_Points ?? 0);
-              print('Updating $qty');
               // Fixed type error
               num qtyNum = qty ?? 0;
 
               return Builder(builder: (context) {
-                print('Rebuilding');
                 return InputQty.int(
                   minVal: 0,
                   initVal: qtyNum,
                   onQtyChanged: (value) {
-                    print('Qty : $value');
                     context
                         .read<InventoryItemDetailBloc>()
                         .add(SetItemQuantity(value.toDouble()));
@@ -179,64 +276,6 @@ class ItemQty extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class ItemQuantity extends StatefulWidget {
-  const ItemQuantity({Key? key, required this.focusNode}) : super(key: key);
-  final FocusNode focusNode;
-
-  @override
-  State<ItemQuantity> createState() => _ItemQuantityState();
-}
-
-class _ItemQuantityState extends State<ItemQuantity> {
-  @override
-  Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      double? qty = context.select((InventoryItemDetailBloc element) =>
-          element.state.item?.quantity ?? 0);
-      int dec = context.select((InventoryItemDetailBloc element) =>
-          element.state.item?.uomObject?.UOM_decimal_Points ?? 0);
-      print('New Qty Build');
-      return Card(
-        child: widget.focusNode.hasFocus
-            ? MNumField(
-                label: 'Quantity',
-                showBorder: true,
-                showSuffix: false,
-                focusNode: widget.focusNode,
-                // focusNode: FocusNode(),
-                autoFocus: true,
-                selectAllOnClick: true,
-                textAlign: TextAlign.right,
-                textData: qty?.toStringAsFixed(dec) ?? '0',
-                textStyle: Theme.of(context).textTheme.titleLarge,
-                readOnly: false,
-                onSubmitted: (value) {
-                  FocusScope.of(context).unfocus();
-                  context
-                      .read<InventoryItemDetailBloc>()
-                      .add(ItemDetailShowBatchEditor(show: true));
-                },
-                onChanged: (value) {
-                  context
-                      .read<InventoryItemDetailBloc>()
-                      .add(SetItemQuantity(value.toDouble()));
-                },
-              )
-            : InkWell(
-                onTap: () {
-                  setState(() {
-                    widget.focusNode.requestFocus();
-                  });
-                },
-                child: Text(
-                  'Qty : ${qty?.toStringAsFixed(dec)}',
-                ),
-              ),
-      );
-    });
   }
 }
 
@@ -292,12 +331,12 @@ class ItemNarration extends StatelessWidget {
       String? narration = context.select(
           (InventoryItemDetailBloc element) => element.state.item!.narration);
       return Card(
-        child: MMultiLineTextField(
-          label: 'Narration',
+        child: MTextField(
+          label: 'Narration2',
+          hintText: "Nar",
           textData: narration,
-          textStyle: Theme.of(context).textTheme.titleLarge,
+          textStyle: Theme.of(context).textTheme.bodyMedium,
           onChanged: (value) {
-            print('Setting narration');
             context
                 .read<InventoryItemDetailBloc>()
                 .add(SetItemNarration(value));
@@ -314,12 +353,16 @@ class ItemNameArabic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
-      final String? itemNameArabic = context.select(
-          (InventoryItemDetailBloc bloc) => bloc.state.item?.ItemNameArabic);
-      return Text(
-        itemNameArabic ?? '',
-        style: kTotalListStyle,
-      );
+      final String itemNameArabic = context.select(
+              (InventoryItemDetailBloc bloc) =>
+                  bloc.state.item?.ItemNameArabic) ??
+          '';
+      return itemNameArabic.length > 0
+          ? Text(
+              itemNameArabic ?? '',
+              style: kTotalListStyle,
+            )
+          : Container();
     });
   }
 }
