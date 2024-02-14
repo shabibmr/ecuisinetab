@@ -173,7 +173,7 @@ class InventoryItemDataModel extends Equatable {
 
   UOMHiveMOdel? uomObject;
 
-  final String? priceListID;
+  final int? priceListID;
   final String? priceListName;
 
   final bool? itemPriceEditted;
@@ -359,7 +359,7 @@ class InventoryItemDataModel extends Equatable {
     double? taxAmount,
     String? defaultUOMID,
     UOMHiveMOdel? uomObject,
-    String? priceListID,
+    int? priceListID,
     String? priceListName,
     DateTime? lastModified,
     DateTime? dateCreated,
@@ -926,6 +926,7 @@ class InventoryItemDataModel extends Equatable {
       'fromGodownId': fromGodownID,
       'toGodownId': toGodownID,
       'isActive': isActive,
+      'priceListID': priceListID,
     };
   }
 

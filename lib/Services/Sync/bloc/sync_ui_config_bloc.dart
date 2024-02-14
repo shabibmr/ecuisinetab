@@ -61,7 +61,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       }
       await syncItemGroups();
       // await syncGodowns();
-      // await syncLedgers();
+      await syncLedgers();
       // await syncAccGroups();
       await syncUOMs();
       await syncEmployees();

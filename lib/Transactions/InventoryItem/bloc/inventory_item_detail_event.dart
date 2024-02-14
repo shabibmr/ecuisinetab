@@ -56,6 +56,12 @@ class SetItemNarration extends InventoryItemDetailEvent {
   SetItemNarration(this.narration);
 }
 
+class SetItemPriceLevel extends InventoryItemDetailEvent {
+  final int priceID;
+
+  const SetItemPriceLevel({required this.priceID});
+}
+
 class SetItemUOM extends InventoryItemDetailEvent {
   final UOMHiveMOdel uom;
 

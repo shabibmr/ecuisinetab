@@ -15,7 +15,7 @@ import '../../widgets/Basic/MMultiLineText.dart';
 import '../../widgets/Basic/MText.dart';
 
 class POSItemDetailPage extends StatefulWidget {
-  POSItemDetailPage({Key? key}) : super(key: key);
+  const POSItemDetailPage({super.key});
 
   @override
   State<POSItemDetailPage> createState() => _POSItemDetailPageState();
@@ -33,133 +33,72 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      clipBehavior: Clip.antiAlias,
       child: getB2(),
     );
   }
 
   Widget getB2() {
-    return Builder(builder: (context) {
-      // status: ItemDetailStatus.ready,
-      final status =
-          context.select((InventoryItemDetailBloc bloc) => bloc.state.status);
-      if (status == ItemDetailStatus.ready) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 80,
-              child: Container(
-                  decoration: BoxDecoration(
-                color: Colors.green.shade100,
-              )),
-            ),
-            Expanded(
-              flex: 1,
-              child: Card(
-                shadowColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    color: Colors.blue.shade50,
-                  ),
+    return BlocListener<InventoryItemDetailBloc, InventoryItemDetailState>(
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      child: Builder(builder: (context) {
+        // status: ItemDetailStatus.ready,
+        final status =
+            context.select((InventoryItemDetailBloc bloc) => bloc.state.status);
+        if (status == ItemDetailStatus.ready) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade100,
                 ),
-              ),
-            ),
-            Container(
-              height: 3,
-            ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                color: Colors.yellow.shade50,
-                child: const Column(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    ItemNameArabic(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(child: ItemRateWidget()),
-                        Expanded(child: ItemQty()),
-                      ],
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ItemName(),
+                      ),
                     ),
-                    ItemNarration(),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              color: Colors.amber.shade50,
-              child: Builder(
-                builder: (context) {
-                  final InventoryItemDataModel item = context.select(
-                      (InventoryItemDetailBloc blox) => blox.state.item!);
-                  return Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      FloatingActionButton(
-                        onPressed: () {
-                          int index = context
-                                  .read<InventoryItemDetailBloc>()
-                                  .state
-                                  .index ??
-                              -1;
-                          if (index >= 0) {
+                    Builder(builder: (context) {
+                      int index = context.select(
+                          (InventoryItemDetailBloc bloc) =>
+                              bloc.state.index ?? -1);
+                      print('Index = $index');
+                      return Visibility(
+                        visible: index >= 0,
+                        child: IconButton(
+                          onPressed: () {
                             context
                                 .read<VoucherBloc>()
                                 .add(RemoveInventoryItemAtIndex(index: index));
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        child: const Icon(Icons.delete),
-                      ),
-                      const ItemTotalWidget(),
-                      FloatingActionButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(item);
-                        },
-                        child: const Icon(Icons.check),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      } else {
-        return Text('${status}');
-      }
-    });
-  }
 
-  Widget getBody() {
-    return Builder(builder: (context) {
-      // status: ItemDetailStatus.ready,
-      final status =
-          context.select((InventoryItemDetailBloc bloc) => bloc.state.status);
-      if (status == ItemDetailStatus.ready) {
-        return SingleChildScrollView(
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text(context.select((InventoryItemDetailBloc bloc) =>
-                  bloc.state.item?.ItemName ?? '')),
-              centerTitle: false,
-            ),
-            body: Container(
-              padding: EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.transparent),
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Card(
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
+                      );
+                    })
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Card(
                       shadowColor: Colors.green,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),
@@ -170,75 +109,65 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                    height: 3,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      color: Colors.yellow.shade50,
-                      child: const Column(
-                        children: [
-                          ItemNameArabic(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(child: ItemRateWidget()),
-                              Expanded(child: ItemQty()),
-                            ],
-                          ),
-                          ItemNarration(),
-                        ],
+                    const Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: ItemQty(),
                       ),
                     ),
-                  ),
-                  Container(
-                    color: Colors.amber.shade50,
-                    child: Builder(
-                      builder: (context) {
-                        final InventoryItemDataModel item = context.select(
-                            (InventoryItemDetailBloc blox) => blox.state.item!);
-                        return Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            FloatingActionButton(
-                              onPressed: () {
-                                int index = context
-                                        .read<InventoryItemDetailBloc>()
-                                        .state
-                                        .index ??
-                                    -1;
-                                if (index >= 0) {
-                                  context.read<VoucherBloc>().add(
-                                      RemoveInventoryItemAtIndex(index: index));
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              child: const Icon(Icons.delete),
-                            ),
-                            const ItemTotalWidget(),
-                            FloatingActionButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(item);
-                              },
-                              child: const Icon(Icons.check),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ),
-        );
-      } else {
-        return Text('${status}');
-      }
-    });
+              Container(
+                height: 3,
+              ),
+              const Expanded(
+                flex: 1,
+                child: Column(
+                  children: [
+                    ItemNameArabic(),
+                    ItemRateWidget(),
+                    ItemNarration(),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Builder(
+                  builder: (context) {
+                    final InventoryItemDataModel item = context.select(
+                        (InventoryItemDetailBloc blox) => blox.state.item!);
+                    return Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const ItemTotalWidget(),
+                        FloatingActionButton(
+                          // backgroundColor: Colors.black,
+                          onPressed: () {
+                            context.read<VoucherBloc>().add(
+                                UpdateItemQty(item: item, qty: item.quantity!));
+                            // Navigator.of(context).pop>()
+                            Navigator.of(context).pop();
+                          },
+                          child: const Icon(
+                            Icons.check,
+                            // color: Colors.lightGreen,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        } else {
+          return Text('${status}');
+        }
+      }),
+    );
   }
 }
 
@@ -248,30 +177,39 @@ class ItemQty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Center(
-            child: Builder(builder: (context) {
-              double? qty = context.select((InventoryItemDetailBloc element) =>
-                  element.state.item?.quantity ?? 0);
-              int dec = context.select((InventoryItemDetailBloc element) =>
-                  element.state.item?.uomObject?.UOM_decimal_Points ?? 0);
-              // Fixed type error
-              num qtyNum = qty ?? 0;
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Quantity', style: kSmallStyle),
+              ),
+              Builder(builder: (context) {
+                double? qty = context.select(
+                    (InventoryItemDetailBloc element) =>
+                        element.state.item?.quantity ?? 0);
+                int dec = context.select((InventoryItemDetailBloc element) =>
+                    element.state.item?.uomObject?.UOM_decimal_Points ?? 0);
+                // Fixed type error
+                num qtyNum = qty ?? 0;
 
-              return Builder(builder: (context) {
-                return InputQty.int(
-                  minVal: 0,
-                  initVal: qtyNum,
-                  onQtyChanged: (value) {
-                    context
-                        .read<InventoryItemDetailBloc>()
-                        .add(SetItemQuantity(value.toDouble()));
-                  },
-                );
-              });
-            }),
+                return Builder(builder: (context) {
+                  return InputQty.int(
+                    minVal: 0,
+                    initVal: qtyNum,
+                    onQtyChanged: (value) {
+                      context
+                          .read<InventoryItemDetailBloc>()
+                          .add(SetItemQuantity(value.toDouble()));
+                    },
+                  );
+                });
+              }),
+            ],
           ),
         ],
       ),
@@ -288,13 +226,12 @@ class ItemTotalWidget extends StatelessWidget {
       double? itemTotal = context.select(
           (InventoryItemDetailBloc element) => element.state.item!.grandTotal);
       return Card(
-        color: Colors.blue,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
               child: MText(
-            'Total : ' + (itemTotal?.inCurrency ?? (0 as double).inCurrency),
-            textStyle: Theme.of(context).textTheme.titleLarge,
+            'Total : ${itemTotal?.inCurrency ?? (0 as double).inCurrency}',
+            textStyle: kTotalListStyle,
             textAlign: TextAlign.end,
           )),
         ),

@@ -103,7 +103,7 @@ class _POSCartPageState extends State<POSCartPage> {
                 child: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () {
-                    context.read<VoucherBloc>().add(VoucherRequestSave());
+                    context.read<VoucherBloc>().add(const VoucherRequestSave());
                   },
                 ),
               ),
@@ -113,7 +113,6 @@ class _POSCartPageState extends State<POSCartPage> {
                 child: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () {
-                    print('sending');
                     context.read<VoucherBloc>().add(VoucherRequestSave());
                   },
                 ),
@@ -213,14 +212,15 @@ class _POSCartPageState extends State<POSCartPage> {
   }
 
   Future<void> openItemDetail(int index) async {
+    print('opening item detail at $index');
     final item = context
         .read<VoucherBloc>()
         .state
         .voucher!
         .InventoryItems![index]
         .BaseItem;
-    final InventoryItemDataModel? itemX =
-        await showDialog<InventoryItemDataModel>(
+
+    await showDialog<InventoryItemDataModel>(
       context: context,
       builder: (context2) {
         return MultiBlocProvider(
@@ -240,18 +240,10 @@ class _POSCartPageState extends State<POSCartPage> {
                 ),
             ),
           ],
-          child: POSItemDetailPage(),
+          child: const POSItemDetailPage(),
         );
       },
     );
-    if (itemX != null) {
-      context.read<VoucherBloc>().add(
-            UpdateInventoryItemAtIndex(
-              index: index,
-              inventoryItem: itemX,
-            ),
-          );
-    }
   }
 }
 

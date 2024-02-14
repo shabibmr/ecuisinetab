@@ -1,5 +1,3 @@
-import 'package:ecuisinetab/Login/login_page.dart';
-import 'package:ecuisinetab/Screens/POS/pos_screen.dart';
 import 'package:ecuisinetab/auth/bloc/authentication_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +8,7 @@ import 'App/app_initial.dart';
 import 'Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
 import 'Datamodels/HiveModels/InventoryGroups/InventorygroupHiveModel.dart';
 import 'Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
+import 'Datamodels/HiveModels/Ledgers/LedMasterHiveModel.dart';
 import 'Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
 import 'Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
 import 'Datamodels/HiveModels/UOM/UOMHiveModel.dart';
@@ -67,6 +66,7 @@ Future<void> initHiveBoxes() async {
   Hive.registerAdapter<EmployeeHiveModel>(EmployeeHiveModelAdapter());
   Hive.registerAdapter<PriceListEntriesHive>(PriceListEntriesHiveAdapter());
   Hive.registerAdapter<PriceListMasterHive>(PriceListMasterHiveAdapter());
+  Hive.registerAdapter<LedgerMasterHiveModel>(LedgerMasterHiveModelAdapter());
 
   // Hive.registerAdapter<UserGroupDataModel>(UserGroupDataModelAdapter());
   // Hive.registerAdapter<ContactsDataModel>(ContactsDataModelAdapter());
@@ -93,8 +93,8 @@ Future<void> initHiveBoxes() async {
       await Hive.openBox(HiveTagNames.PriceLists_Hive_Tag);
   Box<PriceListEntriesHive> priceEntries =
       await Hive.openBox(HiveTagNames.PriceListsEntries_Hive_Tag);
-  // Box<LedgerMasterHiveModel> ledgers =
-  //     await Hive.openBox(HiveTagNames.Ledgers_Hive_Tag);
+  Box<LedgerMasterHiveModel> ledgers =
+      await Hive.openBox(HiveTagNames.Ledgers_Hive_Tag);
   // Box<AccountGroupHiveModel> groups =
   //     await Hive.openBox(HiveTagNames.AccountGroups_Hive_Tag);
   // Box<GodownHiveModel> godowns =

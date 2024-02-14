@@ -1,6 +1,11 @@
+import 'package:hive_flutter/hive_flutter.dart';
+
+import '../../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
+import '../../../Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
 import '../../../Datamodels/HiveModels/UOM/UOMHiveModel.dart';
 import '../../../Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
 import '../../../Datamodels/Masters/Inventory/item_batch_datamodel.dart';
+import '../../../Login/constants.dart';
 import '../../../Webservices/webservicePHP.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -70,6 +75,9 @@ class InventoryItemDetailBloc
     }));
     on<ItemDetailShowBatchEditor>(((event, emit) {
       emit(state.copyWith(showBatchEditor: event.show));
+    }));
+    on<SetItemPriceLevel>(((event, emit) {
+      resetPrices(event, emit);
     }));
 
     on<SetItemUOM>(((event, emit) {
@@ -209,5 +217,23 @@ class InventoryItemDetailBloc
     } catch (e) {
       emit(state.copyWith(batchFetchStatus: FetchStatus.error));
     }
+  }
+
+  void resetPrices(
+      SetItemPriceLevel event, Emitter<InventoryItemDetailState> emit) {
+    Box<InventoryItemHive> itemsBox = Hive.box(HiveTagNames.Items_Hive_Tag);
+    Box<PriceListEntriesHive> pbox =
+        Hive.box(HiveTagNames.PriceListsEntries_Hive_Tag);
+    print('prices count  :: ${pbox.length}');
+    final double pRate =
+        itemsBox.get(state.item!.ItemID)?.prices?[event.priceID]?.rate ??
+            state.item!.rate ??
+            0;
+
+    emit(state.copyWith(
+        item: state.item!.copyWith(
+      rate: pRate,
+      priceListID: event.priceID,
+    )));
   }
 }

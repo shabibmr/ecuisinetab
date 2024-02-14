@@ -167,14 +167,18 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   Future<void> fetchNextVoucherNumber(emit) async {
-    final nextVoucherNumber = await WebservicePHPHelper.getNextVoucherNumber(
-        state.voucher!.voucherType, state.voucher!.VoucherPrefix);
-    if (nextVoucherNumber != null) {
-      emit(state.copyWith(
-        voucher: state.voucher?.copyWith(voucherNumber: nextVoucherNumber),
-        status: VoucherEditorStatus.loaded,
-        vStatus: ViewStatus.create,
-      ));
+    try {
+      final nextVoucherNumber = await WebservicePHPHelper.getNextVoucherNumber(
+          state.voucher!.voucherType, state.voucher!.VoucherPrefix);
+      if (nextVoucherNumber != null) {
+        emit(state.copyWith(
+          voucher: state.voucher?.copyWith(voucherNumber: nextVoucherNumber),
+          status: VoucherEditorStatus.loaded,
+          vStatus: ViewStatus.create,
+        ));
+      }
+    } on Exception catch (ex) {
+      print('Exception Fetching next Voucher nUmber : ${ex.toString()}');
     }
   }
 
@@ -235,7 +239,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
 
     emit(state.copyWith(status: VoucherEditorStatus.sent));
 
-    setEmptyVoucher(state.voucher!.voucherType, emit);
+    await setEmptyVoucher(state.voucher!.voucherType, emit);
 
     //Save Data;
   }
@@ -268,16 +272,9 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   void updateItemQty(emit, InventoryItemDataModel item, quantity) {
     emit(state.copyWith(status: VoucherEditorStatus.loading));
     final voucher = state.voucher!;
-    voucher.InventoryItems?.forEach((element) {
-      print('${element.BaseItem.ItemName} - ${element.BaseItem.quantity} ');
-    });
-    print('qq : ${voucher.getItemCurrCount(item.ItemID!)}');
+    print('Updating Item Qty  : $quantity ');
     if (voucher.getItemCurrCount(item.ItemID!) == 0) {
-      // if (quantity == 0) return;
-
-      // item.prevQty = 0;
-      print('Adding Item quan : $quantity');
-
+      print('New Item FOUND');
       voucher.InventoryItems!.add(CompoundItemDataModel(
           BaseItem: item.copyWith(
         quantity: quantity,
@@ -287,32 +284,24 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     } else {
       int i = 0;
       for (; i < voucher.InventoryItems!.length; i++) {
-        print(
-            '$i ::: ${voucher.InventoryItems![i].BaseItem.ItemName} : ${voucher.InventoryItems![i].BaseItem.quantity}');
         if (voucher.InventoryItems![i].BaseItem.ItemID == item.ItemID &&
             (voucher.InventoryItems![i].BaseItem.prevQty ?? 0) == 0) {
-          print(' New quanttity updated to $quantity');
           voucher.InventoryItems?[i] = CompoundItemDataModel(
               BaseItem: voucher.InventoryItems![i].BaseItem.copyWith(
                   quantity: quantity, currQty: quantity, crQty: quantity));
 
           if (voucher.InventoryItems![i].BaseItem.quantity == 0) {
-            print('Item Removed at index : $i');
             voucher.InventoryItems!.removeAt(i);
           }
           break;
         }
       }
-      print(' updated at index : $i');
     }
-    print('Item Updated Done');
     voucher.calculateVoucherSales();
-    print('Calc Completed');
     emit(state.copyWith(
       voucher: voucher,
       status: VoucherEditorStatus.loaded,
     ));
-    print('Item count Increased');
     return;
   }
 
@@ -339,8 +328,8 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   void deleteInventoryItem(event, emit) {
-    print("Add Inventory Item");
-    emit(state.copyWith(status: VoucherEditorStatus.loading));
+    print("Delete Inventory Item");
+    // emit(state.copyWith(status: VoucherEditorStatus.loading));
     final GeneralVoucherDataModel? voucher = state.voucher;
     voucher!.InventoryItems!.removeAt(event.index);
     voucher.calculateVoucherSales();

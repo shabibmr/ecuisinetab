@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
-import 'package:ecuisinetab/Screens/POS/pos_cart.dart';
+import 'package:ecuisinetab/Screens/POS/pos_cart2.dart';
 import 'package:ecuisinetab/Screens/POS/pos_table_selector.dart';
 import 'package:ecuisinetab/Screens/POS/voucher_editor.dart';
 import 'package:ecuisinetab/Services/Sync/bloc/sync_ui_config_bloc.dart';
@@ -95,11 +95,9 @@ class _POSScreenState extends State<POSScreen> {
               height: 80,
               child: InkWell(
                   onTap: () async {
-                    await showDialog(
-                      context: context,
-                      builder: (contextB) => Dialog(
-                        elevation: 5,
-                        child: MultiBlocProvider(
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (contextB) {
+                        return MultiBlocProvider(
                           providers: [
                             BlocProvider.value(
                               value: context.read<VoucherBloc>(),
@@ -108,20 +106,37 @@ class _POSScreenState extends State<POSScreen> {
                               value: context.read<PosBloc>(),
                             ),
                           ],
-                          child: POSCartPage(),
-                        ),
-                      ),
-                    );
+                          child: const POSCartPage(),
+                        );
+                      },
+                    ));
+                    // await showDialog(
+                    //   context: context,
+                    //   builder: (contextB) => Dialog(
+                    //     elevation: 5,
+                    //     child: MultiBlocProvider(
+                    //       providers: [
+                    //         BlocProvider.value(
+                    //           value: context.read<VoucherBloc>(),
+                    //         ),
+                    //         BlocProvider.value(
+                    //           value: context.read<PosBloc>(),
+                    //         ),
+                    //       ],
+                    //       child: const POSCartPage(),
+                    //     ),
+                    //   ),
+                    // );
                   },
                   child: VoucherFooter()),
             ),
           );
         },
       ),
-      drawer: GroupsDrawer(),
+      drawer: const GroupsDrawer(),
       appBar: AppBar(
         title: const Text('eCuisineTab'),
-        actions: [TableButton()],
+        actions: const [TableButton()],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -142,8 +157,7 @@ class _POSScreenState extends State<POSScreen> {
   }
 
   Future<void> openItemDetailAdd(InventoryItemHive item) async {
-    final InventoryItemDataModel? itemX =
-        await showDialog<InventoryItemDataModel>(
+    await showDialog<InventoryItemDataModel>(
       context: context,
       builder: (context2) {
         return MultiBlocProvider(
@@ -163,23 +177,10 @@ class _POSScreenState extends State<POSScreen> {
                 ..add(SetItemQuantity(1)),
             ),
           ],
-          child: Dialog(
-            elevation: 3,
-            alignment: Alignment.center,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8))),
-            child: POSItemDetailPage(),
-          ),
+          child: const POSItemDetailPage(),
         );
       },
     );
-    if (itemX != null) {
-      context.read<VoucherBloc>().add(
-            AddInventoryItem(
-              inventoryItem: itemX,
-            ),
-          );
-    }
   }
 
   Widget getBodyList() {
@@ -213,7 +214,7 @@ class _POSScreenState extends State<POSScreen> {
 }
 
 class TableButton extends StatelessWidget {
-  TableButton({Key? key}) : super(key: key);
+  const TableButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -221,20 +222,6 @@ class TableButton extends StatelessWidget {
       return InkWell(
         onTap: () async {
           context.read<PosBloc>().add(FetchCurrentOrders());
-
-          // await Navigator.of(context).push(MaterialPageRoute(
-          //   builder: (contextRoute) => MultiBlocProvider(
-          //     providers: [
-          //       BlocProvider.value(
-          //         value: context.read<PosBloc>()..add(FetchCurrentOrders()),
-          //       ),
-          //       BlocProvider.value(
-          //         value: context.read<VoucherBloc>(),
-          //       ),
-          //     ],
-          //     child: PosTableSelector(),
-          //   ),
-          // ));
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
@@ -255,50 +242,6 @@ class TableButton extends StatelessWidget {
         ),
       );
     });
-  }
-}
-
-class ShowCartButton extends StatelessWidget {
-  const ShowCartButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Center(
-        child: Builder(builder: (context) {
-          int count = context.select((VoucherBloc bloc) =>
-              bloc.state.voucher?.InventoryItems?.length ?? 0);
-
-          return Visibility(
-            visible: count > 0,
-            child: IconButton(
-              onPressed: () async {
-                await showDialog(
-                  context: context,
-                  builder: (contextB) => Dialog(
-                    elevation: 5,
-                    child: MultiBlocProvider(
-                      providers: [
-                        BlocProvider.value(
-                          value: context.read<VoucherBloc>(),
-                        ),
-                        BlocProvider.value(
-                          value: context.read<PosBloc>(),
-                        ),
-                      ],
-                      child: POSCartPage(),
-                    ),
-                  ),
-                );
-              },
-              icon: Icon(Icons.send_rounded),
-            ),
-          );
-        }),
-      ),
-    );
   }
 }
 

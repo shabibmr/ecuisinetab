@@ -39,12 +39,12 @@ class CompoundItemDataModel extends Equatable {
   @override
   String toString() => 'CompoundItemDataModel(BaseItem: $BaseItem)';
 
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
+  // @override
+  // bool operator ==(Object other) {
+  //   if (identical(this, other)) return true;
 
-    return other is CompoundItemDataModel && other.BaseItem == BaseItem;
-  }
+  //   return other is CompoundItemDataModel && other.BaseItem == BaseItem;
+  // }
 
   @override
   int get hashCode => BaseItem.hashCode;

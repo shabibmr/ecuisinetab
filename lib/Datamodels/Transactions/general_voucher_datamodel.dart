@@ -836,7 +836,7 @@ class GeneralVoucherDataModel extends Equatable {
 
   num getItemCurrCount(String itemID) {
     num val = 0;
-    // print('item : $itemID');
+    // print('Checking item : $itemID');
     for (int i = 0; i < InventoryItems!.length; i++) {
       // print('Prev : ${InventoryItems![i].BaseItem.prevQty}');
       if (itemID == InventoryItems![i].BaseItem.ItemID &&
@@ -868,7 +868,7 @@ class GeneralVoucherDataModel extends Equatable {
         }
 */
     // print('Leee');
-    print('Items length: ${InventoryItems!.length}');
+    // print('Items length: ${InventoryItems!.length}');
     for (int i = 0; i < InventoryItems!.length; i++) {
       // num vatAmt = 0;
       num vatamtBy_2 = 0;
@@ -1132,8 +1132,6 @@ class GeneralVoucherDataModel extends Equatable {
     double dTotal = 0;
 
     for (var obj in ledgersList) {
-      print(obj.crAmount);
-      print('dr : ${obj.drAmount}');
       double c = obj.crAmount!;
       double d = obj.drAmount!;
       cTotal = cTotal + c;
@@ -1142,7 +1140,6 @@ class GeneralVoucherDataModel extends Equatable {
 
     ledgersTotal = dTotal - cTotal;
     grandTotal = ledgersTotal!.abs();
-    print('Led Total : $grandTotal dr:  $drTotal cr: $crTotal');
 
     ledgerObject!.amount = grandTotal;
   }
@@ -1200,8 +1197,6 @@ class GeneralVoucherDataModel extends Equatable {
 
     // print('Led List : ${map['ledgersList']}');
 
-    print('vat is ${map['vatAmount'].runtimeType}');
-
     GeneralVoucherDataModel v = GeneralVoucherDataModel(
       voucherNumber: map['Voucher_No'],
       timestamp: DateTime.fromMillisecondsSinceEpoch(
@@ -1252,8 +1247,6 @@ class GeneralVoucherDataModel extends Equatable {
 
       reference: map['reference'] ?? '',
     );
-
-    print('returning VouCher : ${v.voucherNumber}');
 
     return v;
   }

@@ -43,6 +43,7 @@ class InventoryItemDetailState extends Equatable {
         showBatchEditor,
         type,
         batchFetchStatus,
+        index,
       ];
 
   InventoryItemDetailState copyWith({

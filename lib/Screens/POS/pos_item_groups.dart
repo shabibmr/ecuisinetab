@@ -262,25 +262,26 @@ class InvItemListExp extends StatelessWidget {
                   ),
                 )
                 ..add(const SetIndex(index: -1))
+                ..add(SetItemPriceLevel(priceID: voucher!.priceListId ?? 0))
                 ..add(SetItemQuantity(qty)),
             ),
           ],
-          child: POSItemDetailPage(),
+          child: const POSItemDetailPage(),
         );
       },
     );
-    if (itemX != null) {
-      num q = voucher!.getItemCurrCount(item.Item_ID!) ?? 0;
-      if (itemX.quantity! > 0) {
-        context
-            .read<VoucherBloc>()
-            .add(UpdateItemQty(item: itemX, qty: itemX.quantity!));
-      } else {
-        context
-            .read<VoucherBloc>()
-            .add(UpdateItemQty(item: itemX, qty: itemX.quantity!));
-      }
-    }
+    // if (itemX != null) {
+    //   num q = voucher!.getItemCurrCount(item.Item_ID!) ?? 0;
+    //   if (itemX.quantity! > 0) {
+    //     context
+    //         .read<VoucherBloc>()
+    //         .add(UpdateItemQty(item: itemX, qty: itemX.quantity!));
+    //   } else {
+    //     context
+    //         .read<VoucherBloc>()
+    //         .add(UpdateItemQty(item: itemX, qty: itemX.quantity!));
+    //   }
+    // }
   }
 }
 
@@ -490,6 +491,7 @@ class _ItemQtyState extends State<ItemQty> {
         return widget.qtyNum == 0
             ? ElevatedButton(
                 onPressed: () {
+                  print('Pressed Add Button');
                   context.read<VoucherBloc>().add(AddInventoryItem(
                       inventoryItem:
                           InventoryItemDataModel.fromHive(widget.item)

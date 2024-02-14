@@ -73,16 +73,15 @@ class _VoucherItemsListingState extends State<VoucherItemsListing> {
         ),
       );
     } else {
-      return Container(
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context2, index) {
-            return ItemsListItemWidget(
-              index: index,
-              ItemClicked: widget.ItemClicked,
-            );
-          },
-        ),
+      return ListView.builder(
+        key: UniqueKey(),
+        itemCount: items.length,
+        itemBuilder: (context2, index) {
+          return ItemsListItemWidget(
+            index: index,
+            ItemClicked: widget.ItemClicked,
+          );
+        },
       );
     }
   }
