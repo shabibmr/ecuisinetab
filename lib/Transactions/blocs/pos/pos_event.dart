@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'pos_bloc.dart';
 
 abstract class PosEvent extends Equatable {
@@ -47,3 +48,14 @@ class OrderSelected extends PosEvent {
 class OrderSent extends PosEvent {}
 
 class FetchCurrentOrders extends PosEvent {}
+
+class RefreshPOS extends PosEvent {}
+
+class UpdateItem extends PosEvent {
+  final String itemID;
+  final double quantity;
+  const UpdateItem({
+    required this.itemID,
+    required this.quantity,
+  });
+}

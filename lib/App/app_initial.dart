@@ -3,6 +3,7 @@
 import 'package:ecuisinetab/Login/login_page.dart';
 import 'package:ecuisinetab/Screens/POS/pos_screen.dart';
 import 'package:ecuisinetab/Screens/POS/widgets/Configurations/configurations.dart';
+import 'package:ecuisinetab/Screens/POS/widgets/common/gm_progress_indicator.dart';
 import 'package:ecuisinetab/Utils/voucher_types.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -26,77 +27,138 @@ class _Init_AppState extends State<Init_App> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<SyncServiceBloc, SyncServiceState>(
-      listener: (context, state) {
-        if (state.status == SyncUiConfigStatus.fetched) {
-          print('fetch Completed');
-          context.read<AuthenticationBloc>().add(AuthenticationStarted());
+      listener: (context, state) async {
+        if (state.status == SyncUiConfigStatus.fetching) {
+          print("... fetching ...");
+          await showDialog(
+            context: context,
+            builder: (contextB) {
+              return BlocListener<SyncServiceBloc, SyncServiceState>(
+                listener: (context2, state) {
+                  print('state :$state');
+                },
+                child: const Dialog(
+                  backgroundColor: Colors.transparent,
+                  child: GMProgress(msg: "Fetching. masters.."),
+                ),
+              );
+            },
+          );
+        } else if (state.status == SyncUiConfigStatus.fetched) {
+          // context.read<AuthenticationBloc>().add(AuthenticationStarted());
+          Navigator.pop(context);
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text(
+                    'Sync Completed',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Continue...'),
+                    )
+                  ],
+                );
+              });
+        } else if (state.status == SyncUiConfigStatus.error) {
+          Navigator.pop(context);
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text(
+                    'Sync Error!!',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        openConfigPage();
+                      },
+                      child: const Text('Retry'),
+                    )
+                  ],
+                );
+              });
         }
       },
       child: BlocListener<AuthenticationBloc, AuthenticationState>(
         listenWhen: (previous, current) =>
             previous.authState != current.authState,
         listener: (context, state) {
-          print(
-              'new state ${state.authState} ${context.read<AuthenticationBloc>().state.msg} ${context.read<AuthenticationBloc>().state.username}  ');
-          if (state.authState == AuthState.failure) {
-            openLoginWidget(msg: state.msg);
-          } else if (state.authState == AuthState.success) {
-            openPOSScreen(context);
+          if (state.authState == AuthState.success) {
+            openPOSScreen();
           } else if (state.authState == AuthState.dataEmpty) {
-            context.read<SyncServiceBloc>().add(FetchAllMastersEvent());
+            // context.read<SyncServiceBloc>().add(const FetchAllMastersEvent());
           } else if (state.authState == AuthState.configEmpty) {
-            // show Config Page
+            openConfigPage();
+          } else if (state.authState == AuthState.failure) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Login Failed'),
+                  content: const Text('Invalid Username or Password'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
           }
         },
-        child: Builder(
-          builder: (contextBuilder) {
-            var stat = contextBuilder
-                .select((AuthenticationBloc bloc) => bloc.state.authState);
-            print('77. BUILDER STATE State : $stat ');
+        child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+          buildWhen: (previous, current) {
+            // print('cur : $current prev = $previous');
+            if (current.authState == AuthState.success) {
+              return false;
+            }
+            return true;
+          },
+          builder: (context, state) {
+            final stat = state.authState;
+
             if (stat == AuthState.loading || stat == AuthState.started) {
-              return Scaffold(
-                body: Center(
-                  child: Text('Logging in  User : ${stat}'),
+              print('Stat : $stat');
+              return const Scaffold(
+                body: GMProgress(
+                  msg: "Xoxo",
                 ),
               );
             }
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  children: [
-                    Text('Hello!!! $stat'),
-                    IconButton(
-                      onPressed: () {
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(AuthenticationStarted());
-                      },
-                      icon: Icon(Icons.cleaning_services),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        print(
-                            'pressed ${contextBuilder.read<AuthenticationBloc>().state.username}');
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(AuthPrintState());
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(AuthSetStat(authState: AuthState.failure));
-                      },
-                      icon: Icon(Icons.cleaning_services),
-                    )
-                  ],
+            if (stat == AuthState.failure ||
+                stat == AuthState.intitial ||
+                stat == AuthState.configEmpty ||
+                stat == AuthState.dataEmpty) {
+              return const LoginWidget();
+            } else if (stat == AuthState.success) {
+              return Center(
+                child: TextButton(
+                  onPressed: () {
+                    openPOSScreen();
+                  },
+                  child: const Text('Open POS'),
                 ),
-              ),
-            );
+              );
+            } else {
+              return Container();
+            }
           },
         ),
       ),
     );
   }
 
-  void openLoginWidget({String? msg}) {
+  void openConfigPage({String? msg}) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => MultiBlocProvider(
         providers: [
@@ -104,7 +166,7 @@ class _Init_AppState extends State<Init_App> {
             value: context.read<AuthenticationBloc>(),
           ),
         ],
-        child: LoginWidget(),
+        child: const ConfigurationPage(),
       ),
     ));
   }
@@ -120,13 +182,13 @@ class _Init_AppState extends State<Init_App> {
             value: context.read<SyncServiceBloc>(),
           ),
         ],
-        child: ConfigurationPage(),
+        child: const ConfigurationPage(),
       ),
     ));
   }
 
-  void openPOSScreen(BuildContext context) {
-    final int defaultPrice =
+  void openPOSScreen() {
+    final int? defaultPrice =
         Hive.box(HiveTagNames.Settings_Hive_Tag).get("Default_Pricelist_Id");
     Navigator.of(context).pop();
     Navigator.of(context).push(
@@ -143,7 +205,7 @@ class _Init_AppState extends State<Init_App> {
                 ..add(SetEmptyVoucher(
                   voucherType: GMVoucherTypes.SalesOrder,
                 ))
-                ..add(SetPriceList(priceListID: defaultPrice)),
+                ..add(SetPriceList(priceListID: defaultPrice ?? 1)),
             )
           ],
           child: POSScreen(),

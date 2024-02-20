@@ -109,7 +109,6 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
   bool? isSerialNumbered;
   @HiveField(48)
   bool? isActive;
-
   InventoryItemHive({
     this.Item_ID,
     this.Item_Name,

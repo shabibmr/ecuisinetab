@@ -96,15 +96,29 @@ class SetNarration extends VoucherEvent {
   List<Object> get props => [narration];
 }
 
-class SaveVoucher extends VoucherEvent {
-  const SaveVoucher();
+class SaveVoucherOrder extends VoucherEvent {
+  const SaveVoucherOrder();
 
   @override
   List<Object> get props => [];
 }
 
-class VoucherRequestSave extends VoucherEvent {
-  const VoucherRequestSave();
+class SaveVoucherInvoice extends VoucherEvent {
+  const SaveVoucherInvoice();
+
+  @override
+  List<Object> get props => [];
+}
+
+class VoucherRequestSaveOrder extends VoucherEvent {
+  const VoucherRequestSaveOrder();
+
+  @override
+  List<Object> get props => [];
+}
+
+class VoucherRequestSaveInvoice extends VoucherEvent {
+  const VoucherRequestSaveInvoice();
 
   @override
   List<Object> get props => [];

@@ -69,17 +69,16 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                       ),
                     ),
                     Builder(builder: (context) {
-                      int index = context.select(
-                          (InventoryItemDetailBloc bloc) =>
-                              bloc.state.index ?? -1);
-                      print('Index = $index');
+                      final item = context.select(
+                          (InventoryItemDetailBloc bloc) => bloc.state.item!);
+
                       return Visibility(
-                        visible: index >= 0,
+                        visible: (item.quantity ?? 0) > 0,
                         child: IconButton(
                           onPressed: () {
                             context
                                 .read<VoucherBloc>()
-                                .add(RemoveInventoryItemAtIndex(index: index));
+                                .add(UpdateItemQty(item: item, qty: 0));
 
                             Navigator.of(context).pop();
                           },
@@ -251,9 +250,9 @@ class ItemName extends StatelessWidget {
       bool flag = sett.get('isArabic', defaultValue: false);
       final String? itemName = context.select((InventoryItemDetailBloc bloc) =>
           flag ? bloc.state.item?.ItemNameArabic : bloc.state.item?.ItemName);
-      return Text(
+      return AutoSizeText(
         itemName ?? '',
-        // style: kAppbarLabelStyle,
+        style: kAppbarLabelStyle,
       );
     });
   }
@@ -267,12 +266,12 @@ class ItemNarration extends StatelessWidget {
     return Builder(builder: (context) {
       String? narration = context.select(
           (InventoryItemDetailBloc element) => element.state.item!.narration);
+      print('narration $narration');
       return Card(
-        child: MTextField(
-          label: 'Narration2',
-          hintText: "Nar",
-          textData: narration,
-          textStyle: Theme.of(context).textTheme.bodyMedium,
+        child: TextFormField(
+          maxLines: 3,
+          decoration: InputDecoration(hintText: "Narration"),
+          initialValue: narration,
           onChanged: (value) {
             context
                 .read<InventoryItemDetailBloc>()

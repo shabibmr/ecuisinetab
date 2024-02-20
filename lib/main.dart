@@ -29,23 +29,29 @@ Future<void> initSettings() async {
 
   await Hive.initFlutter();
   Box sett = await Hive.openBox(HiveTagNames.Settings_Hive_Tag);
-  String dbname = sett.get('DBName', defaultValue: 'cake_studio_mukkam');
+  String dbname =
+      sett.get(Config_Tag_Names.DBName_Tag, defaultValue: 'gmrestaurant');
+  sett.put(Config_Tag_Names.DBName_Tag, dbname);
 
-  String url =
-      sett.get('url', defaultValue: 'http://192.168.0.106/test_app_water');
+  String serverIP =
+      sett.get(Config_Tag_Names.Server_IP_Tag, defaultValue: '192.168.1.99');
+  sett.put(Config_Tag_Names.Server_IP_Tag, serverIP);
+  String url = sett.get(Config_Tag_Names.Base_URL_Tag,
+      defaultValue: 'http://192.168.1.99/test_app_water');
 
-  sett.put('url', url);
-  String billPrinter = sett.get('BillPrinter', defaultValue: 'Counter');
-  sett.put('BillPrinter', billPrinter);
+  sett.put(Config_Tag_Names.Base_URL_Tag, url);
+  String billPrinter =
+      sett.get(Config_Tag_Names.Bill_Printer_Tag, defaultValue: 'Counter');
+  sett.put(Config_Tag_Names.Bill_Printer_Tag, billPrinter);
   // sett.put('CompanyName', item['CompanyName'] ?? '');
   // sett.put('branch', item['branch'] ?? '');
   // sett.put('addressLine', item['addressline'] ?? '');
   // sett.put('vPref', item['VoucherPrefix'] ?? 'A');
   // sett.put('Salesman_ID', item['Emp_ID']);
   // sett.put('Warehouse', item['Godown_ID'] ?? 'GODOWN');
-  // sett.put('defaultGodown', item['defaultGodown'] ?? 'GODOWN');
+  sett.put(Config_Tag_Names.Default_Godown_ID, 'GODOWN');
   // sett.put('defaultCash', item['defaultCash'] ?? '');
-  // sett.put('defaultbank', item['defaultBank'] ?? '');
+  sett.put(Config_Tag_Names.Default_Bank_Tag, '0x5x21x2');
   // sett.put('defaultPO', item['defaultPO'] ?? '');
   // sett.put('strictCreditLimit', item['strictCreditLimit'] ?? false);
   // sett.put('TRN', item['GSTRN'] ?? '');
@@ -116,25 +122,28 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          lazy: false,
-          create: (context) =>
-              SyncServiceBloc()..add(const FetchAllMastersEvent()),
-        ),
-        BlocProvider(
-          lazy: false,
-          create: (context) => AuthenticationBloc()
-            ..add(AuthenticationStarted())
-            ..add(AuthSetUser(username: 'user'))
-            ..add(AuthSetPass(password: '123456')),
-        ),
+        BlocProvider(lazy: false, create: (context) => SyncServiceBloc()
+            // ..add(
+            //   const FetchAllMastersEvent(),
+            // ),
+            ),
+        BlocProvider(lazy: false, create: (context) => AuthenticationBloc()
+            // ..add(AuthSetUser(username: 'user'))
+            // ..add(AuthSetPass(password: '123456'))
+            // ..add(AuthenticationStarted()),
+            ),
       ],
       child: MaterialApp(
         title: 'eCuisineTab',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 137, 233, 130)),
+              seedColor: const Color.fromARGB(
+            255,
+            137,
+            233,
+            200,
+          )),
           useMaterial3: true,
         ),
         home: const EcuisineTabApp(title: 'eCuisineTab'),
@@ -153,162 +162,3 @@ class EcuisineTabApp extends StatelessWidget {
     return const Init_App();
   }
 }
-/*
-// class Just extends StatelessWidget {
-//   const Just({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
-//       builder: (context, state) {
-//         print(
-//             '.................................................. .  JUST BUILDING   .................................................. .  ');
-//         return Init_App();
-//       },
-//     );
-//   }
-// }
-
-// class TestScreen extends StatelessWidget {
-//   const TestScreen({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocListener<AuthenticationBloc, AuthenticationState>(
-//       listener: (context, state) {
-//         print('Listening to New State : $state : ${state.authState}');
-//       },
-//       listenWhen: (previous, current) {
-//         print('prev : ${previous.authState}');
-
-//         print('Curr : ${current.authState}');
-//         return true;
-//       },
-//       child: Scaffold(
-//         body: Builder(
-//           builder: (context) {
-//             var status = context
-//                 .select((AuthenticationBloc bloc) => bloc.state.authState);
-//             print('New Status Changed at Scaffold Body  Build: $status');
-//             return Center(
-//               child: Column(
-//                 children: [
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                     children: [
-//                       Text('State is : $status'),
-//                       IconButton(
-//                         onPressed: () {
-//                           print(
-//                               '........................................................................................');
-//                           print(
-//                               'pressed ${context.read<AuthenticationBloc>().state.authState}');
-//                           context
-//                               .read<AuthenticationBloc>()
-//                               .add(AuthPrintState());
-//                           print(
-//                               '........................................................................................');
-//                         },
-//                         icon: Icon(Icons.print),
-//                       ),
-//                     ],
-//                   ),
-//                   IconButton(
-//                     onPressed: () {
-//                       context
-//                           .read<AuthenticationBloc>()
-//                           .add(AuthenticationStarted());
-//                     },
-//                     icon: Icon(Icons.cleaning_services),
-//                   ),
-//                   Text('to Failure '),
-//                   IconButton(
-//                     onPressed: () {
-//                       print(
-//                           'pressed ${context.read<AuthenticationBloc>().state.username}');
-//                       context.read<AuthenticationBloc>().add(AuthPrintState());
-//                       context
-//                           .read<AuthenticationBloc>()
-//                           .add(AuthSetStat(authState: AuthState.failure));
-//                     },
-//                     icon: Icon(Icons.family_restroom),
-//                   ),
-//                   Text('to Loading '),
-//                   IconButton(
-//                     onPressed: () {
-//                       print(
-//                           'pressed ${context.read<AuthenticationBloc>().state.username}');
-//                       context.read<AuthenticationBloc>().add(AuthPrintState());
-//                       context
-//                           .read<AuthenticationBloc>()
-//                           .add(AuthSetStat(authState: AuthState.loading));
-//                     },
-//                     icon: Icon(Icons.cleaning_services),
-//                   ),
-//                   Text('to Auth Started'),
-//                   IconButton(
-//                     onPressed: () {
-//                       print(
-//                           'pressed ${context.read<AuthenticationBloc>().state.username}');
-//                       context.read<AuthenticationBloc>().add(AuthPrintState());
-//                       context
-//                           .read<AuthenticationBloc>()
-//                           .add(AuthSetStat(authState: AuthState.started));
-//                     },
-//                     icon: Icon(Icons.cleaning_services),
-//                   ),
-//                   Text('To Initial'),
-//                   IconButton(
-//                     onPressed: () {
-//                       print('pressed to intitial');
-//                       context
-//                           .read<AuthenticationBloc>()
-//                           .add(AuthSetStat(authState: AuthState.intitial));
-//                       context.read<AuthenticationBloc>().add(AuthPrintState());
-//                     },
-//                     icon: Icon(Icons.cleaning_services),
-//                   ),
-//                   Row(
-//                     children: [
-//                       Text('To New USer'),
-//                       IconButton(
-//                         onPressed: () {
-//                           print('pressed to intitial');
-//                           context
-//                               .read<AuthenticationBloc>()
-//                               .add(AuthSetUser(username: 'New User'));
-//                           context
-//                               .read<AuthenticationBloc>()
-//                               .add(AuthPrintState());
-//                         },
-//                         icon: Icon(Icons.verified_user),
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       Text('To X USer'),
-//                       IconButton(
-//                         onPressed: () {
-//                           print('pressed to intitial');
-//                           context
-//                               .read<AuthenticationBloc>()
-//                               .add(AuthSetUser(username: 'XXX User'));
-//                           context
-//                               .read<AuthenticationBloc>()
-//                               .add(AuthPrintState());
-//                         },
-//                         icon: Icon(Icons.verified_user),
-//                       ),
-//                     ],
-//                   )
-//                 ],
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-*/

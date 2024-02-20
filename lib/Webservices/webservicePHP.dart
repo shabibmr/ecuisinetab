@@ -17,7 +17,7 @@ import 'package:intl/intl.dart';
 class WebservicePHPHelper {
   static String getBaseURL() {
     Box sett = Hive.box('settings');
-    String url = sett.get('url');
+    String url = sett.get(Config_Tag_Names.Base_URL_Tag);
     // String url = 'https://192.168.0.104/test_app_water';
 
     // String url = 'https://www.algoray.in/test_app_water';
@@ -32,7 +32,8 @@ class WebservicePHPHelper {
 
     // return 'aawater';
 
-    return settings.get('DBName', defaultValue: 'gmdb');
+    return settings.get(Config_Tag_Names.DBName_Tag,
+        defaultValue: 'gmrestaurant');
   }
 
   static Future<GeneralVoucherDataModel?> getVoucherByVoucherNo({
@@ -139,11 +140,21 @@ class WebservicePHPHelper {
     Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
 
     String printer = sett.get('BillPrinter', defaultValue: 'Counter');
+    print(
+        'status : ${voucher.status} - $vType  PRINT REQUEST : $requestBillCopy');
+
+    int req = requestBillCopy != null
+        ? requestBillCopy
+            ? 1
+            : 0
+        : 0;
+
+    // String url =;
 
     String fullURl =
-        '${getBaseURL()}transactions_webservice.php?action=upsertTransaction&Voucher_Type=$vType';
+        '${getBaseURL()}transactions_webservice.php?action=upsertTransaction&Voucher_Type=$vType&Request_Print=$req&Printer_Name=$printer';
 
-    // print("url : $fullURl");
+    print("url : $fullURl");
     print('BODY : ${voucher.toMapForTransTest()}');
     Response? response;
 
@@ -347,7 +358,7 @@ class WebservicePHPHelper {
     print('Url : $fullURl');
     dynamic data;
     try {
-      // print('DBNAME : ${Hive.box('settings').get('DBName')}');
+      print('DBNAME : ${Hive.box('settings').get('DBName')}');
       String dBName = getDBName();
       Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));
       final Response response = await dio.get(
@@ -358,6 +369,7 @@ class WebservicePHPHelper {
       data = response.data;
       // print('Emp data (Webservice) : $data');
     } catch (ex) {
+      print('Newtwork Error');
       print(ex.toString());
       return false;
     }
@@ -546,7 +558,7 @@ class WebservicePHPHelper {
     } catch (ex) {
       print('Inv Group : $fullURl');
       print('Inv Group fetch error caught : $ex}');
-      return '$ex$fullURl is the link';
+      return false;
     }
     if (data['success'] == 1 || data['success'] == '1') {
       return data['data'];
@@ -569,6 +581,7 @@ class WebservicePHPHelper {
     Response? response;
     try {
       String dBName = getDBName();
+      print('DB Name $dBName');
       // Hive.box('settings').get('DBName');
       Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));
 

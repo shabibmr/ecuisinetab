@@ -44,14 +44,26 @@ class PosBloc extends Bloc<PosEvent, PosState> {
         currentOrders: {},
         status: POSStatus.NEW,
       ));
-      await getCurrentOrders();
+      await getCurrentOrders(event, emit);
     });
     on<FetchCurrentOrders>((event, emit) async {
-      await getCurrentOrders();
+      await getCurrentOrders(event, emit);
     });
+    on<RefreshPOS>((event, emit) {
+      emit(state.copyWith(
+        status: POSStatus.NEW,
+        currentOrders: {},
+      ));
+    });
+    on<UpdateItem>(((event, emit) {
+      final Map<String, double> newMap = Map.from(state.currentKOT ?? {})
+        ..[event.itemID] = event.quantity;
+
+      emit(state.copyWith(currentKOT: newMap));
+    }));
   }
 
-  Future<void> getCurrentOrders() async {
+  Future<void> getCurrentOrders(event, emit) async {
     try {
       print('Getting Orders');
       emit(state.copyWith(status: POSStatus.FetchingOrders));

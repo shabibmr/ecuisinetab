@@ -246,8 +246,8 @@ class ItemsListItemWidget extends StatelessWidget {
 }
 
 class VoucherFooter extends StatefulWidget {
-  VoucherFooter({Key? key}) : super(key: key);
-
+  const VoucherFooter({super.key, this.show = true});
+  final bool show;
   @override
   State<VoucherFooter> createState() => _VoucherFooterState();
 }
@@ -257,50 +257,46 @@ class _VoucherFooterState extends State<VoucherFooter> {
   Widget build(BuildContext context) {
     final voucher = context.select((VoucherBloc bloc) => bloc.state.voucher);
     return Card(
+      color: Colors.white,
       elevation: 5,
+      shadowColor: Colors.black,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Expanded(
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Padding(
-            //       padding: const EdgeInsets.fromLTRB(8.0, 4, 4, 8),
-            //       child: Text(
-            //         'Total',
-            //         style: kTotalListStyle,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-
             Align(
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  voucher!.grandTotal?.inCurrency ?? '0.00',
-                  style: kTotalListStyle,
-                ),
-              ),
-            ),
-            Row(
-              children: [
-                const Icon(
-                  Icons.shopping_cart,
-                  color: Colors.black,
-                ),
-                Builder(builder: (context) {
-                  int count = context.select((VoucherBloc bloc) =>
-                      bloc.state.voucher!.InventoryItems!.length);
+                child: Builder(builder: (context) {
+                  double totalValue = context.select((VoucherBloc bloc) =>
+                      bloc.state.voucher?.grandTotal ?? 0);
                   return Text(
-                    count > 0 ? count.toString() : '0',
+                    totalValue.inCurrency,
                     style: kTotalListStyle,
                   );
                 }),
-              ],
+              ),
+            ),
+            Visibility(
+              visible: widget.show,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.shopping_cart,
+                    color: Colors.black,
+                  ),
+                  Builder(builder: (context) {
+                    int count = context.select((VoucherBloc bloc) =>
+                        bloc.state.voucher!.InventoryItems!.length);
+                    return AutoSizeText(
+                      count > 0 ? count.toString() : '0',
+                      style: kTotalListStyle,
+                    );
+                  }),
+                ],
+              ),
             ),
           ],
         ),

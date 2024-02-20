@@ -19,8 +19,6 @@ class AuthenticationBloc
           msg: "hi!",
         )) {
     on<AuthenticationStarted>((event, emit) async {
-      print(
-          'STARTING AUTH FIRED---------------------- -------------- --------------------------');
       await authStarted(event, emit);
     });
     on<AuthenticationStateChanged>((event, emit) async {
@@ -28,29 +26,21 @@ class AuthenticationBloc
     });
     on<AuthSetUser>(
       (event, emit) {
-        print('------------------ ----------------> Upd L: ${event.username}');
         emit(
           state.copyWith(
             username: event.username,
           ),
         );
-        print('Updated User : ${state.username}');
       },
     );
     on<AuthSetPass>(
       (event, emit) {
-        print('Upd P: ${event.password}');
         emit(state.copyWith(password: event.password));
-        print('New P: ${state.password}');
       },
     );
     on<AuthSetStat>(
       (event, emit) {
-        print('Current State : ${state.authState}');
-        print(
-            'Emitting New State : ${event.authState}   user : ${state.username} ');
         emit(state.copyWith(authState: event.authState));
-        print('New (Current) State Emitted : ${state.authState}');
       },
     );
     on<AuthPrintState>(
@@ -60,42 +50,50 @@ class AuthenticationBloc
   }
 
   Future<void> authStarted(event, emit) async {
-    print('46. Auth Started');
     try {
       String? login = state.username;
       String? password = state.password;
       Box<EmployeeHiveModel> emp = Hive.box(HiveTagNames.Employee_Hive_Tag);
       if (emp.length == 0) {
-        print('emp Empty');
         emit(state.copyWith(authState: AuthState.dataEmpty));
       }
-      print('52. Login : $login : ${password}');
       if (login == null || login.isEmpty) {
-        print('Auth Failure No Login : 56');
-        emit(state.copyWith(authState: AuthState.failure));
+        emit(
+          state.copyWith(
+            authState: AuthState.failure,
+            msg: 'Please enter username',
+          ),
+        );
         return;
       }
-      print('l');
-      print('emp : ${emp.length}');
+      if (password == null || password.isEmpty) {
+        emit(
+          state.copyWith(
+            authState: AuthState.failure,
+            msg: 'Please enter password',
+          ),
+        );
+        return;
+      }
       emit(state.copyWith(authState: AuthState.loading));
 
-      emp.values.forEach((element) {
-        print('${element.UserName} : ${element.Password}');
-      });
       EmployeeHiveModel empL = emp.values.firstWhere(
         (element) => element.UserName == login && element.Password == password,
         orElse: () => EmployeeHiveModel(),
       );
 
-      print('Login : ${empL.UserName} : ${empL.Password}');
       if (empL.id != null) {
         Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
-        await sett.put('Salesman_ID', empL.id);
+        await sett.put(Config_Tag_Names.Salesmain_ID_Tag, empL.id);
         emit(state.copyWith(authState: AuthState.success));
         return;
       } else {
-        print('Auth Failure emitting : 63');
-        emit(state.copyWith(authState: AuthState.failure));
+        emit(
+          state.copyWith(
+            authState: AuthState.failure,
+            msg: 'User not found',
+          ),
+        );
         return;
       }
 
@@ -105,13 +103,11 @@ class AuthenticationBloc
         print(
             'Error occured while fetching authentication detail : ${e.toString()}');
       }
-      print('Emitting Failure!!!');
-      emit(state.copyWith(authState: AuthState.failure));
+      emit(state.copyWith(msg: 'Login Error', authState: AuthState.failure));
     }
   }
 
   Future<void> authExited(event, emit) async {
-    print('Loging user out');
     try {
       emit(state.copyWith(authState: AuthState.loading));
       // await _authenticationRepository.unAuthenticate();

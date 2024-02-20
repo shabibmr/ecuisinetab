@@ -24,6 +24,7 @@ class PosState extends Equatable {
     this.vID,
     this.vPrefix,
     this.tables,
+    this.currentKOT,
   });
 
   final POSStatus status;
@@ -33,15 +34,22 @@ class PosState extends Equatable {
   final List<String>? tables;
   final String? vID;
   final String? vPrefix;
+  final Map<String, double>? currentKOT;
 
   @override
-  List<Object?> get props => [status, items, itemsLoadStaus];
+  List<Object?> get props => [
+        status,
+        items,
+        itemsLoadStaus,
+        currentKOT,
+      ];
 
   PosState copyWith({
     POSStatus? status,
     List<InventoryItemHive>? items,
     SyncStatus? itemsLoadStaus,
     Map<String, dynamic>? currentOrders,
+    Map<String, double>? currentKOT,
     List<String>? tables,
     String? vID,
     String? vPrefix,
@@ -51,6 +59,7 @@ class PosState extends Equatable {
       items: items ?? this.items,
       itemsLoadStaus: itemsLoadStaus ?? this.itemsLoadStaus,
       currentOrders: currentOrders ?? this.currentOrders,
+      currentKOT: currentKOT ?? this.currentKOT,
       tables: tables ?? this.tables,
       vID: vID ?? this.vID,
       vPrefix: vPrefix ?? this.vPrefix,

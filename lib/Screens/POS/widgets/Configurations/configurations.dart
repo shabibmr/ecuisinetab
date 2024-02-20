@@ -53,6 +53,7 @@ class _ConfigurationWidgetState extends State<ConfigurationWidget> {
                             const ArabicCheck(),
                             ElevatedButton(
                                 onPressed: () {
+                                  Navigator.pop(context);
                                   context
                                       .read<ConfigurationsBloc>()
                                       .add(SaveConfiguration());

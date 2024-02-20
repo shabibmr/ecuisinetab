@@ -132,7 +132,6 @@ class InventoryItemDetailBloc
   }
 
   void setItem(item, emit) {
-    print('Tax : ${item.taxRate}');
     emit(state.copyWith(
       item: item,
       status: ItemDetailStatus.ready,

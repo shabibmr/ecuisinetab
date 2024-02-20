@@ -150,7 +150,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
         }
       });
     } catch (e) {
-      print('Erro : ${e.toString()}  ${box.getAt(0) ?? 'null'}');
+      print('Erro : ${e.toString()} ');
       return false;
     }
     print('Inventory Items FETCHED : ${box.length}');
@@ -368,18 +368,24 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     bool flag = false;
     String qry = "";
     DateTime last = DateTime(2021);
-    final List dataResponse =
-        await WebservicePHPHelper.getAllPriceList(lastUpdated: last);
     Box<PriceListMasterHive> box = Hive.box(HiveTagNames.PriceLists_Hive_Tag);
-    await box.clear();
+    try {
+      final List dataResponse =
+          await WebservicePHPHelper.getAllPriceList(lastUpdated: last);
 
-    dataResponse.forEach((element) async {
-      // print('>> ${element}');
-      final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
-      // print('Name : ${p.priceListName}');
-      await box.put(element['Price_List_ID'], p);
-    });
-    print('PRICES : ${box.length}');
+      await box.clear();
+
+      dataResponse.forEach((element) async {
+        // print('>> ${element}');
+        final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
+        // print('Name : ${p.priceListName}');
+        await box.put(element['Price_List_ID'], p);
+      });
+    } catch (e) {
+      print('Error : $e');
+    } finally {
+      print('PRICES : ${box.length}');
+    }
     return flag;
   }
 }

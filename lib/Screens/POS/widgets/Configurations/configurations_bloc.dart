@@ -34,25 +34,28 @@ class ConfigurationsBloc
     });
     on<SaveConfiguration>((event, emit) {
       Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
-      sett.put('url', state.serverIP);
-      sett.put('DBName', state.dBName);
-      sett.put('BillPrinter', state.printerName);
-      sett.put('vPref', state.voucherPref);
-      sett.put('isArabic', state.arabic);
-      sett.put('Default_Pricelist_Id', state.defaultPriceListID);
+      sett.put(Config_Tag_Names.Base_URL_Tag, state.serverIP);
+      sett.put(Config_Tag_Names.DBName_Tag, state.dBName);
+      sett.put(Config_Tag_Names.Bill_Printer_Tag, state.printerName);
+      sett.put(Config_Tag_Names.Voucher_Prefix_Tag, state.voucherPref);
+      sett.put(Config_Tag_Names.Arabic_Lang_Tag, state.arabic);
+      sett.put(
+          Config_Tag_Names.Default_PriceList_Tag, state.defaultPriceListID);
     });
     on<ReadConfig>((event, emit) async {
       emit(state.copyWith(ready: false));
       // await getIPAddress();
       Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
-      print('Settings Read : ');
       emit(state.copyWith(
-        ServerIP:
-            sett.get('url', defaultValue: 'http://192.168.1.99/test_app_water'),
-        DBName: sett.get('DBName', defaultValue: 'cake_studio_mukkam'),
-        voucherPref: sett.get('vPref', defaultValue: 'A'),
-        printerName: sett.get('BillPrinter', defaultValue: 'Counter'),
-        arabic: sett.get('isArabic', defaultValue: false),
+        ServerIP: sett.get(Config_Tag_Names.Base_URL_Tag,
+            defaultValue: 'http://192.168.1.99/test_app_water'),
+        DBName: sett.get(Config_Tag_Names.DBName_Tag,
+            defaultValue: 'cake_studio_mukkam'),
+        voucherPref:
+            sett.get(Config_Tag_Names.Voucher_Prefix_Tag, defaultValue: 'A'),
+        printerName: sett.get(Config_Tag_Names.Bill_Printer_Tag,
+            defaultValue: 'Counter'),
+        arabic: sett.get(Config_Tag_Names.Arabic_Lang_Tag, defaultValue: false),
         defaultPriceListID: sett.get('Default_Pricelist_Id', defaultValue: 3),
         ready: true,
       ));

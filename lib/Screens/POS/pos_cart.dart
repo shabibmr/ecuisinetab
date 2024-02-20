@@ -103,7 +103,9 @@ class _POSCartPageState extends State<POSCartPage> {
                 child: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () {
-                    context.read<VoucherBloc>().add(const VoucherRequestSave());
+                    context
+                        .read<VoucherBloc>()
+                        .add(const VoucherRequestSaveOrder());
                   },
                 ),
               ),
@@ -113,7 +115,7 @@ class _POSCartPageState extends State<POSCartPage> {
                 child: IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: () {
-                    context.read<VoucherBloc>().add(VoucherRequestSave());
+                    context.read<VoucherBloc>().add(VoucherRequestSaveOrder());
                   },
                 ),
               ),
@@ -139,7 +141,7 @@ class _POSCartPageState extends State<POSCartPage> {
               content: Text('Please check your internet connection'),
             ),
           );
-        } else if (state.status == VoucherEditorStatus.requestSave) {
+        } else if (state.status == VoucherEditorStatus.requestSaveOrder) {
           bool? confirm = await showDialog<bool?>(
               context: context,
               builder: (context) {
@@ -163,7 +165,7 @@ class _POSCartPageState extends State<POSCartPage> {
                 );
               });
           if (confirm ?? false) {
-            context.read<VoucherBloc>().add(SaveVoucher());
+            context.read<VoucherBloc>().add(SaveVoucherOrder());
           }
           //Dialog to show error
         }

@@ -3,6 +3,7 @@ import 'package:ecuisinetab/Datamodels/Masters/Inventory/InventoryItemDataModel.
 import 'package:ecuisinetab/Screens/POS/pos_cart2.dart';
 import 'package:ecuisinetab/Screens/POS/pos_table_selector.dart';
 import 'package:ecuisinetab/Screens/POS/voucher_editor.dart';
+import 'package:ecuisinetab/Screens/POS/widgets/common/gm_progress_indicator.dart';
 import 'package:ecuisinetab/Services/Sync/bloc/sync_ui_config_bloc.dart';
 
 import '../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
@@ -22,7 +23,7 @@ import '../../Transactions/blocs/pos/pos_bloc.dart';
 import 'pos_item_detail.dart';
 
 class POSScreen extends StatefulWidget {
-  POSScreen({Key? key}) : super(key: key);
+  const POSScreen({super.key});
 
   @override
   State<POSScreen> createState() => _POSScreenState();
@@ -36,47 +37,36 @@ class _POSScreenState extends State<POSScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SyncServiceBloc, SyncServiceState>(
-      listener: (context, state) {
-        // TODO: implement listener
-      },
-      builder: (context, state) {
-        if (state.status == SyncUiConfigStatus.fetched) {
-          return Builder(
-            builder: (context) {
-              final status =
-                  context.select((VoucherBloc bloc) => bloc.state.status);
-              if (status == VoucherEditorStatus.sending) {
-                return Container(
-                  child: Text('state : ${state.status} <<<'),
-                );
-              } else if (status == VoucherEditorStatus.loaded) {
-                final status =
-                    context.select((PosBloc bloc) => bloc.state.status);
-                return Builder(
-                  builder: (contextBx) {
-                    if (status == POSStatus.OrderSelected) {
-                      return getPOSScreen(context);
-                    } else {
-                      return PosTableSelector();
-                    }
-                  },
-                );
-              } else if (status == VoucherEditorStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (status == VoucherEditorStatus.fetcherror) {
-                return Center(child: Text('${state.status}'));
-              } else {
-                return Center(child: Text('${state.status}'));
-              }
-            },
-          );
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
+    return PopScope(
+      canPop: false,
+      child: Builder(
+        builder: (context) {
+          final status =
+              context.select((VoucherBloc bloc) => bloc.state.status);
+          if (status == VoucherEditorStatus.sending) {
+            return const GMProgress(
+              msg: 'Sending Voucher',
+            );
+          } else if (status == VoucherEditorStatus.loaded) {
+            final status = context.select((PosBloc bloc) => bloc.state.status);
+            return Builder(
+              builder: (contextBx) {
+                if (status == POSStatus.OrderSelected) {
+                  return getPOSScreen(context);
+                } else {
+                  return PosTableSelector();
+                }
+              },
+            );
+          } else if (status == VoucherEditorStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (status == VoucherEditorStatus.fetcherror) {
+            return Center(child: Text('${status}'));
+          } else {
+            return Center(child: Text('${status}'));
+          }
+        },
+      ),
     );
   }
 
@@ -110,25 +100,8 @@ class _POSScreenState extends State<POSScreen> {
                         );
                       },
                     ));
-                    // await showDialog(
-                    //   context: context,
-                    //   builder: (contextB) => Dialog(
-                    //     elevation: 5,
-                    //     child: MultiBlocProvider(
-                    //       providers: [
-                    //         BlocProvider.value(
-                    //           value: context.read<VoucherBloc>(),
-                    //         ),
-                    //         BlocProvider.value(
-                    //           value: context.read<PosBloc>(),
-                    //         ),
-                    //       ],
-                    //       child: const POSCartPage(),
-                    //     ),
-                    //   ),
-                    // );
                   },
-                  child: VoucherFooter()),
+                  child: const VoucherFooter()),
             ),
           );
         },
@@ -205,12 +178,25 @@ class _POSScreenState extends State<POSScreen> {
   }
 
   Widget getBody() {
-    return BlocBuilder<VoucherBloc, VoucherState>(
-      builder: (context, state) {
-        return InvGroupExpansionPanel();
-      },
-    );
+    return InvGroupExpansionPanel();
   }
+}
+
+Widget getBody2() {
+  Box<InventoryItemHive> itemsBox =
+      Hive.box<InventoryItemHive>(HiveTagNames.Items_Hive_Tag);
+  return ListView.builder(
+      itemCount: itemsBox.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(8, 2, 8, 4),
+          child: Card(
+            child: ListTile(
+              title: Text(itemsBox.getAt(index)?.Item_Name ?? ''),
+            ),
+          ),
+        );
+      });
 }
 
 class TableButton extends StatelessWidget {
@@ -224,19 +210,26 @@ class TableButton extends StatelessWidget {
           context.read<PosBloc>().add(FetchCurrentOrders());
         },
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+          padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
           child: Card(
             elevation: 5,
             child: Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Builder(builder: (context) {
-                final String ref = context.select(
-                    (VoucherBloc bloc) => bloc.state.voucher?.reference ?? '');
-                return Text(
-                  ref,
-                  style: k18lStyleBold,
-                );
-              }),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 100),
+                child: Center(
+                  child: Builder(
+                    builder: (context) {
+                      final String ref = context.select((VoucherBloc bloc) =>
+                          bloc.state.voucher?.reference ?? '');
+                      return Text(
+                        ref,
+                        style: k18lStyleBold,
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
         ),

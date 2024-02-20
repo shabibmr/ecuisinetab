@@ -24,6 +24,7 @@ const kLabelStyle = TextStyle(
 
 final kAppbarLabelStyle = GoogleFonts.roboto(
   color: Colors.black,
+  fontSize: 18,
   fontWeight: FontWeight.bold,
 );
 
@@ -140,6 +141,8 @@ class HiveTagNames {
 class Config_Tag_Names {
   static String get Company_Name_Tag => "CompanyName";
   static String get Branch_Name_Tag => "branch";
+  static String get Server_IP_Tag => "Server_IP";
+  static String get Bill_Printer_Tag => "BillPrinter";
 
   static String get Login_User_Name_tag => "login_user_name";
   static String get Login_User_Emp_ID => "login_user_emp_id";
@@ -152,12 +155,15 @@ class Config_Tag_Names {
 
   static String get Default_PO_Ledger => "defaultPO";
 
-  static String get Default_Bank => "defaultbank";
+  static String get Default_PriceList_Tag => "defaultPriceList";
 
-  static String get Voucher_Prefix => "vPref";
-  static String get DBName => "DBName";
+  static String get Default_Bank_Tag => "defaultbank";
 
-  static String get Salesmain_ID => "Salesman_ID";
+  static String get Voucher_Prefix_Tag => "vPref";
+  static String get DBName_Tag => "DBName";
+
+  static String get Salesmain_ID_Tag => "Salesman_ID";
+  static String get Arabic_Lang_Tag => "isArabic";
 }
 
 // class DefaultFirebaseConfig {

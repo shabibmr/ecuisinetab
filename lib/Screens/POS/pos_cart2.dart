@@ -10,6 +10,7 @@ import '../../Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
 import '../../Login/constants.dart';
 import '../../Transactions/blocs/pos/pos_bloc.dart';
 import '../../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
+import 'voucher_editor.dart';
 
 class POSCartPage extends StatefulWidget {
   const POSCartPage({super.key});
@@ -26,6 +27,25 @@ class _POSCartPageState extends State<POSCartPage> {
         if (state.status == VoucherEditorStatus.sent) {
           Navigator.of(context).pop();
           context.read<PosBloc>().add(OrderSent());
+        } else if (state.status == VoucherEditorStatus.validationError) {
+          //Dialog to show error
+
+          showDialog(
+            context: context,
+            builder: (contextB) => AlertDialog(
+              title: const Text('Error Sending Sales Voucher'),
+              content: Text(state.msg!),
+              actions: [
+                TextButton(
+                  child: const Text('Retry'),
+                  onPressed: () {
+                    context.read<VoucherBloc>().add(const SaveVoucherInvoice());
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            ),
+          );
         } else if (state.status == VoucherEditorStatus.senderror) {
           //Dialog to show error
           showDialog(
@@ -35,7 +55,7 @@ class _POSCartPageState extends State<POSCartPage> {
               content: Text('Please check your internet connection'),
             ),
           );
-        } else if (state.status == VoucherEditorStatus.requestSave) {
+        } else if (state.status == VoucherEditorStatus.requestSaveOrder) {
           await showDialog<bool?>(
               context: context,
               builder: (contextA) {
@@ -52,7 +72,39 @@ class _POSCartPageState extends State<POSCartPage> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(contextA).pop(true);
-                        context.read<VoucherBloc>().add(const SaveVoucher());
+                        context
+                            .read<VoucherBloc>()
+                            .add(const SaveVoucherOrder());
+                      },
+                      child: const Text('Yes'),
+                    ),
+                  ],
+                );
+              });
+          // if (confirm ?? false) {
+          //   context.read<VoucherBloc>().add(const SaveVoucher());
+          // }
+        } else if (state.status == VoucherEditorStatus.requestSaveInvoice) {
+          await showDialog<bool?>(
+              context: context,
+              builder: (contextA) {
+                return AlertDialog(
+                  backgroundColor: Color.fromRGBO(244, 98, 45, 0.811),
+                  title: const Text('Confirm Checkout'),
+                  content: const Text('Do you want to save as Sale ?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(contextA).pop(false);
+                      },
+                      child: const Text('No'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(contextA).pop(true);
+                        context
+                            .read<VoucherBloc>()
+                            .add(const SaveVoucherInvoice());
                       },
                       child: const Text('Yes'),
                     ),
@@ -77,18 +129,99 @@ class POSCartWidget extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cart'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                context
+                    .read<VoucherBloc>()
+                    .add(const VoucherRequestSaveInvoice());
+              },
+              icon: const Icon(
+                Icons.currency_rupee_rounded,
+              ))
+        ],
       ),
-      body: const Column(
+      body: Column(
         children: [
-          Expanded(flex: 1, child: VoucherHeaderDetails()),
-          Expanded(flex: 8, child: CartItemsList()),
-          Expanded(flex: 1, child: VoucherTotalsWidget()),
+          const Expanded(flex: 1, child: VoucherHeaderDetails()),
+          const Expanded(flex: 8, child: CartItemsList()),
+          Expanded(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(
+                      flex: 4,
+                      child: VoucherFooter(
+                        show: false,
+                      )),
+                  Expanded(
+                    flex: 6,
+                    child: Row(
+                      children: [
+                        Card(
+                          color: context.select((VoucherBloc bloc) =>
+                                  bloc.state.printCopy ?? false)
+                              ? Colors.green.shade300
+                              : Colors.red.shade100,
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(
+                                      Icons.print,
+                                      color: context.select(
+                                              (VoucherBloc bloc) =>
+                                                  bloc.state.printCopy ?? false)
+                                          ? Colors.black
+                                          : Colors.grey,
+                                    ),
+                                    const SizedBox(
+                                      height: 3,
+                                    ),
+                                    Text('Print',
+                                        style: TextStyle(
+                                          color: context.select(
+                                                  (VoucherBloc bloc) =>
+                                                      bloc.state.printCopy ??
+                                                      false)
+                                              ? Colors.black
+                                              : Colors.grey,
+                                        )),
+                                  ],
+                                ),
+                                Checkbox(
+                                  value: context.select((VoucherBloc bloc) =>
+                                      bloc.state.printCopy ?? false),
+                                  onChanged: (v) => context
+                                      .read<VoucherBloc>()
+                                      .add(SetPrintCopy(printCopy: v ?? false)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Container()),
+                      ],
+                    ),
+                  ),
+                ],
+              )),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.read<VoucherBloc>().add(
-                const VoucherRequestSave(),
+                const VoucherRequestSaveOrder(),
               );
         },
         child: const Icon(Icons.send),
@@ -121,10 +254,16 @@ class VoucherReferenceWidget extends StatelessWidget {
     return Builder(builder: (context) {
       String ref = context
           .select((VoucherBloc bloc) => bloc.state.voucher?.reference ?? '');
+      String vno = context.select(
+          (VoucherBloc bloc) => bloc.state.voucher?.voucherNumber ?? '');
+
+      String vtype = context
+          .select((VoucherBloc bloc) => bloc.state.voucher?.voucherType ?? '');
+
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(ref),
+          child: Text('$ref - $vno - $vtype'),
         ),
       );
     });
@@ -159,12 +298,15 @@ class VoucherTotalsWidget extends StatelessWidget {
     return Builder(builder: (context) {
       final double total = context
           .select((VoucherBloc bloc) => bloc.state.voucher?.grandTotal ?? 0);
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            total.inCurrency,
-            style: Theme.of(context).textTheme.titleLarge,
+      return Padding(
+        padding: const EdgeInsets.all(12),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              total.inCurrency,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
         ),
       );
@@ -242,25 +384,104 @@ class CartItemsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // print('Building CartItemsList ');
-    return BlocBuilder<VoucherBloc, VoucherState>(
-      builder: (context, state) {
-        // print('new list state');
-        if (state.voucher!.InventoryItems!.isEmpty) {
-          return const Center(
-            child: Text('No Items'),
-          );
-        } else {
-          return ListView.builder(
-            key: UniqueKey(),
-            itemCount: state.voucher!.InventoryItems!.length,
-            itemBuilder: (context, index) {
-              return POSCartListItem(
-                index: index,
-              );
-            },
-          );
-        }
-      },
+    return BlocProvider(
+      create: (context) => InventoryItemDetailBloc(),
+      child: BlocBuilder<VoucherBloc, VoucherState>(
+        builder: (context, state) {
+          print('new list state');
+          if (state.voucher!.InventoryItems!.isEmpty) {
+            return const Center(
+              child: Text('No Items'),
+            );
+          } else {
+            // return ListView(children: [
+            //   ...state.voucher!.InventoryItems!.map((e) =>
+            //   Card(
+            //         child: InkWell(
+            //           onTap: () async {
+            //             await showDialog(
+            //                 context: context,
+            //                 builder: (contextB) {
+            //                   final item = e.BaseItem;
+            //                   return MultiBlocProvider(
+            //                     providers: [
+            //                       BlocProvider.value(
+            //                         value: context.read<VoucherBloc>(),
+            //                       ),
+            //                       BlocProvider.value(
+            //                           value: context
+            //                               .read<InventoryItemDetailBloc>()
+            //                             ..add(
+            //                               SetItem(item: item),
+            //                             )),
+            //                     ],
+            //                     child: const POSItemDetailPage(),
+            //                   );
+            //                 });
+            //           },
+            //           child: ListTile(
+            //             title: Text(e.BaseItem.ItemName!),
+            //             subtitle: Row(
+            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //               children: [
+            //                 Text(e.BaseItem.rate?.inCurrency ?? ''),
+            //                 Text(e.BaseItem.grandTotal?.inCurrency ?? '')
+            //               ],
+            //             ),
+            //             trailing: Text(
+            //                 e.BaseItem.quantity?.toStringAsFixed(2) ?? '0.00'),
+            //           ),
+            //         ),
+            //       ))
+            // ]);
+            return ListView.builder(
+              key: UniqueKey(),
+              itemCount: state.voucher!.InventoryItems!.length,
+              itemBuilder: (context, index) {
+                final e = state.voucher!.InventoryItems![index];
+                return Card(
+                  child: InkWell(
+                    onTap: () async {
+                      await showDialog(
+                          context: context,
+                          builder: (contextB) {
+                            final item = e.BaseItem;
+                            return MultiBlocProvider(
+                              providers: [
+                                BlocProvider.value(
+                                  value: context.read<VoucherBloc>(),
+                                ),
+                                BlocProvider.value(
+                                    value:
+                                        context.read<InventoryItemDetailBloc>()
+                                          ..add(
+                                            SetItem(item: item),
+                                          )
+                                          ..add(SetIndex(index: index))),
+                              ],
+                              child: const POSItemDetailPage(),
+                            );
+                          });
+                    },
+                    child: ListTile(
+                      title: Text(e.BaseItem.ItemName!),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(e.BaseItem.rate?.inCurrency ?? ''),
+                          Text(e.BaseItem.grandTotal?.inCurrency ?? '')
+                        ],
+                      ),
+                      trailing: Text(
+                          e.BaseItem.quantity?.toStringAsFixed(2) ?? '0.00'),
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
     );
   }
 }

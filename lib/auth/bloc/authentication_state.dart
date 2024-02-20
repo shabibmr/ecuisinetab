@@ -39,7 +39,6 @@ class AuthenticationState extends Equatable {
   }) {
     return AuthenticationState(
       authState: authState ?? this.authState,
-      // authDetail: authDetail ?? this.authDetail,
       msg: msg ?? this.msg,
       username: username ?? this.username,
       password: password ?? this.password,

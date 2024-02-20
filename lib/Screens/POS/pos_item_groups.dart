@@ -103,6 +103,7 @@ class _InvGroupExpansionPanelState extends State<InvGroupExpansionPanel> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      key: UniqueKey(),
       child: ExpansionPanelList(
         expansionCallback: (panelIndex, isExpanded) {
           setState(() {
@@ -193,29 +194,25 @@ class InvItemListExp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
-      final voucher = context.read<VoucherBloc>().state.voucher;
-      // context.select((VoucherBloc bloc) => bloc.state.voucher);
-      num qty = voucher?.getItemCurrCount(item.Item_ID!) ?? 0;
-      int dec = item.uomObjects[0].UOM_decimal_Points ?? 0;
+      // final voucher = context.read<VoucherBloc>().state.voucher;
+      // final voucher = context.select((VoucherBloc bloc) => bloc.state.voucher);
+      // num qty = voucher?.getItemCurrCount(item.Item_ID!) ?? 0;
+      // int dec = item.uomObjects[0].UOM_decimal_Points ?? 0;
 
       // print(
       //     '................................................... Voucher Changed!!');
 
       return InkWell(
         onTap: () async {
-          // Open Item Detail;
-          // final voucher = context.read<VoucherBloc>().state.voucher;
-          // num qty = voucher?.getItemCurrCount(widget.item.Item_ID!) ?? 0;
-          // int dec = widget.item.uomObjects[0].UOM_decimal_Points ?? 0;
-
-          if (qty == 0) {
-            qty = 1;
-          }
-          if (dec == 0) {
-            await openItemDetail(context, voucher, qty + 0.0);
-          } else {
-            await openItemDetail(context, voucher, qty as double);
-          }
+          await openItemDetail2(context, item, index);
+          // if (qty == 0) {
+          //   qty = 1;
+          // }
+          // if (dec == 0) {
+          //   await openItemDetail(context, voucher, qty + 0.0);
+          // } else {
+          //   await openItemDetail(context, voucher, qty as double);
+          // }
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(4, 1, 4, 2),
@@ -223,18 +220,27 @@ class InvItemListExp extends StatelessWidget {
             child: ListTile(
               title: Text(item.Item_Name ?? ''),
               subtitle: Text(' ${item.Price?.inCurrency}'),
-              // trailing: ItemQty(
-              //   item: widget.item,
-              //   qtyNum: qty as double,
-              // ),
-              trailing: SizedBox(
-                width: 100,
-                child: ItemQty(
-                  index: index,
-                  item: item,
-                  qtyNum: qty,
-                ),
+              trailing: ItemStataLess(
+                // index: index,
+                item: item,
+                // qtyNum: qty as double,
               ),
+              // trailing: BlocBuilder<VoucherBloc, VoucherState>(
+              //   buildWhen: (previous, current) => true,
+              //   builder: (context, state) {
+              //     // print('Building $qty');
+              //     return SizedBox(
+              //       width: 100,
+              //       child: Text('${item.Item_Name} : $qty'),
+
+              //       // ItemQty(
+              //       //   index: index,
+              //       //   item: item,
+              //       //   qtyNum: qty,
+              //       // ),
+              //     );
+              //   },
+              // ),
             ),
           ),
         ),
@@ -242,10 +248,37 @@ class InvItemListExp extends StatelessWidget {
     });
   }
 
+  Future<void> openItemDetail2(
+      BuildContext context, final InventoryItemHive item, int index) async {
+    // final InventoryItemDataModel? itemX =
+    await showDialog<InventoryItemDataModel>(
+      context: context,
+      builder: (context2) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(
+              value: context.read<VoucherBloc>(),
+            ),
+            BlocProvider(
+                create: (context) => InventoryItemDetailBloc()
+                  ..add(
+                    SetItem(
+                      item: InventoryItemDataModel.fromHive(item)
+                          .copyWith(ItemReqUuid: 'X'),
+                    ),
+                  )
+                  ..add(SetIndex(index: index))),
+          ],
+          child: const POSItemDetailPage(),
+        );
+      },
+    );
+  }
+
   Future<void> openItemDetail(BuildContext context,
       final GeneralVoucherDataModel? voucher, double qty) async {
-    final InventoryItemDataModel? itemX =
-        await showDialog<InventoryItemDataModel>(
+    // final InventoryItemDataModel? itemX =
+    await showDialog<InventoryItemDataModel>(
       context: context,
       builder: (context2) {
         return MultiBlocProvider(
@@ -462,15 +495,35 @@ class InvItemListExp extends StatelessWidget {
 //     }
 //   }
 // }
+class ItemStataLess extends StatelessWidget {
+  const ItemStataLess({
+    super.key,
+    required this.item,
+  });
+
+  final InventoryItemHive item;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<VoucherBloc, VoucherState>(
+      builder: (context, state) {
+        final voucher = state.voucher;
+        num qty = voucher?.getItemCurrCount(item.Item_ID!) ?? 0;
+
+        return Text(qty.toStringAsFixed(2));
+      },
+    );
+  }
+}
 
 class ItemQty extends StatefulWidget {
   const ItemQty({
     Key? key,
-    required this.qtyNum,
+    // required this.qtyNum,
     required this.item,
     required this.index,
   }) : super(key: key);
-  final num qtyNum;
+  // final num qtyNum;
   final InventoryItemHive item;
   final int index;
 
@@ -486,12 +539,12 @@ class _ItemQtyState extends State<ItemQty> {
       builder: (context) {
         final voucher =
             context.select((VoucherBloc bloc) => bloc.state.voucher);
-        // num qtyNum = voucher?.getItemCurrCount(widget.item.Item_ID!) ?? 0;
+        num qtyNum = voucher?.getItemCurrCount(widget.item.Item_ID!) ?? 0;
 
-        return widget.qtyNum == 0
+        // double qtyNum = item?.quantity ?? 0;
+        return qtyNum == 0
             ? ElevatedButton(
                 onPressed: () {
-                  print('Pressed Add Button');
                   context.read<VoucherBloc>().add(AddInventoryItem(
                       inventoryItem:
                           InventoryItemDataModel.fromHive(widget.item)
@@ -505,7 +558,7 @@ class _ItemQtyState extends State<ItemQty> {
                   key: UniqueKey(),
                   minVal: 0,
                   isIntrinsicWidth: false,
-                  initVal: widget.qtyNum + 0.0,
+                  initVal: qtyNum + 0.0,
                   decimalPlaces:
                       widget.item.uomObjects[0].UOM_decimal_Points ?? 0,
                   onQtyChanged: (value) {

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginWidget extends StatefulWidget {
-  LoginWidget({Key? key}) : super(key: key);
+  const LoginWidget({super.key});
 
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
@@ -14,12 +14,12 @@ class LoginWidget extends StatefulWidget {
 class _LoginWidgetState extends State<LoginWidget> {
   @override
   Widget build(BuildContext context) {
-    return LoginPage();
+    return const LoginPage();
   }
 }
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -28,71 +28,78 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    print('Rebuilding Login Page');
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('eCuisineTab'),
+        title: const Text('eCuisineTab'),
         centerTitle: false,
         actions: [
           IconButton(
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ConfigurationPage(),
+                  builder: (context) => const ConfigurationPage(),
                 ));
               },
-              icon: Icon(Icons.settings))
+              icon: const Icon(Icons.settings))
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-                flex: 1,
-                child: SizedBox(
-                  width: 350,
-                  height: 350,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(180)),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/algoLogo.png',
-                        height: 200,
-                        width: 200,
-                      ),
-                    ),
-                  ),
-                )),
-            const Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+            Flexible(
+              flex: 2,
+              child: SizedBox(
+                width: 250,
+                height: 250,
                 child: Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            ),
-                          ),
-                          UserName(),
-                          LoginPassword(),
-                          LoginButton(),
-                        ],
-                      ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(180)),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/algoLogo.png',
+                      height: 150,
+                      width: 150,
                     ),
                   ),
                 ),
+              ),
+            ),
+            const Expanded(
+              flex: 3,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(0.0),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Login',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              ),
+                              UserNameWidget(),
+                              PasswordWidget(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  LoginButton(),
+                ],
               ),
             ),
           ],
@@ -102,75 +109,103 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class UserName extends StatelessWidget {
-  const UserName({Key? key}) : super(key: key);
+class UserNameWidget extends StatelessWidget {
+  const UserNameWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Builder(builder: (context) {
-        String? text =
-            context.select((AuthenticationBloc bloc) => bloc.state.username);
-        print('user : $text');
-        return MTextField(
-          autoFocus: true,
-          inputDecoration: InputDecoration(
-              // hintText: 'Username',
-              label: Text('Username'),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-          initialText: text,
-          onChanged: (value) {
-            context
-                .read<AuthenticationBloc>()
-                .add(AuthSetUser(username: value));
-          },
-        );
-      }),
+    return TextFormField(
+      onChanged: (value) => context.read<AuthenticationBloc>().add(
+            AuthSetUser(username: value),
+          ),
+      autofocus: true,
+      decoration: const InputDecoration(
+        label: Text('Username'),
+      ),
     );
+  }
+}
+
+class PasswordWidget extends StatelessWidget {
+  const PasswordWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      onChanged: (value) => context.read<AuthenticationBloc>().add(
+            AuthSetPass(password: value),
+          ),
+      autofocus: true,
+      obscureText: true,
+      decoration: const InputDecoration(
+        label: Text('Password'),
+      ),
+    );
+  }
+}
+
+class UserName extends StatelessWidget {
+  const UserName({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      String? text =
+          context.select((AuthenticationBloc bloc) => bloc.state.username);
+      return MTextField(
+        autoFocus: true,
+        inputDecoration: InputDecoration(
+            // hintText: 'Username',
+            label: const Text('Username'),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+        initialText: text,
+        onChanged: (value) {
+          context.read<AuthenticationBloc>().add(AuthSetUser(username: value));
+        },
+      );
+    });
   }
 }
 
 class LoginPassword extends StatelessWidget {
-  const LoginPassword({Key? key}) : super(key: key);
+  const LoginPassword({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Builder(builder: (context) {
-        String? text =
-            context.select((AuthenticationBloc bloc) => bloc.state.password);
-        print('Passwotd : $text   ');
-        return MTextField(
-          initialText: text,
-          obscureText: true,
-          inputDecoration: InputDecoration(
-              // hintText: 'Username',
-              label: Text('Password'),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-          onChanged: (value) => context
-              .read<AuthenticationBloc>()
-              .add(AuthSetPass(password: value)),
-        );
-      }),
-    );
+    return Builder(builder: (context) {
+      String? text =
+          context.select((AuthenticationBloc bloc) => bloc.state.password);
+      return MTextField(
+        initialText: text,
+        obscureText: true,
+        inputDecoration: InputDecoration(
+            // hintText: 'Username',
+            label: const Text('Password'),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+        onChanged: (value) => context
+            .read<AuthenticationBloc>()
+            .add(AuthSetPass(password: value)),
+      );
+    });
   }
 }
 
 class LoginButton extends StatelessWidget {
-  const LoginButton({Key? key}) : super(key: key);
+  const LoginButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: const SizedBox(
-        height: 40,
-        width: 100,
-        child: Center(
-          child: Text(
-            'Login',
-            style: TextStyle(fontSize: 18),
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: SizedBox(
+          height: 40,
+          width: 100,
+          child: Center(
+            child: Text(
+              'Login',
+              style: TextStyle(fontSize: 18),
+            ),
           ),
         ),
       ),

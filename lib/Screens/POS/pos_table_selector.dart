@@ -147,7 +147,7 @@ class _PosTableSelectorState extends State<PosTableSelector> {
           return Column(
             children: [
               Card(
-                child: Container(
+                child: SizedBox(
                   height: 60,
                   child: Row(
                     children: [
@@ -314,7 +314,7 @@ class _TablesGridState extends State<TablesGrid> {
           onTap: () {
             print('Table change to ${tables?[index].toString() ?? ''}');
             int defPrice = Hive.box(HiveTagNames.Settings_Hive_Tag)
-                .get("Default_Pricelist_Id");
+                .get(Config_Tag_Names.Default_PriceList_Tag, defaultValue: 3);
             if (orders.keys.contains(tables?[index].toString())) {
               String vNo =
                   orders[tables?[index].toString()]['Voucher_No'].toString();

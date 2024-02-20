@@ -46,3 +46,7 @@ class FetchAllMastersEvent extends SyncServiceEvent {
 class FetchPricesEvent extends SyncServiceEvent {
   const FetchPricesEvent();
 }
+
+class CheckServer extends SyncServiceEvent {
+  const CheckServer();
+}
