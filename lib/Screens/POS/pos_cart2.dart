@@ -66,6 +66,9 @@ class _POSCartPageState extends State<POSCartPage> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(contextA).pop(false);
+                        context
+                            .read<VoucherBloc>()
+                            .add(const SaveVoucherOrder());
                       },
                       child: const Text('No'),
                     ),
@@ -394,46 +397,6 @@ class CartItemsList extends StatelessWidget {
               child: Text('No Items'),
             );
           } else {
-            // return ListView(children: [
-            //   ...state.voucher!.InventoryItems!.map((e) =>
-            //   Card(
-            //         child: InkWell(
-            //           onTap: () async {
-            //             await showDialog(
-            //                 context: context,
-            //                 builder: (contextB) {
-            //                   final item = e.BaseItem;
-            //                   return MultiBlocProvider(
-            //                     providers: [
-            //                       BlocProvider.value(
-            //                         value: context.read<VoucherBloc>(),
-            //                       ),
-            //                       BlocProvider.value(
-            //                           value: context
-            //                               .read<InventoryItemDetailBloc>()
-            //                             ..add(
-            //                               SetItem(item: item),
-            //                             )),
-            //                     ],
-            //                     child: const POSItemDetailPage(),
-            //                   );
-            //                 });
-            //           },
-            //           child: ListTile(
-            //             title: Text(e.BaseItem.ItemName!),
-            //             subtitle: Row(
-            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //               children: [
-            //                 Text(e.BaseItem.rate?.inCurrency ?? ''),
-            //                 Text(e.BaseItem.grandTotal?.inCurrency ?? '')
-            //               ],
-            //             ),
-            //             trailing: Text(
-            //                 e.BaseItem.quantity?.toStringAsFixed(2) ?? '0.00'),
-            //           ),
-            //         ),
-            //       ))
-            // ]);
             return ListView.builder(
               key: UniqueKey(),
               itemCount: state.voucher!.InventoryItems!.length,

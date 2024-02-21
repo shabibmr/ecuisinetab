@@ -103,8 +103,22 @@ class SaveVoucherOrder extends VoucherEvent {
   List<Object> get props => [];
 }
 
+class RejectSaveVoucherOrder extends VoucherEvent {
+  const RejectSaveVoucherOrder();
+
+  @override
+  List<Object> get props => [];
+}
+
 class SaveVoucherInvoice extends VoucherEvent {
   const SaveVoucherInvoice();
+
+  @override
+  List<Object> get props => [];
+}
+
+class RejectSaveVoucherInvoice extends VoucherEvent {
+  const RejectSaveVoucherInvoice();
 
   @override
   List<Object> get props => [];

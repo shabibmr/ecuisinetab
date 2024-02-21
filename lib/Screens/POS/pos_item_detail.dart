@@ -197,7 +197,8 @@ class ItemQty extends StatelessWidget {
                 num qtyNum = qty ?? 0;
 
                 return Builder(builder: (context) {
-                  return InputQty.int(
+                  return InputQty(
+                    decimalPlaces: dec,
                     minVal: 0,
                     initVal: qtyNum,
                     onQtyChanged: (value) {

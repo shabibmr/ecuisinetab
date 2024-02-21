@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
 import 'package:ecuisinetab/Screens/POS/pos_cart2.dart';
+import 'package:ecuisinetab/Screens/POS/pos_items.dart';
 import 'package:ecuisinetab/Screens/POS/pos_table_selector.dart';
 import 'package:ecuisinetab/Screens/POS/voucher_editor.dart';
 import 'package:ecuisinetab/Screens/POS/widgets/common/gm_progress_indicator.dart';
@@ -49,8 +50,10 @@ class _POSScreenState extends State<POSScreen> {
             );
           } else if (status == VoucherEditorStatus.loaded) {
             final status = context.select((PosBloc bloc) => bloc.state.status);
+            print("WTF");
             return Builder(
               builder: (contextBx) {
+                print('State  RERUN @55');
                 if (status == POSStatus.OrderSelected) {
                   return getPOSScreen(context);
                 } else {
@@ -125,7 +128,20 @@ class _POSScreenState extends State<POSScreen> {
           ),
         ],
       ),
-      body: getBody(),
+      body: getBodyClassic(),
+    );
+  }
+
+  Widget getBodyClassic() {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 80,
+          child: PosGroupsHorizontal(),
+        ),
+        Expanded(child: POSItemsListWidget())
+      ],
     );
   }
 

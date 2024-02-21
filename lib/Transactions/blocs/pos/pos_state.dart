@@ -25,6 +25,7 @@ class PosState extends Equatable {
     this.vPrefix,
     this.tables,
     this.currentKOT,
+    this.currentGroupID,
   });
 
   final POSStatus status;
@@ -35,6 +36,7 @@ class PosState extends Equatable {
   final String? vID;
   final String? vPrefix;
   final Map<String, double>? currentKOT;
+  final String? currentGroupID;
 
   @override
   List<Object?> get props => [
@@ -42,6 +44,8 @@ class PosState extends Equatable {
         items,
         itemsLoadStaus,
         currentKOT,
+        itemsLoadStaus,
+        currentGroupID
       ];
 
   PosState copyWith({
@@ -53,6 +57,7 @@ class PosState extends Equatable {
     List<String>? tables,
     String? vID,
     String? vPrefix,
+    String? currentGroupID,
   }) {
     return PosState(
       status: status ?? this.status,
@@ -63,9 +68,7 @@ class PosState extends Equatable {
       tables: tables ?? this.tables,
       vID: vID ?? this.vID,
       vPrefix: vPrefix ?? this.vPrefix,
+      currentGroupID: currentGroupID ?? this.currentGroupID,
     );
   }
-
-  @override
-  bool get stringify => true;
 }

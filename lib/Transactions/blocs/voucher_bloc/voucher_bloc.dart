@@ -87,6 +87,10 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     on<VoucherRequestSaveInvoice>((event, emit) => emit(state.copyWith(
           status: VoucherEditorStatus.requestSaveInvoice,
         )));
+    on<RejectSaveVoucherOrder>((event, emit) =>
+        emit(state.copyWith(status: VoucherEditorStatus.loaded)));
+    on<RejectSaveVoucherInvoice>((event, emit) =>
+        emit(state.copyWith(status: VoucherEditorStatus.loaded)));
     on<SaveVoucherOrder>(
         (event, emit) async => await saveVoucherOrder(event, emit));
     on<SaveVoucherInvoice>(
@@ -275,12 +279,12 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     print("Save Voucher Invoice ");
 
     emit(state.copyWith(status: VoucherEditorStatus.sending));
-    if (state.voucher!.ledgerObject!.LedgerID?.isEmpty == true) {
-      emit(state.copyWith(
-          status: VoucherEditorStatus.validationError,
-          msg: 'Please Select Customer'));
-      return;
-    }
+    // if (state.voucher!.ledgerObject!.LedgerID?.isEmpty == true) {
+    //   emit(state.copyWith(
+    //       status: VoucherEditorStatus.validationError,
+    //       msg: 'Please Select Customer'));
+    //   return;
+    // }
     if (state.voucher!.ledgersList.isEmpty) {}
 
     emit(state.copyWith(
@@ -362,6 +366,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   void updateItemQty(emit, InventoryItemDataModel item, quantity) {
     emit(state.copyWith(status: VoucherEditorStatus.loading));
     final voucher = state.voucher!;
+    print('GODOWN : ${voucher.fromGodownID}');
     print('Updating Item Qty  : $quantity ');
     if (voucher.getItemCurrCount(item.ItemID!) == 0) {
       print('New Item FOUND');

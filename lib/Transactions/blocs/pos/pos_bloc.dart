@@ -21,16 +21,18 @@ class PosBloc extends Bloc<PosEvent, PosState> {
       ));
       final List<InventoryItemHive> items = itemsBox.values.where((element) {
         // print('${element.Group_Id} to ${event.groupID}');
-        return element.Group_Id == event.groupID;
+        return element.Group_Id == event.groupID &&
+            (element.isSalesItem == true);
       }).toList();
 
-      // print(
-      //     'Items Filtered : ${items?.length} before : ${state.items?.length}');
+      print('Items Filtered : ${items.length} before : ${state.items?.length}');
 
       emit(state.copyWith(
         itemsLoadStaus: SyncStatus.ItemsLoaded,
         items: items,
+        currentGroupID: event.groupID,
       ));
+      print('Emit Completed');
     });
     on<OrderSelected>((event, emit) {
       emit(state.copyWith(

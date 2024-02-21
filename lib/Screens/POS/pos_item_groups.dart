@@ -263,8 +263,16 @@ class InvItemListExp extends StatelessWidget {
                 create: (context) => InventoryItemDetailBloc()
                   ..add(
                     SetItem(
-                      item: InventoryItemDataModel.fromHive(item)
-                          .copyWith(ItemReqUuid: 'X'),
+                      item: InventoryItemDataModel.fromHive(item).copyWith(
+                        ItemReqUuid: 'X',
+                        quantity: (context
+                                    .read<VoucherBloc>()
+                                    .state
+                                    .voucher!
+                                    .getItemCurrCount(item.Item_ID!) ??
+                                1) +
+                            0.0,
+                      ),
                     ),
                   )
                   ..add(SetIndex(index: index))),
@@ -510,7 +518,10 @@ class ItemStataLess extends StatelessWidget {
         final voucher = state.voucher;
         num qty = voucher?.getItemCurrCount(item.Item_ID!) ?? 0;
 
-        return Text(qty.toStringAsFixed(2));
+        return Text(qty.toStringAsFixed(2),
+            style: TextStyle(
+              fontSize: 12,
+            ));
       },
     );
   }

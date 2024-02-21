@@ -1241,7 +1241,7 @@ class GeneralVoucherDataModel extends Equatable {
               ),
             ),
       toGodownID: map['toGodownID'] ?? '',
-      fromGodownID: map['fromGodownID'] ?? '',
+      fromGodownID: map['fromGodownID'] ?? 'GODOWN',
       Contact: ContactsDataModel.fromMap(map['Contact'] ?? {}),
       // isHidden: int.parse(map['isHidden']) == 1 ? true : false,
 
