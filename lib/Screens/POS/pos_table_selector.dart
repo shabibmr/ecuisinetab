@@ -86,7 +86,8 @@ class _PosTableSelectorState extends State<PosTableSelector> {
         },
         label: Builder(builder: (context) {
           var plist = context.select((VoucherBloc bloc) =>
-              bloc.state.voucher?.priceListId?.toString() ?? '3');
+                  bloc.state.voucher?.priceListId?.toString() ?? '3') ??
+              "3";
           // print('New plist : $plist');
           return Text(pBox.get(plist)?.priceListName ?? '');
         }),
@@ -476,7 +477,6 @@ class _RefreshTimeIndicatorState extends State<RefreshTimeIndicator> {
 
   callTimer() async {
     T = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      print('Running Timr');
       setState(() {
         if (val >= 1) {
           context.read<PosBloc>().add(FetchCurrentOrders());

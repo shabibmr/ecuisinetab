@@ -140,6 +140,9 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                   builder: (context) {
                     final InventoryItemDataModel item = context.select(
                         (InventoryItemDetailBloc blox) => blox.state.item!);
+                    final int index = context.select(
+                        (InventoryItemDetailBloc blox) =>
+                            blox.state.index ?? -1);
                     return Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -148,8 +151,17 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                         FloatingActionButton(
                           // backgroundColor: Colors.black,
                           onPressed: () {
-                            context.read<VoucherBloc>().add(
-                                UpdateItemQty(item: item, qty: item.quantity!));
+                            if (index > -1) {
+                              context
+                                  .read<VoucherBloc>()
+                                  .add(UpdateInventoryItemAtIndex(
+                                    index: index,
+                                    inventoryItem: item,
+                                  ));
+                            } else {
+                              context.read<VoucherBloc>().add(UpdateItemQty(
+                                  item: item, qty: item.quantity!));
+                            }
                             // Navigator.of(context).pop>()
                             Navigator.of(context).pop();
                           },

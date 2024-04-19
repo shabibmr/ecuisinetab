@@ -114,7 +114,7 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
                         .copyWith(ItemReqUuid: 'X'),
                   ),
                 )
-                // ..add(const SetIndex(index: -1))
+                ..add(const SetIndex(index: -1))
                 ..add(SetItemPriceLevel(priceID: voucher!.priceListId ?? 0))
                 ..add(SetItemQuantity(qty == 0 ? 1 : qty)),
             ),
