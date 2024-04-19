@@ -1,7 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -201,35 +203,53 @@ class _PosGroupsHorizontalState extends State<PosGroupsHorizontal> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PosBloc, PosState>(
-      builder: (context, state) {
-        return ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: _groups.length,
-          itemBuilder: (listContext, index) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () {
-                  context.read<PosBloc>().add(GroupSelected(
-                      groupID: _groups[index].Group_ID!, index: index));
-                },
-                child: Card(
-                  elevation: 1,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: AutoSizeText(
-                        _groups[index].Group_Name!,
-                        textAlign: TextAlign.left,
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: _groups.length,
+      itemBuilder: (listContext, index) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: BlocBuilder<PosBloc, PosState>(
+            builder: (context, state) {
+              final selectedIndex = state.currentGroupID;
+              return Card(
+                elevation: 1,
+                color: selectedIndex == _groups[index].Group_ID
+                    ? Colors.amber
+                    : Colors.green.shade100,
+                child: InkWell(
+                  onTap: () {
+                    context.read<PosBloc>().add(GroupSelected(
+                        groupID: _groups[index].Group_ID!, index: index));
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          color: Colors.green.shade50,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: AutoSizeText(
+                                _groups[index].Group_Name!,
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

@@ -25,29 +25,17 @@ class _PosTableSelectorState extends State<PosTableSelector> {
   @override
   void initState() {
     super.initState();
-    callTimer();
+    // callTimer();
   }
 
   @override
   void dispose() {
-    T.cancel();
-    T2.cancel();
     super.dispose();
   }
 
-  late Timer T;
-  late Timer T2;
+  // late Timer T;
 
   double val = 0;
-
-  callTimer() async {
-    T = Timer.periodic(const Duration(seconds: 10), (timer) {
-      context.read<PosBloc>().add(FetchCurrentOrders());
-    });
-    T2 = Timer.periodic(const Duration(seconds: 1), (timer) {
-      val += 0.1;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -479,7 +467,6 @@ class _RefreshTimeIndicatorState extends State<RefreshTimeIndicator> {
   @override
   void dispose() {
     T.cancel();
-
     super.dispose();
   }
 
@@ -488,9 +475,13 @@ class _RefreshTimeIndicatorState extends State<RefreshTimeIndicator> {
   double val = 0;
 
   callTimer() async {
-    T = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    T = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      print('Running Timr');
       setState(() {
-        val += 0.01;
+        if (val >= 1) {
+          context.read<PosBloc>().add(FetchCurrentOrders());
+        }
+        val += 0.005;
       });
     });
   }

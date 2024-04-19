@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ecuisinetab/auth/bloc/authentication_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,10 +19,19 @@ import 'Services/Sync/bloc/sync_ui_config_bloc.dart';
 
 Future<void> main() async {
   // HiveTagNames.setDB('cake_studio_mukkam');
-
+  HttpOverrides.global = MyHttpOverrides();
   await initSettings();
   await initHiveBoxes();
   runApp(const MyApp());
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 Future<void> initSettings() async {

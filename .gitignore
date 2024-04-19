@@ -49,3 +49,8 @@ windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugin_registrant.h
 windows/flutter/generated_plugins.cmake
 pubspec.lock
+macos/Podfile.lock
+macos/Runner/DebugProfile.entitlements
+macos/Runner/Release.entitlements
+macos/Runner.xcodeproj/project.pbxproj
+macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme

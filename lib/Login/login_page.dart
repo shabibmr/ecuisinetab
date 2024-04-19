@@ -114,13 +114,16 @@ class UserNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      onChanged: (value) => context.read<AuthenticationBloc>().add(
-            AuthSetUser(username: value),
-          ),
-      autofocus: true,
-      decoration: const InputDecoration(
-        label: Text('Username'),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        onChanged: (value) => context.read<AuthenticationBloc>().add(
+              AuthSetUser(username: value),
+            ),
+        autofocus: true,
+        decoration: const InputDecoration(
+          label: Text('Username'),
+        ),
       ),
     );
   }
@@ -131,62 +134,19 @@ class PasswordWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      onChanged: (value) => context.read<AuthenticationBloc>().add(
-            AuthSetPass(password: value),
-          ),
-      autofocus: true,
-      obscureText: true,
-      decoration: const InputDecoration(
-        label: Text('Password'),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        onChanged: (value) => context.read<AuthenticationBloc>().add(
+              AuthSetPass(password: value),
+            ),
+        autofocus: true,
+        obscureText: true,
+        decoration: const InputDecoration(
+          label: Text('Password'),
+        ),
       ),
     );
-  }
-}
-
-class UserName extends StatelessWidget {
-  const UserName({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      String? text =
-          context.select((AuthenticationBloc bloc) => bloc.state.username);
-      return MTextField(
-        autoFocus: true,
-        inputDecoration: InputDecoration(
-            // hintText: 'Username',
-            label: const Text('Username'),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-        initialText: text,
-        onChanged: (value) {
-          context.read<AuthenticationBloc>().add(AuthSetUser(username: value));
-        },
-      );
-    });
-  }
-}
-
-class LoginPassword extends StatelessWidget {
-  const LoginPassword({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      String? text =
-          context.select((AuthenticationBloc bloc) => bloc.state.password);
-      return MTextField(
-        initialText: text,
-        obscureText: true,
-        inputDecoration: InputDecoration(
-            // hintText: 'Username',
-            label: const Text('Password'),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
-        onChanged: (value) => context
-            .read<AuthenticationBloc>()
-            .add(AuthSetPass(password: value)),
-      );
-    });
   }
 }
 
@@ -195,23 +155,26 @@ class LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      child: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: SizedBox(
-          height: 40,
-          width: 100,
-          child: Center(
-            child: Text(
-              'Login',
-              style: TextStyle(fontSize: 18),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: SizedBox(
+            height: 40,
+            // width: 100,
+            child: Center(
+              child: Text(
+                'Login',
+                style: TextStyle(fontSize: 18),
+              ),
             ),
           ),
         ),
+        onPressed: () {
+          context.read<AuthenticationBloc>().add(AuthenticationStarted());
+        },
       ),
-      onPressed: () {
-        context.read<AuthenticationBloc>().add(AuthenticationStarted());
-      },
     );
   }
 }

@@ -1352,7 +1352,10 @@ class WebservicePHPHelper {
     print('Current ORders : $url');
 
     String dBName = getDBName();
-    Dio dio = Dio(BaseOptions(headers: {'dbname': dBName}));
+    Dio dio = Dio(BaseOptions(
+      connectTimeout: const Duration(seconds: 5),
+      headers: {'dbname': dBName},
+    ));
 
     Response response;
     try {

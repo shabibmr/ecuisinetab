@@ -57,16 +57,16 @@ class _POSScreenState extends State<POSScreen> {
                 if (status == POSStatus.OrderSelected) {
                   return getPOSScreen(context);
                 } else {
-                  return PosTableSelector();
+                  return const PosTableSelector();
                 }
               },
             );
           } else if (status == VoucherEditorStatus.loading) {
             return const Center(child: CircularProgressIndicator());
           } else if (status == VoucherEditorStatus.fetcherror) {
-            return Center(child: Text('${status}'));
+            return Center(child: Text('$status'));
           } else {
-            return Center(child: Text('${status}'));
+            return Center(child: Text('$status'));
           }
         },
       ),
@@ -134,13 +134,13 @@ class _POSScreenState extends State<POSScreen> {
 
   Widget getBodyClassic() {
     return const Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         SizedBox(
-          height: 80,
-          child: PosGroupsHorizontal(),
+          height: 3,
         ),
-        Expanded(child: POSItemsListWidget())
+        SizedBox(height: 80, child: PosGroupsHorizontal()),
+        Expanded(child: POSItemsListWidget()),
       ],
     );
   }
