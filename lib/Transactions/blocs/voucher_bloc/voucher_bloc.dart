@@ -7,7 +7,7 @@ import '../../../Datamodels/Masters/Inventory/CompoundItemDataModel.dart';
 import '../../../Datamodels/Transactions/general_voucher_datamodel.dart';
 import '../../../Login/constants.dart';
 import '../../../Webservices/webservicePHP.dart';
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -53,8 +53,14 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
         emit(VoucherState(
           voucher: state.voucher?.copyWith(reference: event.newReference),
           status: VoucherEditorStatus.loaded,
+          vStatus: state.vStatus,
         ));
       },
+    );
+    on<SetSwitchState>(
+      (event, emit) => emit(
+        state.copyWith(switchOption: event.sState),
+      ),
     );
     on<SetMainLedger>((event, emit) => emit(state.copyWith(
           voucher: state.voucher?.copyWith(
@@ -364,6 +370,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   void updateItemQty(emit, InventoryItemDataModel item, quantity) {
+    double dQty = double.parse(quantity.toString());
     emit(state.copyWith(status: VoucherEditorStatus.loading));
     final voucher = state.voucher!;
     print('GODOWN : ${voucher.fromGodownID}');
@@ -382,8 +389,8 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
         if (voucher.InventoryItems![i].BaseItem.ItemID == item.ItemID &&
             (voucher.InventoryItems![i].BaseItem.prevQty ?? 0) == 0) {
           voucher.InventoryItems?[i] = CompoundItemDataModel(
-              BaseItem: voucher.InventoryItems![i].BaseItem.copyWith(
-                  quantity: quantity, currQty: quantity, crQty: quantity));
+              BaseItem: voucher.InventoryItems![i].BaseItem
+                  .copyWith(quantity: dQty, currQty: dQty, crQty: dQty));
 
           if (voucher.InventoryItems![i].BaseItem.quantity == 0) {
             voucher.InventoryItems!.removeAt(i);

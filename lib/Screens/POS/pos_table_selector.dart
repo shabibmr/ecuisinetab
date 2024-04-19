@@ -7,13 +7,12 @@ import 'package:ecuisinetab/Transactions/blocs/pos/pos_bloc.dart';
 import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
 import 'package:ecuisinetab/Utils/voucher_types.dart';
-import 'package:ecuisinetab/widgets/Search/price_list_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class PosTableSelector extends StatefulWidget {
-  PosTableSelector({Key? key}) : super(key: key);
+  const PosTableSelector({super.key});
 
   @override
   State<PosTableSelector> createState() => _PosTableSelectorState();
@@ -22,21 +21,29 @@ class PosTableSelector extends StatefulWidget {
 class _PosTableSelectorState extends State<PosTableSelector> {
   final TextEditingController _ctrl = TextEditingController();
   Box<PriceListMasterHive> pBox = Hive.box(HiveTagNames.PriceLists_Hive_Tag);
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Colors.blue.shade50,
       body: getBody(),
+      // drawer: const SwitchDrawer(),
       appBar: AppBar(
         title: const Text('Select Table'),
         centerTitle: false,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              onPressed: () {
-                context.read<PosBloc>().add(FetchCurrentOrders());
-              },
-              icon: const Icon(Icons.refresh)),
+            onPressed: () {
+              context.read<PosBloc>().add(FetchCurrentOrders());
+            },
+            icon: const Icon(Icons.refresh),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) {},
@@ -70,7 +77,7 @@ class _PosTableSelectorState extends State<PosTableSelector> {
         label: Builder(builder: (context) {
           var plist = context.select((VoucherBloc bloc) =>
               bloc.state.voucher?.priceListId?.toString() ?? '3');
-          print('New plist : $plist');
+          // print('New plist : $plist');
           return Text(pBox.get(plist)?.priceListName ?? '');
         }),
       ),
@@ -168,6 +175,10 @@ class _PosTableSelectorState extends State<PosTableSelector> {
                         visible: _ctrl.text.isNotEmpty,
                         child: IconButton(
                             onPressed: () {
+                              int defPrice =
+                                  Hive.box(HiveTagNames.Settings_Hive_Tag).get(
+                                      Config_Tag_Names.Default_PriceList_Tag,
+                                      defaultValue: 3);
                               final String ref = _ctrl.text;
                               if (state.currentOrders!.keys.contains(ref)) {
                                 String vNo = state.currentOrders![ref]
@@ -190,8 +201,11 @@ class _PosTableSelectorState extends State<PosTableSelector> {
                                     );
                               } else {
                                 context.read<VoucherBloc>()
-                                  ..add(SetVoucherType(
+                                  ..add(SetEmptyVoucher(
                                     voucherType: GMVoucherTypes.SalesOrder,
+                                  ))
+                                  ..add(SetPriceList(
+                                    priceListID: defPrice,
                                   ))
                                   ..add(SwitchReference(
                                       newReference: _ctrl.text));
@@ -234,8 +248,38 @@ class _PosTableSelectorState extends State<PosTableSelector> {
   }
 }
 
+class SwitchDrawer extends StatelessWidget {
+  const SwitchDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.green.shade50,
+      ),
+      width: 300,
+      child: Column(children: [
+        Builder(builder: (context) {
+          bool switchVal = context
+              .select((VoucherBloc bloc) => bloc.state.switchOption ?? false);
+          print('Val : $switchVal');
+          return CheckboxListTile(
+            title: const Text("Switch Table"),
+            value: switchVal,
+            onChanged: (val) {
+              context.read<VoucherBloc>().add(
+                    SetSwitchState(sState: val!),
+                  );
+            },
+          );
+        }),
+      ]),
+    );
+  }
+}
+
 class TablesGrid extends StatefulWidget {
-  TablesGrid({Key? key}) : super(key: key);
+  const TablesGrid({super.key});
 
   @override
   State<TablesGrid> createState() => _TablesGridState();
@@ -246,108 +290,112 @@ class _TablesGridState extends State<TablesGrid> {
   Widget build(BuildContext context) {
     Map orders =
         context.select((PosBloc bloc) => bloc.state.currentOrders) ?? {};
-    List<String>? tables =
-        context.select((PosBloc bloc) => bloc.state.tables! ?? []);
+    List<String>? tables = context.select((PosBloc bloc) => bloc.state.tables!);
 
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        mainAxisExtent: 80,
-      ),
-      itemCount: tables?.length ?? 0,
-      itemBuilder: (BuildContext context, int index) {
-        return InkWell(
-          child: Card(
-            color: orders.keys.contains(tables?[index].toString())
-                ? Colors.red.shade100
-                : null,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: AutoSizeText(tables?[index].toString() ?? '',
-                          style: const TextStyle(fontSize: 18)),
+    print('Orders : $orders');
+
+    return Builder(builder: (context) {
+      return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisExtent: 80,
+        ),
+        itemCount: tables?.length ?? 0,
+        itemBuilder: (BuildContext context, int index) {
+          return InkWell(
+            child: Card(
+              color: orders.keys.contains(tables?[index].toString())
+                  ? Colors.red.shade100
+                  : null,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: AutoSizeText(tables?[index].toString() ?? '',
+                            style: const TextStyle(fontSize: 18)),
+                      ),
                     ),
-                  ),
-                  Container(
-                    child: orders.keys.contains(tables?[index].toString())
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(4, 0, 0, 4),
-                                    child: Text(double.parse(
-                                            orders[tables?[index].toString()]
-                                                    ['Total'] ??
-                                                "0.0")
-                                        .inCurrencySmall),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(0, 0, 4, 4),
-                                    child: ClockWidget(
-                                        timeStamp: DateTime.parse(
-                                            orders[tables?[index].toString()]
-                                                ['timestamp'])),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )
-                        : Container(),
-                  )
-                ],
+                    Container(
+                      child: orders.keys.contains(tables?[index].toString())
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(4, 0, 0, 4),
+                                      child: Text(double.parse(
+                                              orders[tables?[index].toString()]
+                                                      ['Total'] ??
+                                                  "0.0")
+                                          .inCurrencySmall),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(0, 0, 4, 4),
+                                      child: ClockWidget(
+                                          timeStamp: DateTime.parse(
+                                              orders[tables?[index].toString()]
+                                                  ['timestamp'])),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : Container(),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-          onTap: () {
-            print('Table change to ${tables?[index].toString() ?? ''}');
-            int defPrice = Hive.box(HiveTagNames.Settings_Hive_Tag)
-                .get(Config_Tag_Names.Default_PriceList_Tag, defaultValue: 3);
-            if (orders.keys.contains(tables?[index].toString())) {
-              String vNo =
-                  orders[tables?[index].toString()]['Voucher_No'].toString();
-              String vPref = orders[tables?[index].toString()]['Voucher_Prefix']
-                  .toString();
-              print('Order Exist in MAP $vNo');
-              context.read<VoucherBloc>().add(FetchVoucher(
-                    voucherID: vNo,
-                    voucherPref: vPref,
-                    link: '',
-                    vType: GMVoucherTypes.SalesOrder,
-                  ));
-              context
-                  .read<PosBloc>()
-                  .add(OrderSelected(voucherNo: vNo, vPrefix: vPref));
-            } else {
-              context.read<VoucherBloc>()
-                ..add(SetEmptyVoucher(voucherType: GMVoucherTypes.SalesOrder))
-                ..add(SetPriceList(priceListID: defPrice))
-                ..add(SwitchReference(
-                    newReference: tables?[index].toString() ?? ''));
-              context.read<PosBloc>().add(const OrderSelected());
-            }
-            print('Changin POS BLOC');
+            onTap: () {
+              print('Table change to ${tables?[index].toString() ?? ''}');
+              int defPrice = Hive.box(HiveTagNames.Settings_Hive_Tag)
+                  .get(Config_Tag_Names.Default_PriceList_Tag, defaultValue: 3);
+              if (orders.keys.contains(tables?[index].toString())) {
+                String vNo =
+                    orders[tables?[index].toString()]['Voucher_No'].toString();
+                String vPref = orders[tables?[index].toString()]
+                        ['Voucher_Prefix']
+                    .toString();
+                print('Order Exist in MAP $vNo');
+                context.read<VoucherBloc>().add(FetchVoucher(
+                      voucherID: vNo,
+                      voucherPref: vPref,
+                      link: '',
+                      vType: GMVoucherTypes.SalesOrder,
+                    ));
+                context
+                    .read<PosBloc>()
+                    .add(OrderSelected(voucherNo: vNo, vPrefix: vPref));
+              } else {
+                context.read<VoucherBloc>()
+                  ..add(SetEmptyVoucher(voucherType: GMVoucherTypes.SalesOrder))
+                  ..add(SetPriceList(priceListID: defPrice))
+                  ..add(SwitchReference(
+                      newReference: tables?[index].toString() ?? ''));
+                context.read<PosBloc>().add(const OrderSelected());
+              }
+              print('Changin POS BLOC');
 
-            // Navigator.of(context).pop();
-            // context.read<PosBloc>().add(OrderSelected(
-            //     voucherNo: tables?[index]['tableNumber'].toString() ?? '',
-            //     vPrefix: tables?[index]['tableNumber'].toString() ?? ''));
-          },
-        );
-      },
-    );
+              // Navigator.of(context).pop();
+              // context.read<PosBloc>().add(OrderSelected(
+              //     voucherNo: tables?[index]['tableNumber'].toString() ?? '',
+              //     vPrefix: tables?[index]['tableNumber'].toString() ?? ''));
+            },
+          );
+        },
+      );
+    });
   }
 }
 
@@ -388,5 +436,91 @@ class _ClockWidgetState extends State<ClockWidget> {
         : '';
 
     return Text('$hours${duration.inMinutes.remainder(60)}');
+  }
+}
+
+class SwitchToTablesGrid extends StatelessWidget {
+  const SwitchToTablesGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      Map orders =
+          context.select((PosBloc bloc) => bloc.state.currentOrders) ?? {};
+      return Builder(builder: (context) {
+        List<String>? tables =
+            context.select((PosBloc bloc) => bloc.state.tables!);
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3),
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            return InkWell(
+              child: Card(
+                color: Colors.red.shade100,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 80,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: AutoSizeText(
+                              'tableName',
+                              style: const TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(4, 0, 0, 4),
+                                  child: Text(double.parse(
+                                          orders['tableName']['Total'] ?? "0.0")
+                                      .inCurrencySmall),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 4, 4),
+                                  child: ClockWidget(
+                                      timeStamp: DateTime.parse(
+                                          orders['tableName']['timestamp'])),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () {
+                // context.read<VoucherBloc>().add(FetchVoucher(
+                //       voucherID: vNo,
+                //       voucherPref: vPref,
+                //       link: '',
+                //       vType: GMVoucherTypes.SalesOrder,
+                //     ));
+              },
+            );
+          },
+        );
+      });
+    });
   }
 }

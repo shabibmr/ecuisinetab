@@ -91,7 +91,7 @@ class AuthenticationBloc
         emit(
           state.copyWith(
             authState: AuthState.failure,
-            msg: 'User not found',
+            msg: 'User not found ${emp.values.length}',
           ),
         );
         return;

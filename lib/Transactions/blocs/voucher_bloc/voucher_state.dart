@@ -29,6 +29,7 @@ class VoucherState extends Equatable {
     this.vStatus,
     this.type,
     this.printCopy,
+    this.switchOption = false,
   });
 
   final GeneralVoucherDataModel? voucher;
@@ -38,6 +39,8 @@ class VoucherState extends Equatable {
   final TransactionType? type;
   final bool? printCopy;
 
+  final bool? switchOption;
+
   @override
   List<Object?> get props => [
         voucher,
@@ -46,6 +49,7 @@ class VoucherState extends Equatable {
         vStatus,
         type,
         printCopy,
+        switchOption,
       ];
 
   VoucherState copyWith({
@@ -55,6 +59,7 @@ class VoucherState extends Equatable {
     ViewStatus? vStatus,
     TransactionType? type,
     bool? printCopy,
+    bool? switchOption,
   }) {
     return VoucherState(
       voucher: voucher ?? this.voucher,
@@ -63,6 +68,7 @@ class VoucherState extends Equatable {
       vStatus: vStatus ?? this.vStatus,
       type: type ?? this.type,
       printCopy: printCopy ?? this.printCopy,
+      switchOption: switchOption ?? this.switchOption,
     );
   }
 }

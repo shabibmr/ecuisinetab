@@ -68,9 +68,9 @@ class InvItemSearchDelegate extends SearchDelegate<InventoryItemHive> {
     List<InventoryItemHive> ledList = query.isEmpty
         ? items.values.toList()
         : items.values.where((element) {
-            return (element.Item_Name!
+            return (element.Item_Name!.toLowerCase().contains(query
                     .toLowerCase()
-                    .contains(query.replaceAll(RegExp('[^A-Za-z0-9]'), '')) ||
+                    .replaceAll(RegExp('[^A-Za-z0-9]'), '')) ||
                 (element.Item_Name_Arabic ?? '~~~~~~~').contains(query));
           }).toList();
     if (ledList.isEmpty) {
@@ -109,9 +109,9 @@ class InvItemSearchDelegate extends SearchDelegate<InventoryItemHive> {
     List<InventoryItemHive> ledList = query.isEmpty
         ? items.values.toList()
         : items.values.where((element) {
-            return element.Item_Name!
+            return element.Item_Name!.toLowerCase().contains(query
                     .toLowerCase()
-                    .contains(query.replaceAll(RegExp('[^A-Za-z0-9]'), '')) ||
+                    .replaceAll(RegExp('[^A-Za-z0-9]'), '')) ||
                 (element.Item_Name_Arabic ?? '~~~~').contains(query);
           }).toList();
     if (ledList.isEmpty) {

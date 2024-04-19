@@ -55,17 +55,22 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     });
     on<FetchAllMastersEvent>((event, emit) async {
       emit(state.copyWith(status: SyncUiConfigStatus.fetching));
-      bool itemsSync = await syncItems();
-      if (itemsSync) {
-        emit(state.copyWith(itemsSynced: true));
+      try {
+        bool itemsSync = await syncItems();
+        if (itemsSync) {
+          emit(state.copyWith(itemsSynced: true));
+        }
+        await syncItemGroups();
+        // await syncGodowns();
+        await syncLedgers();
+        // await syncAccGroups();
+        await syncUOMs();
+        await syncEmployees();
+        await syncPrices();
+      } catch (e) {
+        emit(state.copyWith(status: SyncUiConfigStatus.error));
+        print('Error : $e');
       }
-      await syncItemGroups();
-      // await syncGodowns();
-      await syncLedgers();
-      // await syncAccGroups();
-      await syncUOMs();
-      await syncEmployees();
-      await syncPrices();
       // await syncUserGroups();
       emit(state.copyWith(status: SyncUiConfigStatus.fetched));
     });
@@ -124,7 +129,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
   }
 
   Future<bool> syncItems() async {
-    print('Fetching Inventory items');
+    print('Fetching Inventory items ${DateTime.now()}');
     bool flag = true;
     String qry = "";
     DateTime last = DateTime(2021);
@@ -158,7 +163,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
   }
 
   Future<bool> syncItemGroups() async {
-    print('Fetching item Groups');
+    print('Fetching item Groups ${DateTime.now()}');
     bool flag = false;
     String qry = "";
     DateTime last = DateTime(2021);
@@ -183,12 +188,12 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       print('Error Adding to Hive : ${e.toString()}');
     }
 
-    print('Groups : ${box.length}');
+    print('Groups : ${box.length} at ${DateTime.now()}');
     return flag;
   }
 
   Future<bool> syncLedgers() async {
-    print('Fetching Leds');
+    print('Fetching Leds ${DateTime.now()}');
     bool flag = false;
     DateTime last = DateTime(2021);
     final dataResponse = await WebservicePHPHelper.getAllLedgers(
@@ -200,16 +205,15 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     Box<LedgerMasterHiveModel> box = Hive.box(HiveTagNames.Ledgers_Hive_Tag);
     try {
       await box.clear();
-      // print('Box cleared');
+
       dataResponse.forEach((element) async {
-        // print('${element['Ledger_Name']}');
         LedgerMasterHiveModel ledger = LedgerMasterHiveModel.fromMap(element);
         await box.put(element['Ledger_Id'], ledger);
       });
     } catch (e) {
       print('Error Adding to Hive : ${e.toString()}');
     } finally {
-      print('Ledgers : ${box.length}');
+      print('Ledgers : ${box.length} ${DateTime.now()}');
     }
 
     return flag;
@@ -303,7 +307,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
   }
 
   Future<bool> syncUOMs() async {
-    print('Fetching uo');
+    print('Fetching uom ${DateTime.now()}');
     bool flag = false;
     String qry = "";
     DateTime last = DateTime(2021);
@@ -379,6 +383,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
         // print('>> ${element}');
         final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
         // print('Name : ${p.priceListName}');
+        print(element['Price_List_ID'].runtimeType);
         await box.put(element['Price_List_ID'], p);
       });
     } catch (e) {

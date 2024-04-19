@@ -102,7 +102,7 @@ class _Init_AppState extends State<Init_App> {
               builder: (context) {
                 return AlertDialog(
                   title: const Text('Login Failed'),
-                  content: const Text('Invalid Username or Password'),
+                  content: Text('Invalid Username or Password ${state.msg}'),
                   actions: [
                     TextButton(
                       onPressed: () {

@@ -56,7 +56,7 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
               Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: Colors.green.shade100,
+                  color: Colors.green.shade50,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,9 +71,11 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                     Builder(builder: (context) {
                       final item = context.select(
                           (InventoryItemDetailBloc bloc) => bloc.state.item!);
-
+                      final vqty = context
+                          .select((VoucherBloc bloc) => bloc.state.voucher)
+                          ?.getItemCurrCount(item.ItemID!);
                       return Visibility(
-                        visible: (item.quantity ?? 0) > 0,
+                        visible: (vqty ?? 0) > 0,
                         child: IconButton(
                           onPressed: () {
                             context
@@ -103,9 +105,10 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
                           borderRadius: BorderRadius.circular(10)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Container(
+                        child: DecoratedBox(
+                            decoration: BoxDecoration(
                           color: Colors.blue.shade50,
-                        ),
+                        )),
                       ),
                     ),
                     const Align(
@@ -171,7 +174,7 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
 }
 
 class ItemQty extends StatelessWidget {
-  const ItemQty({Key? key}) : super(key: key);
+  const ItemQty({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -199,6 +202,20 @@ class ItemQty extends StatelessWidget {
                 return Builder(builder: (context) {
                   return InputQty(
                     decimalPlaces: dec,
+                    qtyFormProps: QtyFormProps(
+                      style: kDashListStyle,
+                      keyboardType: TextInputType.number,
+                    ),
+                    decoration: const QtyDecorationProps(
+                      plusBtn: Icon(
+                        Icons.add,
+                        size: 32,
+                      ),
+                      minusBtn: Icon(
+                        Icons.remove,
+                        size: 32,
+                      ),
+                    ),
                     minVal: 0,
                     initVal: qtyNum,
                     onQtyChanged: (value) {
@@ -218,7 +235,7 @@ class ItemQty extends StatelessWidget {
 }
 
 class ItemTotalWidget extends StatelessWidget {
-  const ItemTotalWidget({Key? key}) : super(key: key);
+  const ItemTotalWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -243,16 +260,20 @@ class ItemTotalWidget extends StatelessWidget {
 class ItemName extends StatelessWidget {
   ItemName({super.key});
 
-  Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
+  final Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
 
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
       bool flag = sett.get('isArabic', defaultValue: false);
-      final String? itemName = context.select((InventoryItemDetailBloc bloc) =>
-          flag ? bloc.state.item?.ItemNameArabic : bloc.state.item?.ItemName);
+      final String itemName = context.select(
+          (InventoryItemDetailBloc bloc) => bloc.state.item?.ItemName ?? '');
+
+      final String itemNameArabic = context.select(
+          (InventoryItemDetailBloc bloc) =>
+              bloc.state.item?.ItemNameArabic ?? itemName);
       return AutoSizeText(
-        itemName ?? '',
+        flag ? itemNameArabic : itemName,
         style: kAppbarLabelStyle,
       );
     });
@@ -260,24 +281,27 @@ class ItemName extends StatelessWidget {
 }
 
 class ItemNarration extends StatelessWidget {
-  const ItemNarration({Key? key}) : super(key: key);
+  const ItemNarration({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
-      String? narration = context.select(
-          (InventoryItemDetailBloc element) => element.state.item!.narration);
+      String narration = context.select((InventoryItemDetailBloc element) =>
+          element.state.item!.narration ?? '');
       print('narration $narration');
-      return Card(
-        child: TextFormField(
-          maxLines: 3,
-          decoration: InputDecoration(hintText: "Narration"),
-          initialValue: narration,
-          onChanged: (value) {
-            context
-                .read<InventoryItemDetailBloc>()
-                .add(SetItemNarration(value));
-          },
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          child: TextFormField(
+            maxLines: 3,
+            decoration: const InputDecoration(hintText: "Narration"),
+            initialValue: narration,
+            onChanged: (value) {
+              context
+                  .read<InventoryItemDetailBloc>()
+                  .add(SetItemNarration(value));
+            },
+          ),
         ),
       );
     });
@@ -285,7 +309,7 @@ class ItemNarration extends StatelessWidget {
 }
 
 class ItemNameArabic extends StatelessWidget {
-  const ItemNameArabic({Key? key}) : super(key: key);
+  const ItemNameArabic({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +318,7 @@ class ItemNameArabic extends StatelessWidget {
               (InventoryItemDetailBloc bloc) =>
                   bloc.state.item?.ItemNameArabic) ??
           '';
-      return itemNameArabic.length > 0
+      return itemNameArabic.isNotEmpty
           ? Text(
               itemNameArabic ?? '',
               style: kTotalListStyle,
@@ -305,7 +329,7 @@ class ItemNameArabic extends StatelessWidget {
 }
 
 class ItemRateWidget extends StatelessWidget {
-  const ItemRateWidget({Key? key}) : super(key: key);
+  const ItemRateWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -317,10 +341,10 @@ class ItemRateWidget extends StatelessWidget {
           label: 'Rate',
           showSuffix: false,
           showBorder: false,
-          textData: rate.inCurrency,
+          textData: rate.toStringAsFixed(2),
           textAlign: TextAlign.right,
           textStyle: Theme.of(context).textTheme.titleLarge,
-          readOnly: true,
+          readOnly: rate != 0,
           onChanged: (value) {
             context
                 .read<InventoryItemDetailBloc>()

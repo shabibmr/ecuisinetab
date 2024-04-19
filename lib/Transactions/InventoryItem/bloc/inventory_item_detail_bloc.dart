@@ -155,9 +155,10 @@ class InventoryItemDetailBloc
     print('>Set Rate');
     if (rate < 0) return;
 
-    final item = state.item?.copyWith(
+    emit(state.copyWith(
+        item: state.item?.copyWith(
       rate: rate,
-    );
+    )));
 
     calculate(emit);
   }

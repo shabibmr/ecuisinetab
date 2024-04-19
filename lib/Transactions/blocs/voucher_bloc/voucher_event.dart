@@ -10,7 +10,8 @@ abstract class VoucherEvent extends Equatable {
 
 class SetMainLedger extends VoucherEvent {
   final LedgerMasterDataModel? ledger;
-
+  @override
+  // TODO: implement description
   const SetMainLedger({
     required this.ledger,
   });
@@ -39,6 +40,12 @@ class SetInvoiceDate extends VoucherEvent {
 
   @override
   List<Object> get props => [invoiceDate];
+}
+
+class SetSwitchState extends VoucherEvent {
+  final bool sState;
+
+  const SetSwitchState({required this.sState});
 }
 
 class SetInvoiceNumber extends VoucherEvent {

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Datamodels/HiveModels/Employee/EmployeeHiveModel.dart';
 import 'package:ecuisinetab/Screens/POS/pos_item_detail.dart';
 import 'package:ecuisinetab/Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
@@ -10,6 +11,7 @@ import '../../Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
 import '../../Login/constants.dart';
 import '../../Transactions/blocs/pos/pos_bloc.dart';
 import '../../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
+import 'pos_table_selector.dart';
 import 'voucher_editor.dart';
 
 class POSCartPage extends StatefulWidget {
@@ -56,34 +58,40 @@ class _POSCartPageState extends State<POSCartPage> {
             ),
           );
         } else if (state.status == VoucherEditorStatus.requestSaveOrder) {
-          await showDialog<bool?>(
+          bool? x = await showDialog<bool?>(
               context: context,
               builder: (contextA) {
-                return AlertDialog(
-                  title: const Text('Confirm Save'),
-                  content: const Text('Do you want to save?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(contextA).pop(false);
-                        context
-                            .read<VoucherBloc>()
-                            .add(const SaveVoucherOrder());
-                      },
-                      child: const Text('No'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(contextA).pop(true);
-                        context
-                            .read<VoucherBloc>()
-                            .add(const SaveVoucherOrder());
-                      },
-                      child: const Text('Yes'),
-                    ),
-                  ],
+                return BlocProvider.value(
+                  value: context.read<VoucherBloc>(),
+                  child: AlertDialog(
+                    title: const Text('Confirm Save'),
+                    content: const Text('Do you want to save?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          context
+                              .read<VoucherBloc>()
+                              .add(RejectSaveVoucherOrder());
+                          Navigator.of(contextA).pop(false);
+                        },
+                        child: const Text('No'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(contextA).pop(true);
+                          context
+                              .read<VoucherBloc>()
+                              .add(const SaveVoucherOrder());
+                        },
+                        child: const Text('Yes'),
+                      ),
+                    ],
+                  ),
                 );
               });
+          if (x ?? false) {
+            context.read<VoucherBloc>().add(const RejectSaveVoucherOrder());
+          }
           // if (confirm ?? false) {
           //   context.read<VoucherBloc>().add(const SaveVoucher());
           // }
@@ -92,7 +100,7 @@ class _POSCartPageState extends State<POSCartPage> {
               context: context,
               builder: (contextA) {
                 return AlertDialog(
-                  backgroundColor: Color.fromRGBO(244, 98, 45, 0.811),
+                  backgroundColor: const Color.fromRGBO(244, 98, 45, 0.811),
                   title: const Text('Confirm Checkout'),
                   content: const Text('Do you want to save as Sale ?'),
                   actions: [
@@ -133,15 +141,18 @@ class POSCartWidget extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Cart'),
         actions: [
-          IconButton(
-              onPressed: () {
-                context
-                    .read<VoucherBloc>()
-                    .add(const VoucherRequestSaveInvoice());
-              },
-              icon: const Icon(
-                Icons.currency_rupee_rounded,
-              ))
+          Visibility(
+            visible: false,
+            child: IconButton(
+                onPressed: () {
+                  context
+                      .read<VoucherBloc>()
+                      .add(const VoucherRequestSaveInvoice());
+                },
+                icon: const Icon(
+                  Icons.currency_rupee_rounded,
+                )),
+          )
         ],
       ),
       body: Column(
@@ -158,63 +169,74 @@ class POSCartWidget extends StatelessWidget {
                       child: VoucherFooter(
                         show: false,
                       )),
-                  Expanded(
-                    flex: 6,
-                    child: Row(
-                      children: [
-                        Card(
-                          color: context.select((VoucherBloc bloc) =>
-                                  bloc.state.printCopy ?? false)
-                              ? Colors.green.shade300
-                              : Colors.red.shade100,
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Icon(
-                                      Icons.print,
-                                      color: context.select(
-                                              (VoucherBloc bloc) =>
-                                                  bloc.state.printCopy ?? false)
-                                          ? Colors.black
-                                          : Colors.grey,
-                                    ),
-                                    const SizedBox(
-                                      height: 3,
-                                    ),
-                                    Text('Print',
-                                        style: TextStyle(
-                                          color: context.select(
-                                                  (VoucherBloc bloc) =>
-                                                      bloc.state.printCopy ??
-                                                      false)
-                                              ? Colors.black
-                                              : Colors.grey,
-                                        )),
-                                  ],
-                                ),
-                                Checkbox(
-                                  value: context.select((VoucherBloc bloc) =>
-                                      bloc.state.printCopy ?? false),
-                                  onChanged: (v) => context
-                                      .read<VoucherBloc>()
-                                      .add(SetPrintCopy(printCopy: v ?? false)),
-                                ),
-                              ],
+                  Visibility(
+                    visible: Hive.box(HiveTagNames.Settings_Hive_Tag)
+                        .get('BillPrinter', defaultValue: '')
+                        .toString()
+                        .isNotEmpty,
+                    child: Expanded(
+                      flex: 6,
+                      child: Row(
+                        children: [
+                          Card(
+                            color: context.select((VoucherBloc bloc) =>
+                                    bloc.state.printCopy ?? false)
+                                ? Colors.green.shade300
+                                : Colors.red.shade100,
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Icon(
+                                        Icons.print,
+                                        color: context.select(
+                                                (VoucherBloc bloc) =>
+                                                    bloc.state.printCopy ??
+                                                    false)
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                      const SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text('Print',
+                                          style: TextStyle(
+                                            color: context.select(
+                                                    (VoucherBloc bloc) =>
+                                                        bloc.state.printCopy ??
+                                                        false)
+                                                ? Colors.black
+                                                : Colors.grey,
+                                          )),
+                                    ],
+                                  ),
+                                  Checkbox(
+                                    value: context.select((VoucherBloc bloc) =>
+                                        bloc.state.printCopy ?? false),
+                                    onChanged: (v) => context
+                                        .read<VoucherBloc>()
+                                        .add(
+                                          SetPrintCopy(printCopy: v ?? false),
+                                        ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(child: Container()),
-                      ],
+                          Expanded(
+                            child: Container(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -249,9 +271,14 @@ class VoucherHeaderDetails extends StatelessWidget {
   }
 }
 
-class VoucherReferenceWidget extends StatelessWidget {
+class VoucherReferenceWidget extends StatefulWidget {
   const VoucherReferenceWidget({super.key});
 
+  @override
+  State<VoucherReferenceWidget> createState() => _VoucherReferenceWidgetState();
+}
+
+class _VoucherReferenceWidgetState extends State<VoucherReferenceWidget> {
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
@@ -263,10 +290,170 @@ class VoucherReferenceWidget extends StatelessWidget {
       String vtype = context
           .select((VoucherBloc bloc) => bloc.state.voucher?.voucherType ?? '');
 
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('$ref - $vno - $vtype'),
+      return Builder(builder: (context) {
+        final status = context.select((VoucherBloc bloc) => bloc.state.vStatus);
+        return InkWell(
+          onTap: () async {
+            print('status : $status');
+            if (status == ViewStatus.edit) {
+              await setNewReference();
+            }
+          },
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(ref),
+            ),
+          ),
+        );
+      });
+    });
+  }
+
+  Future<void> setNewReference() async {
+    String? ref = await showDialog<String>(
+      context: context,
+      builder: (context2) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(
+              value: context.read<PosBloc>()..add(FetchCurrentOrders()),
+            ),
+            BlocProvider.value(
+              value: context.read<VoucherBloc>(),
+            ),
+          ],
+          child: Dialog(
+            elevation: 4,
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15))),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: const RefSelectorWidget(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class RefSelectorWidget extends StatelessWidget {
+  const RefSelectorWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(color: Colors.yellow.shade50),
+          child: const Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Select New Table',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+        ),
+        Builder(builder: (context) {
+          final stat = context.select((PosBloc bloc) => bloc.state.status);
+          // print('Status : $stat');
+          switch (stat) {
+            case POSStatus.OrdersFetched:
+              return const Expanded(child: RefSelectorGrid());
+            case POSStatus.FetchingOrders:
+              return const Center(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Checking Orders'),
+                    ),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+              );
+            case POSStatus.NEW:
+              return Center(child: Text('NEW'));
+            case POSStatus.OrderFetchError:
+              return Center(child: Text('ERROR'));
+            case POSStatus.OrderSelected:
+              return Center(child: Text('Selected'));
+          }
+        }),
+      ],
+    );
+  }
+}
+
+class RefSelectorGrid extends StatelessWidget {
+  const RefSelectorGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      Map orders =
+          context.select((PosBloc bloc) => bloc.state.currentOrders) ?? {};
+      List<String> tables =
+          context.select((PosBloc bloc) => bloc.state.tables ?? []);
+      tables =
+          tables.where((element) => !orders.keys.contains(element)).toList();
+
+      print('Tables : $tables ');
+
+      print('Grid cnt : ${tables.length ?? '+++++'}');
+
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              mainAxisExtent: 80, crossAxisCount: 3),
+          itemCount: tables?.length ?? 0,
+          itemBuilder: (context, index) {
+            final String tableName = tables?[index] ?? '';
+            // print('Tables : $tableName');
+            return InkWell(
+              onTap: () async {
+                //If Table is empty Currently
+
+                context
+                    .read<VoucherBloc>()
+                    .add(SwitchReference(newReference: tableName));
+                // context
+                //     .read<VoucherBloc>()
+                //     .add(const VoucherRequestSaveOrder());
+                Navigator.pop(context);
+              },
+              child: Card(
+                color: Colors.blue.shade50,
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: AutoSizeText(tableName,
+                                style: const TextStyle(
+                                    fontSize: 18, color: Colors.black)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       );
     });
@@ -390,6 +577,7 @@ class CartItemsList extends StatelessWidget {
     return BlocProvider(
       create: (context) => InventoryItemDetailBloc(),
       child: BlocBuilder<VoucherBloc, VoucherState>(
+        buildWhen: (previous, current) => previous.status != current.status,
         builder: (context, state) {
           print('new list state');
           if (state.voucher!.InventoryItems!.isEmpty) {
@@ -436,7 +624,9 @@ class CartItemsList extends StatelessWidget {
                         ],
                       ),
                       trailing: Text(
-                          e.BaseItem.quantity?.toStringAsFixed(2) ?? '0.00'),
+                        e.BaseItem.quantity?.toStringAsFixed(2) ?? '0.00',
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     ),
                   ),
                 );
