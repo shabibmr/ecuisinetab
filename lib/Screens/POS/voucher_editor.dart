@@ -272,7 +272,7 @@ class _VoucherFooterState extends State<VoucherFooter> {
                 child: Builder(builder: (context) {
                   double totalValue = context.select((VoucherBloc bloc) =>
                       bloc.state.voucher?.grandTotal ?? 0);
-                  return Text(
+                  return AutoSizeText(
                     totalValue.inCurrency,
                     style: kTotalListStyle,
                   );

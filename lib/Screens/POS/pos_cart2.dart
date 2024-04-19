@@ -71,7 +71,7 @@ class _POSCartPageState extends State<POSCartPage> {
                         onPressed: () {
                           context
                               .read<VoucherBloc>()
-                              .add(RejectSaveVoucherOrder());
+                              .add(const RejectSaveVoucherOrder());
                           Navigator.of(contextA).pop(false);
                         },
                         child: const Text('No'),
@@ -378,11 +378,11 @@ class RefSelectorWidget extends StatelessWidget {
                 ),
               );
             case POSStatus.NEW:
-              return Center(child: Text('NEW'));
+              return const Center(child: Text('NEW'));
             case POSStatus.OrderFetchError:
-              return Center(child: Text('ERROR'));
+              return const Center(child: Text('ERROR'));
             case POSStatus.OrderSelected:
-              return Center(child: Text('Selected'));
+              return const Center(child: Text('Selected'));
           }
         }),
       ],
@@ -493,9 +493,9 @@ class VoucherTotalsWidget extends StatelessWidget {
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(
+            child: AutoSizeText(
               total.inCurrency,
-              style: Theme.of(context).textTheme.titleLarge,
+              // style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         ),
@@ -593,26 +593,29 @@ class CartItemsList extends StatelessWidget {
                 return Card(
                   child: InkWell(
                     onTap: () async {
-                      await showDialog(
-                          context: context,
-                          builder: (contextB) {
-                            final item = e.BaseItem;
-                            return MultiBlocProvider(
-                              providers: [
-                                BlocProvider.value(
-                                  value: context.read<VoucherBloc>(),
-                                ),
-                                BlocProvider.value(
-                                    value:
-                                        context.read<InventoryItemDetailBloc>()
-                                          ..add(
-                                            SetItem(item: item),
-                                          )
-                                          ..add(SetIndex(index: index))),
-                              ],
-                              child: const POSItemDetailPage(),
-                            );
-                          });
+                      if ((e.BaseItem.prevQty ?? 0) > 0) {
+                      } else {
+                        await showDialog(
+                            context: context,
+                            builder: (contextB) {
+                              final item = e.BaseItem;
+                              return MultiBlocProvider(
+                                providers: [
+                                  BlocProvider.value(
+                                    value: context.read<VoucherBloc>(),
+                                  ),
+                                  BlocProvider.value(
+                                      value: context
+                                          .read<InventoryItemDetailBloc>()
+                                        ..add(
+                                          SetItem(item: item),
+                                        )
+                                        ..add(SetIndex(index: index))),
+                                ],
+                                child: const POSItemDetailPage(),
+                              );
+                            });
+                      }
                     },
                     child: ListTile(
                       title: Text(e.BaseItem.ItemName!),

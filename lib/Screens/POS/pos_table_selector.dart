@@ -25,6 +25,9 @@ class _PosTableSelectorState extends State<PosTableSelector> {
   @override
   void initState() {
     super.initState();
+    Timer.periodic(const Duration(seconds: 10), (timer) {
+      context.read<PosBloc>().add(FetchCurrentOrders());
+    });
   }
 
   @override
@@ -223,7 +226,7 @@ class _PosTableSelectorState extends State<PosTableSelector> {
                   ),
                 ),
               ),
-              Expanded(child: TablesGrid()),
+              const Expanded(child: TablesGrid()),
             ],
           );
         } else if (state.status == POSStatus.OrderFetchError) {

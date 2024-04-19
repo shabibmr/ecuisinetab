@@ -1,4 +1,5 @@
 import 'package:ecuisinetab/Webservices/webservicePHP.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
@@ -66,6 +67,9 @@ class PosBloc extends Bloc<PosEvent, PosState> {
   }
 
   Future<void> getCurrentOrders(event, emit) async {
+    if (state.status == POSStatus.FetchingOrders) {
+      return;
+    }
     try {
       print('Getting Orders');
       emit(state.copyWith(status: POSStatus.FetchingOrders));
@@ -73,23 +77,20 @@ class PosBloc extends Bloc<PosEvent, PosState> {
       if (data == false) {
         emit(state.copyWith(status: POSStatus.OrderFetchError));
       } else {
-        // final List tables =
-        //     data['data_tables'][0]['data_tables'].toString().split('|');
         List<String> tables =
             data['data_tables'][0]['Tables'].toString().split('|');
-        // print('Tables : $tables');
+
         Map<String, dynamic> ordersMap = {};
         if (data['success'].toString() == "1") {
-          // print('Type : ${data['data'].runtimeType}');
           final List orders = data['data'];
-          orders.forEach((element) {
+          for (var element in orders) {
             String ref = element['reference'] ?? '';
-            // print('Ref : ${element['reference']}');
+
             if (!tables.contains(ref)) {
               tables.add(ref);
             }
             ordersMap[ref] = element;
-          });
+          }
 
           emit(state.copyWith(
             tables: tables,
@@ -105,7 +106,10 @@ class PosBloc extends Bloc<PosEvent, PosState> {
         }
       }
     } catch (e) {
-      print('error in getCurrentOrders : ${e.toString()}');
+      emit(state.copyWith(status: POSStatus.OrderFetchError));
+      if (kDebugMode) {
+        print('error in getCurrentOrders : ${e.toString()}');
+      }
     }
   }
 }
