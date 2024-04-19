@@ -823,8 +823,8 @@ class GeneralVoucherDataModel extends Equatable {
     ];
   }
 
-  num getItemCount(String itemID) {
-    num val = 0;
+  double getItemCount(String itemID) {
+    double val = 0;
 
     for (int i = 0; i < InventoryItems!.length; i++) {
       if (itemID == InventoryItems![i].BaseItem.ItemID) {
@@ -834,8 +834,8 @@ class GeneralVoucherDataModel extends Equatable {
     return val;
   }
 
-  num getItemCurrCount(String itemID) {
-    num val = 0;
+  double getItemCurrCount(String itemID) {
+    double val = 0;
     // print('Checking item : $itemID');
     for (int i = 0; i < InventoryItems!.length; i++) {
       // print('Prev : ${InventoryItems![i].BaseItem.prevQty}');

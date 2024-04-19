@@ -25,8 +25,27 @@ class _PosTableSelectorState extends State<PosTableSelector> {
   @override
   void initState() {
     super.initState();
-    Timer.periodic(const Duration(seconds: 10), (timer) {
+    callTimer();
+  }
+
+  @override
+  void dispose() {
+    T.cancel();
+    T2.cancel();
+    super.dispose();
+  }
+
+  late Timer T;
+  late Timer T2;
+
+  double val = 0;
+
+  callTimer() async {
+    T = Timer.periodic(const Duration(seconds: 10), (timer) {
       context.read<PosBloc>().add(FetchCurrentOrders());
+    });
+    T2 = Timer.periodic(const Duration(seconds: 1), (timer) {
+      val += 0.1;
     });
   }
 
@@ -156,6 +175,7 @@ class _PosTableSelectorState extends State<PosTableSelector> {
         } else if (state.status == POSStatus.OrdersFetched) {
           return Column(
             children: [
+              const RefreshTimeIndicator(),
               Card(
                 child: SizedBox(
                   height: 60,
@@ -442,88 +462,50 @@ class _ClockWidgetState extends State<ClockWidget> {
   }
 }
 
-class SwitchToTablesGrid extends StatelessWidget {
-  const SwitchToTablesGrid({super.key});
+class RefreshTimeIndicator extends StatefulWidget {
+  const RefreshTimeIndicator({super.key});
+
+  @override
+  State<RefreshTimeIndicator> createState() => _RefreshTimeIndicatorState();
+}
+
+class _RefreshTimeIndicatorState extends State<RefreshTimeIndicator> {
+  @override
+  void initState() {
+    super.initState();
+    callTimer();
+  }
+
+  @override
+  void dispose() {
+    T.cancel();
+
+    super.dispose();
+  }
+
+  late Timer T;
+
+  double val = 0;
+
+  callTimer() async {
+    T = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      setState(() {
+        val += 0.01;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      Map orders =
-          context.select((PosBloc bloc) => bloc.state.currentOrders) ?? {};
-      return Builder(builder: (context) {
-        List<String>? tables =
-            context.select((PosBloc bloc) => bloc.state.tables!);
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3),
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            return InkWell(
-              child: Card(
-                color: Colors.red.shade100,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 80,
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: AutoSizeText(
-                              'tableName',
-                              style: const TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(4, 0, 0, 4),
-                                  child: Text(double.parse(
-                                          orders['tableName']['Total'] ?? "0.0")
-                                      .inCurrencySmall),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 4, 4),
-                                  child: ClockWidget(
-                                      timeStamp: DateTime.parse(
-                                          orders['tableName']['timestamp'])),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              onTap: () {
-                // context.read<VoucherBloc>().add(FetchVoucher(
-                //       voucherID: vNo,
-                //       voucherPref: vPref,
-                //       link: '',
-                //       vType: GMVoucherTypes.SalesOrder,
-                //     ));
-              },
-            );
-          },
-        );
-      });
-    });
+    return BlocListener<PosBloc, PosState>(
+      listener: (context, state) {
+        if (state.status == POSStatus.OrdersFetched) {
+          val = 0;
+        }
+      },
+      child: LinearProgressIndicator(
+        value: val,
+      ),
+    );
   }
 }
