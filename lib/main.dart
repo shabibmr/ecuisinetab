@@ -40,17 +40,23 @@ Future<void> initSettings() async {
 
   await Hive.initFlutter();
   Box sett = await Hive.openBox(HiveTagNames.Settings_Hive_Tag);
-  String dbname =
-      sett.get(Config_Tag_Names.DBName_Tag, defaultValue: 'gmrestaurant');
+  String dbname = sett.get(Config_Tag_Names.DBName_Tag,
+      defaultValue: HiveTagNames.Default_DB);
   sett.put(Config_Tag_Names.DBName_Tag, dbname);
 
-  String serverIP =
-      sett.get(Config_Tag_Names.Server_IP_Tag, defaultValue: '192.168.1.99');
+  String serverIP = sett.get(Config_Tag_Names.Server_IP_Tag,
+      defaultValue: HiveTagNames.Default_Server_IP);
+
   sett.put(Config_Tag_Names.Server_IP_Tag, serverIP);
   String url = sett.get(Config_Tag_Names.Base_URL_Tag,
-      defaultValue: 'http://192.168.1.99/test_app_water');
-
+      defaultValue:
+          'http://${HiveTagNames.Default_Server_IP}/${HiveTagNames.Default_endpoint}');
   sett.put(Config_Tag_Names.Base_URL_Tag, url);
+
+  String api = sett.get(Config_Tag_Names.App_Endpoint_Tag,
+      defaultValue: HiveTagNames.Default_endpoint);
+  sett.put(Config_Tag_Names.App_Endpoint_Tag, api);
+
   String billPrinter =
       sett.get(Config_Tag_Names.Bill_Printer_Tag, defaultValue: 'Counter');
   sett.put(Config_Tag_Names.Bill_Printer_Tag, billPrinter);
@@ -89,6 +95,7 @@ Future<void> initHiveBoxes() async {
   // Hive.registerAdapter<ContactsDataModel>(ContactsDataModelAdapter());
 
   await Hive.openBox(HiveTagNames.UI_Config_Hive_Tag);
+  await Hive.openBox(HiveTagNames.Config_Hive_Tag);
 
   Box box = await Hive.openBox(HiveTagNames.Values_Hive_Tag);
 

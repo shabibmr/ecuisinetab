@@ -80,18 +80,17 @@ class _PosTableSelectorState extends State<PosTableSelector> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await showPrices();
-        },
-        label: Builder(builder: (context) {
-          var plist = context.select((VoucherBloc bloc) =>
-                  bloc.state.voucher?.priceListId?.toString() ?? '3') ??
-              "3";
-          // print('New plist : $plist');
-          return Text(pBox.get(plist)?.priceListName ?? '');
-        }),
-      ),
+      floatingActionButton: Builder(builder: (context) {
+        var plist = context.select((VoucherBloc bloc) =>
+                bloc.state.voucher?.priceListId?.toString() ?? '3') ??
+            "3";
+        return FloatingActionButton.extended(
+          onPressed: () async {
+            await showPrices();
+          },
+          label: Text(pBox.get(plist)?.priceListName ?? ''),
+        );
+      }),
     );
   }
 

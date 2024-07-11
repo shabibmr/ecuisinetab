@@ -47,10 +47,12 @@ class _ConfigurationWidgetState extends State<ConfigurationWidget> {
                         child: ListView(
                           children: [
                             IPAddress(),
+                            // EndPointWidget(),
                             DBName(),
                             VoucherPrefix(),
                             PrinterName(),
-                            const ArabicCheck(),
+
+                            // const ArabicCheck(),
                             ElevatedButton(
                                 onPressed: () {
                                   Navigator.pop(context);
@@ -90,7 +92,7 @@ class _ConfigurationWidgetState extends State<ConfigurationWidget> {
 
 class IPAddress extends StatefulWidget {
   IPAddress({Key? key}) : super(key: key);
-  String? ip;
+  // String? ip;
 
   @override
   State<IPAddress> createState() => _IPAddressState();
@@ -104,7 +106,7 @@ class _IPAddressState extends State<IPAddress> {
           .select((ConfigurationsBloc bloc) => bloc.state.serverIP ?? '');
       print('New IP : $str');
       return MTextField(
-        label: 'Base URL',
+        label: 'Server',
         controller: TextEditingController()..text = str,
         onChanged: (value) {
           context.read<ConfigurationsBloc>().add(SetIPAddress(str: value));
@@ -116,7 +118,7 @@ class _IPAddressState extends State<IPAddress> {
 
 class DBName extends StatefulWidget {
   DBName({Key? key}) : super(key: key);
-  String? dbname;
+  // String? dbname;
   @override
   State<DBName> createState() => _DBNameState();
 }
@@ -132,6 +134,31 @@ class _DBNameState extends State<DBName> {
         controller: TextEditingController()..text = str,
         onChanged: (value) {
           context.read<ConfigurationsBloc>().add(SetDbName(str: value));
+        },
+      );
+    });
+  }
+}
+
+class EndPointWidget extends StatefulWidget {
+  const EndPointWidget({super.key});
+
+  @override
+  State<EndPointWidget> createState() => _EndPointWidgetState();
+}
+
+class _EndPointWidgetState extends State<EndPointWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (context) {
+      final String str = context
+          .select((ConfigurationsBloc bloc) => bloc.state.endpoint ?? '');
+      print('Endpoint : $str');
+      return MTextField(
+        label: 'Endpoint',
+        controller: TextEditingController()..text = str,
+        onChanged: (value) {
+          context.read<ConfigurationsBloc>().add(SetEndPoint(str: value));
         },
       );
     });
@@ -199,25 +226,6 @@ class ArabicCheck extends StatelessWidget {
       return CheckboxListTile(
         value: isArabic,
         title: Text('Arabic'),
-        onChanged: (bool? value) {
-          context.read<ConfigurationsBloc>().add(SetArabic(isArabic: value!));
-        },
-      );
-    });
-  }
-}
-
-class DefaultPriceListWidget extends StatelessWidget {
-  const DefaultPriceListWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final bool isArabic = context
-          .select((ConfigurationsBloc value) => value.state.arabic ?? false);
-      return CheckboxListTile(
-        value: isArabic,
-        title: const Text('Default Price List '),
         onChanged: (bool? value) {
           context.read<ConfigurationsBloc>().add(SetArabic(isArabic: value!));
         },

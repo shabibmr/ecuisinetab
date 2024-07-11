@@ -49,7 +49,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     );
     on<SwitchReference>(
       (event, emit) {
-        print('Changed voucher reference ${event.newReference}');
+        // print('Changed voucher reference ${event.newReference}');
         emit(VoucherState(
           voucher: state.voucher?.copyWith(reference: event.newReference),
           status: VoucherEditorStatus.loaded,
@@ -158,7 +158,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   Future<void> setEmptyVoucher(voucherType, emit) async {
-    print('SETTING EMPTY VOUCHER');
+    // print('SETTING EMPTY VOUCHER');
     final GeneralVoucherDataModel voucher = GeneralVoucherDataModel(
       voucherType: voucherType,
       VoucherDate: DateTime.now(),
@@ -169,7 +169,9 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
       AddedById: settingsBox.get(Config_Tag_Names.Salesmain_ID_Tag),
       ledgerObject: LedgerMasterDataModel(
         LedgerID: '0x5x2x1',
+        LedgerName: 'Cash',
       ),
+      BillingName: 'Cash',
       DeliveryDate: DateTime.now(),
       fromGodownID: settingsBox.get(Config_Tag_Names.Default_Godown_ID),
       status: 110,
@@ -231,8 +233,10 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   Future<void> saveVoucherOrder(event, emit) async {
-    print("Save Voucher");
-
+    // print("Save Voucher");
+    if (state.status == VoucherEditorStatus.sending) {
+      return;
+    }
     emit(state.copyWith(status: VoucherEditorStatus.sending));
 
     int? status;
@@ -258,7 +262,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
           voucher: voucher,
           requestBillCopy: state.printCopy);
 
-      print('Result : $result');
+      // print('Result : $result');
 
       if (result['Status'] == 'failed') {
         emit(state.copyWith(
@@ -267,7 +271,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
         return;
       }
     } catch (ex) {
-      print('Exception : $ex');
+      // print('Exception : $ex');
       emit(state.copyWith(
         status: VoucherEditorStatus.senderror,
       ));
@@ -282,7 +286,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   Future<void> saveVoucherInvoice(event, emit) async {
-    print("Save Voucher Invoice ");
+    // print("Save Voucher Invoice ");
 
     emit(state.copyWith(status: VoucherEditorStatus.sending));
     // if (state.voucher!.ledgerObject!.LedgerID?.isEmpty == true) {
@@ -309,19 +313,19 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
       TransactionId: const Uuid().v4(),
     )));
 
-    print('New Voucher Type : ${state.voucher!.voucherType} ');
+    // print('New Voucher Type : ${state.voucher!.voucherType} ');
     final GeneralVoucherDataModel voucher =
         state.voucher!.copyWith(lastEditedDateTime: DateTime.now());
 
     voucher.calculateVoucherSales();
-    print('New Voucher Status : ${state.voucher!.status} ');
+    // print('New Voucher Status : ${state.voucher!.status} ');
     try {
       final result = await WebservicePHPHelper.sendVoucher(
           vType: voucher.voucherType ?? "",
           voucher: voucher,
           requestBillCopy: state.printCopy);
 
-      print('Result : $result');
+      // print('Result : $result');
 
       if (result['Status'] == 'failed') {
         emit(state.copyWith(
@@ -345,7 +349,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   Future<void> fetchVoucher(event, emit) async {
-    print("Fetch Voucher ${event.vType}");
+    // print("Fetch Voucher ${event.vType}");
     emit(state.copyWith(status: VoucherEditorStatus.loading));
     try {
       final GeneralVoucherDataModel? voucher =
@@ -362,7 +366,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
         vStatus: ViewStatus.edit,
       ));
     } catch (e) {
-      print('Voucher fetch Error : ${e.toString()}');
+      // print('Voucher fetch Error : ${e.toString()}');
       emit(state.copyWith(status: VoucherEditorStatus.fetcherror));
     }
 
@@ -373,10 +377,10 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     double dQty = double.parse(quantity.toString());
     emit(state.copyWith(status: VoucherEditorStatus.loading));
     final voucher = state.voucher!;
-    print('GODOWN : ${voucher.fromGodownID}');
-    print('Updating Item Qty  : $quantity ');
+    // print('GODOWN : ${voucher.fromGodownID}');
+    // print('Updating Item Qty  : $quantity ');
     if (voucher.getItemCurrCount(item.ItemID!) == 0) {
-      print('New Item FOUND');
+      // print('New Item FOUND');
       voucher.InventoryItems!.add(CompoundItemDataModel(
           BaseItem: item.copyWith(
         quantity: quantity,

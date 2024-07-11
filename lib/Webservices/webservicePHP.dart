@@ -17,14 +17,18 @@ import 'package:intl/intl.dart';
 class WebservicePHPHelper {
   static String getBaseURL() {
     Box sett = Hive.box('settings');
-    String url = sett.get(Config_Tag_Names.Base_URL_Tag);
+    String serverIP = sett.get(Config_Tag_Names.Server_IP_Tag);
+    // String url = sett.get(Config_Tag_Names.Base_URL_Tag);
+    String api = sett.get(Config_Tag_Names.App_Endpoint_Tag);
+
     // String url = 'https://192.168.0.104/test_app_water';
 
     // String url = 'https://www.algoray.in/test_app_water';
 
     // url = 'http://192.168.0.105/test_app_water';
     // print('Url : $url/');
-    return '$url/';
+    // return '$url/';
+    return 'http://$serverIP/$api/';
   }
 
   static String getDBName() {
@@ -598,6 +602,9 @@ class WebservicePHPHelper {
       print('Inventory Error');
       print('Inventory Error Status ${response?.statusCode}');
       print(ex.toString());
+      // if (response!.statusCode == 404) {
+      //   rethrow;
+      // }
       return false;
     }
     if (data['success'] == 1 || data['success'] == '1') {
@@ -608,7 +615,9 @@ class WebservicePHPHelper {
   }
 
   static Future<dynamic> getLedgerBalance(
-      String ledgerID, DateTime date) async {
+    String ledgerID,
+    DateTime date,
+  ) async {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     String dateStr = formatter.format(date);
     String url =
@@ -898,7 +907,7 @@ class WebservicePHPHelper {
 
     dio.options.headers['dbname'] = dBName;
 
-    print("url : $url : $dBName");
+    // print("url : $url : $dBName");
 
     // List data = [];
 
@@ -928,7 +937,6 @@ class WebservicePHPHelper {
     }
 
     String url = '${getBaseURL()}$link$args';
-
     String dBName = getDBName();
     Dio dio = Dio();
 
@@ -1007,9 +1015,7 @@ class WebservicePHPHelper {
     try {
       String dBName = getDBName();
       Dio dio = Dio();
-
       dio.options.headers['dbname'] = dBName;
-
       final Response response = await dio.get(
         fullURl,
         // headers: {"Accept": "application/json"},
@@ -1365,5 +1371,44 @@ class WebservicePHPHelper {
     }
 
     return response.data;
+  }
+
+  static Future<dynamic> getConfigSettings({
+    required List<String> keysList,
+  }) async {
+    String whereClause = '';
+
+    keysList.forEach((element) {
+      whereClause += ' GMKey like "$element" OR';
+    });
+
+    whereClause = whereClause.substring(0, whereClause.length - 3);
+
+    String query =
+        'SELECT GMKey,GMValue FROM config_settings WHERE $whereClause';
+
+    String url = "${getBaseURL()}ReportsWS1.php?action=runQuery&query=$query";
+
+    print('Config query : $url');
+
+    String dBName = getDBName();
+    Dio dio = Dio(BaseOptions(
+      connectTimeout: const Duration(
+        seconds: 5,
+      ),
+      headers: {'dbname': dBName},
+    ));
+
+    Response response;
+    try {
+      response = await dio.post(
+        url,
+        data: keysList,
+      );
+    } catch (e) {
+      return false;
+    }
+
+    return response.data['data'];
   }
 }

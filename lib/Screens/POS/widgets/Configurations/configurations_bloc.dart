@@ -1,6 +1,4 @@
-import 'dart:io';
-
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:connectivity/connectivity.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,10 +13,10 @@ class ConfigurationsBloc
     extends Bloc<ConfigurationsEvent, ConfigurationsState> {
   ConfigurationsBloc() : super(const ConfigurationsState()) {
     on<SetIPAddress>((event, emit) {
-      emit(state.copyWith(ServerIP: event.str));
+      emit(state.copyWith(serverIP: event.str));
     });
     on<SetDbName>((event, emit) {
-      emit(state.copyWith(DBName: event.str));
+      emit(state.copyWith(dBName: event.str));
     });
     on<SetPrinterName>((event, emit) {
       emit(state.copyWith(printerName: event.str));
@@ -34,7 +32,9 @@ class ConfigurationsBloc
     });
     on<SaveConfiguration>((event, emit) {
       Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
-      sett.put(Config_Tag_Names.Base_URL_Tag, state.serverIP);
+      sett.put(Config_Tag_Names.Server_IP_Tag, state.serverIP);
+
+      sett.put(Config_Tag_Names.App_Endpoint_Tag, state.endpoint);
       sett.put(Config_Tag_Names.DBName_Tag, state.dBName);
       sett.put(Config_Tag_Names.Bill_Printer_Tag, state.printerName);
       sett.put(Config_Tag_Names.Voucher_Prefix_Tag, state.voucherPref);
@@ -47,10 +47,12 @@ class ConfigurationsBloc
       // await getIPAddress();
       Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
       emit(state.copyWith(
-        ServerIP: sett.get(Config_Tag_Names.Base_URL_Tag,
-            defaultValue: 'http://192.168.1.99/test_app_water'),
-        DBName: sett.get(Config_Tag_Names.DBName_Tag,
-            defaultValue: 'cake_studio_mukkam'),
+        serverIP: sett.get(Config_Tag_Names.Server_IP_Tag,
+            defaultValue: HiveTagNames.Default_Server_IP),
+        endpoint: sett.get(Config_Tag_Names.App_Endpoint_Tag,
+            defaultValue: HiveTagNames.Default_endpoint),
+        dBName: sett.get(Config_Tag_Names.DBName_Tag,
+            defaultValue: HiveTagNames.Default_DB),
         voucherPref:
             sett.get(Config_Tag_Names.Voucher_Prefix_Tag, defaultValue: 'A'),
         printerName: sett.get(Config_Tag_Names.Bill_Printer_Tag,

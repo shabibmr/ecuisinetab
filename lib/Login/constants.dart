@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-const String currency = "\u20B9";
+const String currency = "Aed.";
 
 final currencyFormat = NumberFormat.currency(
   locale: "en_IN",
@@ -136,6 +136,15 @@ class HiveTagNames {
   static String get Settings_Hive_Tag => 'settings';
 
   static String get Values_Hive_Tag => 'values';
+
+  static String get Config_Hive_Tag => 'ConfigValues';
+
+  static String get Default_Server_IP => 'gm.algoray.in';
+  static String get Default_DB => 'uaetest';
+  static String get Default_endpoint => 'tab_app';
+  
+
+
 }
 
 class Config_Tag_Names {
@@ -147,6 +156,8 @@ class Config_Tag_Names {
   static String get Login_User_Name_tag => "login_user_name";
   static String get Login_User_Emp_ID => "login_user_emp_id";
 
+  static String get App_Endpoint_Tag => "AppEndpoint";
+
   static String get Base_URL_Tag => "url";
 
   static String get Default_Cash_ID => "defaultCash";
@@ -157,13 +168,20 @@ class Config_Tag_Names {
 
   static String get Default_PriceList_Tag => "defaultPriceList";
 
+  static String get Rate_Editable_Tag => "allowSalesRateEdit";
+
+  static String get Allow_Discount_Tag => "allowItemDiscinPOS";
+
   static String get Default_Bank_Tag => "defaultbank";
+
+  static String get Currency_Tag => "Currency_Tag";
 
   static String get Voucher_Prefix_Tag => "vPref";
   static String get DBName_Tag => "DBName";
 
   static String get Salesmain_ID_Tag => "Salesman_ID";
   static String get Arabic_Lang_Tag => "isArabic";
+  static String get Allow_Waiter_Change_Tag => "AllowWaiterChange";
 }
 
 // class DefaultFirebaseConfig {

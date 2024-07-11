@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(4.0),
+                    padding: EdgeInsets.fromLTRB(8, 4.0, 8, 4),
                     child: Card(
                       child: Padding(
                         padding: EdgeInsets.all(0.0),

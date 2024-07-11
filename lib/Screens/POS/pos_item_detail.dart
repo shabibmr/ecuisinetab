@@ -24,6 +24,8 @@ class POSItemDetailPage extends StatefulWidget {
 class _POSItemDetailPageState extends State<POSItemDetailPage> {
   late FocusNode _focusNode;
 
+  final formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +35,7 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      elevation: 3,
+      elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       clipBehavior: Clip.antiAlias,
       child: getB2(),
@@ -50,135 +52,139 @@ class _POSItemDetailPageState extends State<POSItemDetailPage> {
         final status =
             context.select((InventoryItemDetailBloc bloc) => bloc.state.status);
         if (status == ItemDetailStatus.ready) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ItemName(),
-                      ),
-                    ),
-                    Builder(builder: (context) {
-                      final item = context.select(
-                          (InventoryItemDetailBloc bloc) => bloc.state.item!);
-                      final vqty = context
-                          .select((VoucherBloc bloc) => bloc.state.voucher)
-                          ?.getItemCurrCount(item.ItemID!);
-                      return Visibility(
-                        visible: (vqty ?? 0) > 0,
-                        child: IconButton(
-                          onPressed: () {
-                            context
-                                .read<VoucherBloc>()
-                                .add(UpdateItemQty(item: item, qty: 0));
-
-                            Navigator.of(context).pop();
-                          },
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
+          return Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ItemName(),
                         ),
-                      );
-                    })
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Card(
-                      shadowColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: DecoratedBox(
-                            decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                        )),
                       ),
-                    ),
-                    const Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: ItemQty(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 3,
-              ),
-              const Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    ItemNameArabic(),
-                    ItemRateWidget(),
-                    ItemNarration(),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                child: Builder(
-                  builder: (context) {
-                    final InventoryItemDataModel item = context.select(
-                        (InventoryItemDetailBloc blox) => blox.state.item!);
-                    final int index = context.select(
-                        (InventoryItemDetailBloc blox) =>
-                            blox.state.index ?? -1);
-                    return Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const ItemTotalWidget(),
-                        FloatingActionButton(
-                          // backgroundColor: Colors.black,
-                          onPressed: () {
-                            if (index > -1) {
+                      Builder(builder: (context) {
+                        final item = context.select(
+                            (InventoryItemDetailBloc bloc) => bloc.state.item!);
+                        final vqty = context
+                            .select((VoucherBloc bloc) => bloc.state.voucher)
+                            ?.getItemCurrCount(item.ItemID!);
+                        return Visibility(
+                          visible: (vqty ?? 0) > 0,
+                          child: IconButton(
+                            onPressed: () {
                               context
                                   .read<VoucherBloc>()
-                                  .add(UpdateInventoryItemAtIndex(
-                                    index: index,
-                                    inventoryItem: item,
-                                  ));
-                            } else {
-                              context.read<VoucherBloc>().add(UpdateItemQty(
-                                  item: item, qty: item.quantity!));
-                            }
-                            // Navigator.of(context).pop>()
-                            Navigator.of(context).pop();
-                          },
-                          child: const Icon(
-                            Icons.check,
-                            // color: Colors.lightGreen,
+                                  .add(UpdateItemQty(item: item, qty: 0));
+
+                              Navigator.of(context).pop();
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        );
+                      })
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Expanded(
+                  flex: 1,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Card(
+                        shadowColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DecoratedBox(
+                              decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                          )),
+                        ),
+                      ),
+                      const Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: ItemQty(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 3,
+                ),
+                const Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      ItemNameArabic(),
+                      ItemRateWidget(),
+                      ItemNarration(),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Builder(
+                    builder: (context) {
+                      final InventoryItemDataModel item = context.select(
+                          (InventoryItemDetailBloc blox) => blox.state.item!);
+                      final int index = context.select(
+                          (InventoryItemDetailBloc blox) =>
+                              blox.state.index ?? -1);
+                      return Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const ItemTotalWidget(),
+                          FloatingActionButton(
+                            // backgroundColor: Colors.black,
+                            onPressed: () {
+                              formKey.currentState!.save();
+                              if (index > -1) {
+                                context
+                                    .read<VoucherBloc>()
+                                    .add(UpdateInventoryItemAtIndex(
+                                      index: index,
+                                      inventoryItem: item,
+                                    ));
+                              } else {
+                                context.read<VoucherBloc>().add(UpdateItemQty(
+                                    item: item, qty: item.quantity!));
+                              }
+                              // Navigator.of(context).pop>()
+                              Navigator.of(context).pop();
+                            },
+                            child: const Icon(
+                              Icons.check,
+                              // color: Colors.lightGreen,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           );
         } else {
-          return Text('${status}');
+          return Text('$status');
         }
       }),
     );
@@ -345,6 +351,13 @@ class ItemRateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Box conf = Hive.box(HiveTagNames.Config_Hive_Tag);
+    conf.keys.forEach((element) {
+      print('$element : ${conf.get(element)}');
+    });
+    bool allowRateEdit =
+        conf.get(Config_Tag_Names.Rate_Editable_Tag, defaultValue: false);
+    print('Allowd : $allowRateEdit');
     return Builder(builder: (context) {
       double rate = context.select(
           (InventoryItemDetailBloc element) => element.state.item!.rate!);
@@ -356,7 +369,13 @@ class ItemRateWidget extends StatelessWidget {
           textData: rate.toStringAsFixed(2),
           textAlign: TextAlign.right,
           textStyle: Theme.of(context).textTheme.titleLarge,
-          readOnly: rate != 0,
+          readOnly: rate != 0 && !allowRateEdit,
+          onSaved: (value) {
+            print('Save Rate');
+            context
+                .read<InventoryItemDetailBloc>()
+                .add(SetItemRate(double.parse(value)));
+          },
           onChanged: (value) {
             context
                 .read<InventoryItemDetailBloc>()

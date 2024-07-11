@@ -67,6 +67,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
         await syncUOMs();
         await syncEmployees();
         await syncPrices();
+        await readConfigs();
       } catch (e) {
         emit(state.copyWith(status: SyncUiConfigStatus.error));
         print('Error : $e');
@@ -133,6 +134,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     bool flag = true;
     String qry = "";
     DateTime last = DateTime(2021);
+
     final dataResponse = await WebservicePHPHelper.getAllInventoryItems(
       lastUpdatedTimestamp: last,
     );
@@ -141,7 +143,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     }
     Box<InventoryItemHive> box = Hive.box(HiveTagNames.Items_Hive_Tag);
     await box.clear();
-    // print('Items lenngth : ${dataResponse.length}');
+
     try {
       dataResponse.forEach((element) async {
         // print('${element}');
@@ -334,6 +336,41 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       print('Error Adding to Hive : ${e.toString()}');
     }
     print('Uoms : ${box.length}');
+    return flag;
+  }
+
+  Future<bool> readConfigs() async {
+    print('Fetching uom ${DateTime.now()}');
+    bool flag = false;
+    final dataResponse = await WebservicePHPHelper.getConfigSettings(
+      keysList: [
+        Config_Tag_Names.Allow_Discount_Tag,
+        Config_Tag_Names.Rate_Editable_Tag,
+      ],
+    );
+
+    if (dataResponse == false) {
+      print('Fetch Eroor');
+    } else {
+      // print('uom');
+      print(dataResponse);
+    }
+    Box sett = Hive.box(HiveTagNames.Config_Hive_Tag);
+    // sett.put(Config_Tag_Names.Server_IP_Tag, state.serverIP);
+
+    // await box.clear();
+    // print('UOM Box cleared');
+    try {
+      dataResponse.forEach((element) async {
+        var val = element['GMValue'] == "1";
+        print('${element['GMKey']}: ${val.runtimeType}');
+
+        sett.put(element['GMKey'], val);
+      });
+    } catch (e) {
+      print('Error Adding to Hive : ${e.toString()}');
+    }
+    print('Config : ${sett.length}');
     return flag;
   }
 

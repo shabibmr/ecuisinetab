@@ -18,22 +18,35 @@ extension RoundOffExtension on double {
     return fraction + no;
   }
 
-  String get inCurrency2 {
+  String get inCurrency {
     try {
       var format = NumberFormat.simpleCurrency(locale: Platform.localeName);
-      return '${format.currencySymbol}. ${toStringAsFixed(2)}';
+      print('Format : ${format.format(this)}');
+      return format.format(this);
     } catch (e) {
       print('Error : ${e.toString()}');
     }
     return "xxx";
   }
 
-  String get inCurrency {
-    return '$currency ${toStringAsFixed(2)}';
-  }
+  // String get inCurrency2 {
+  //   var format = NumberFormat.simpleCurrency(locale: Platform.localeName);
+  //   print('Format : ${format.format(this)}');
+  //   return '$currency ${toStringAsFixed(2)}';
+  // }
 
   String get inCurrencySmall {
-    return '$currency ${toStringAsFixed(0)}';
+    try {
+      var format = NumberFormat.simpleCurrency(
+        locale: Platform.localeName,
+        decimalDigits: 0,
+      );
+      // print('Format : ${format.format(this)}');
+      return format.format(this);
+    } catch (e) {
+      print('Error : ${e.toString()}');
+    }
+    return '';
   }
 
   String get clean0s {

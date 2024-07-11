@@ -15,6 +15,12 @@ class SetIPAddress extends ConfigurationsEvent {
   SetIPAddress({this.str});
 }
 
+class SetEndPoint extends ConfigurationsEvent {
+  final String? str;
+
+  SetEndPoint({this.str});
+}
+
 class SetDbName extends ConfigurationsEvent {
   final String? str;
 
@@ -39,6 +45,18 @@ class SetArabic extends ConfigurationsEvent {
   final bool isArabic;
 
   const SetArabic({required this.isArabic});
+}
+
+class SetAllowWaiter extends ConfigurationsEvent {
+  final bool isAllowWaiter;
+
+  const SetAllowWaiter({required this.isAllowWaiter});
+}
+
+class SetAllowInovice extends ConfigurationsEvent {
+  final bool allowSales;
+
+  const SetAllowInovice({required this.allowSales});
 }
 
 class SetDefaultPriceListID extends ConfigurationsEvent {

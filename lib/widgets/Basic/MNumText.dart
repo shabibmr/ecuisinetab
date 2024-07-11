@@ -12,6 +12,7 @@ class MNumField extends StatefulWidget {
     this.hintText,
     this.label,
     this.onChanged,
+    this.onSaved,
     this.initialText,
     this.onSubmitted,
     this.inputDecoration,
@@ -40,6 +41,7 @@ class MNumField extends StatefulWidget {
   final String? initialText;
   final ValueChanged<num>? onChanged;
   final void Function(String value)? onSubmitted;
+  final void Function(String value)? onSaved;
   final InputDecoration? inputDecoration;
   final TextStyle? textStyle;
   final FocusNode? focusNode;
@@ -126,6 +128,7 @@ class _MNumFieldState extends State<MNumField> {
       child: TextFormField(
         key: widget.key,
         controller: controller,
+        onSaved: (newValue) => widget.onSaved!(newValue ?? ''),
         // ..text = widget.textData ?? ''
         // ..selection = TextSelection.fromPosition(
         //     TextPosition(offset: controller.text.length)),

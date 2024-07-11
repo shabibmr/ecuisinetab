@@ -217,6 +217,9 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
   }
 
   factory InventoryItemHive.fromMap(Map<String, dynamic> map) {
+    // map.forEach((key, value) {
+    //   print('$key: $value is ${value.runtimeType}');
+    // });
     return InventoryItemHive(
       Item_ID: map['Item_ID'] ?? "",
       Item_Name: map['Item_Name'],
@@ -225,7 +228,7 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
       Group_Id: map['GroupID'],
       Group_Name: map['GroupName'],
       Part_Number: map['Part_Number'],
-      Price: double.parse(map['price'] ?? "0"),
+      Price: double.parse(map['price'].toString() ?? "0"),
       Opening_Stock: double.parse(map['Opening_Stock'] ?? "0"),
       Opening_Balance: double.parse(map['Opening_Balance'] ?? "0"),
       // Opening_Balance_Date:
@@ -237,8 +240,8 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
       Serial_Number: map['Serial_Number'],
       Closing_Stock: double.parse(map['Closing_Stock'] ?? "0"),
       Reorder_Level: double.parse(map['Reorder_Level'] ?? "0"),
-      Std_Cost: double.parse(map['std_cost'] ?? "0"),
-      Vat_Rate: double.parse(map['Vat_Rate'] ?? "0"),
+      Std_Cost: double.parse(map['std_cost'].toString() ?? "0"),
+      Vat_Rate: double.parse(map['Vat_Rate'].toString() ?? "0"),
       Default_UOM_ID: int.parse(map['Default_UOM_ID'] ?? "1"),
       uomObjects: map['UOMList'] != null
           ? List<UOMHiveMOdel>.from(
@@ -268,12 +271,13 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
       // Item_Description: map['Item_Description'],
       // isCustomItem: map['isCustomItem'],
       // Dimension: map['Dimension'],
-      isPurchaseItem: (map['isPurchaseItem'] ?? "0") == "1" ? true : false,
-      isSalesItem: (map['isSalesItem'] ?? "0") == "1" ? true : false,
+      isPurchaseItem:
+          (map['isPurchaseItem'].toString() ?? "0") == "1" ? true : false,
+      isSalesItem: (map['isSalesItem'].toString() ?? "0") == "1" ? true : false,
       // KOT_Printer: map['KOT_Printer'],
       // Item_Name_Arabic: map['Item_Name_Arabic'],
       // Favourite: map['Favourite'],
-      isStockItem: (map['isStockItem'] ?? "0") == "1" ? true : false,
+      isStockItem: (map['isStockItem'].toString() ?? "0") == "1" ? true : false,
       // // From_Time: DateTime.fromMillisecondsSinceEpoch(map['From_Time']),
       // // To_Time: DateTime.fromMillisecondsSinceEpoch(map['To_Time']),
       // Price_2: double.parse(map['Price_2'] ?? "0"),
@@ -282,9 +286,11 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
       // // Flags: map['Flags'],
       // Category: map['Category'],
       // DefaultLedgerID: map['DefaultLedgerID'],
-      isBatchProcessed: (map['isBatchProcessed'] ?? "0") == "1" ? true : false,
-      isSerialNumbered: (map['isSerailNumbered'] ?? "0") == "1" ? true : false,
-      isActive: (map['isActive'] ?? "1") == "1" ? true : false,
+      isBatchProcessed:
+          (map['isBatchProcessed'].toString() ?? "0") == "1" ? true : false,
+      isSerialNumbered:
+          (map['isSerailNumbered'].toString() ?? "0") == "1" ? true : false,
+      isActive: (map['isActive'].toString() ?? "1") == "1" ? true : false,
       Item_Name_Arabic: map['Item_Name_Arabic'],
     );
   }
