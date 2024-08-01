@@ -25,6 +25,8 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       : super(const SyncServiceState(
           status: SyncUiConfigStatus.init,
         )) {
+    on<CheckServer>((event, emit) async => await checkServer(event, emit));
+
     on<FetchItemsEvent>((event, emit) async {
       bool n = await syncItems();
       print('Items Fetched');
@@ -135,16 +137,17 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     String qry = "";
     DateTime last = DateTime(2021);
 
-    final dataResponse = await WebservicePHPHelper.getAllInventoryItems(
-      lastUpdatedTimestamp: last,
-    );
-    if (dataResponse == false) {
-      print('Fetch Eroor');
-    }
-    Box<InventoryItemHive> box = Hive.box(HiveTagNames.Items_Hive_Tag);
-    await box.clear();
-
     try {
+      final dataResponse = await WebservicePHPHelper.getAllInventoryItems(
+        lastUpdatedTimestamp: last,
+      );
+      if (dataResponse == false) {
+        throw Exception('Fetch Error');
+      }
+
+      Box<InventoryItemHive> box = Hive.box(HiveTagNames.Items_Hive_Tag);
+      await box.clear();
+
       dataResponse.forEach((element) async {
         // print('${element}');
         try {
@@ -156,11 +159,11 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
           return false;
         }
       });
+      print('Inventory Items FETCHED : ${box.length}');
     } catch (e) {
       print('Erro : ${e.toString()} ');
       return false;
     }
-    print('Inventory Items FETCHED : ${box.length}');
     return flag;
   }
 
@@ -429,5 +432,12 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       print('PRICES : ${box.length}');
     }
     return flag;
+  }
+
+  Future<bool> checkServer(event, emit) async {
+
+    
+
+    return true;
   }
 }

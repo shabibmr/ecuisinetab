@@ -156,12 +156,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(
-            255,
-            137,
-            233,
-            200,
-          )),
+            seedColor: const Color.fromARGB(
+              255,
+              137,
+              233,
+              200,
+            ),
+          ),
           useMaterial3: true,
         ),
         home: const EcuisineTabApp(title: 'eCuisineTab'),

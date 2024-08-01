@@ -139,8 +139,8 @@ class HiveTagNames {
 
   static String get Config_Hive_Tag => 'ConfigValues';
 
-  static String get Default_Server_IP => 'gm.algoray.in';
-  static String get Default_DB => 'uaetest';
+  static String get Default_Server_IP => '192.168.1.99';
+  static String get Default_DB => 'gmdb24';
   static String get Default_endpoint => 'tab_app';
   
 
