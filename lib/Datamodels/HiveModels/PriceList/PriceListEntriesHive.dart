@@ -21,7 +21,10 @@ class PriceListEntriesHive extends HiveObject with EquatableMixin {
   int? uomID;
   @HiveField(5)
   String? priceListName;
+  @HiveField(6)
+  String? itemID;
   PriceListEntriesHive({
+    this.itemID,
     this.rate,
     this.priceListID,
     this.timestamp,
@@ -43,6 +46,7 @@ class PriceListEntriesHive extends HiveObject with EquatableMixin {
 
   factory PriceListEntriesHive.fromMap(Map<String, dynamic> map) {
     PriceListEntriesHive p = PriceListEntriesHive(
+      itemID: map['Item_ID'] ?? '',
       rate: double.parse(map['price'] ?? "0"),
       priceListID: int.parse(map['Price_List_ID'] ?? '0'),
       timestamp: map['timestamp'] != null
@@ -62,6 +66,7 @@ class PriceListEntriesHive extends HiveObject with EquatableMixin {
       PriceListEntriesHive.fromMap(json.decode(source));
 
   PriceListEntriesHive copyWith({
+    String? itemID,
     double? rate,
     int? priceListID,
     DateTime? timestamp,
@@ -70,6 +75,7 @@ class PriceListEntriesHive extends HiveObject with EquatableMixin {
     String? priceListName,
   }) {
     return PriceListEntriesHive(
+      itemID: itemID ?? this.itemID,
       rate: rate ?? this.rate,
       priceListID: priceListID ?? this.priceListID,
       timestamp: timestamp ?? this.timestamp,
@@ -87,6 +93,7 @@ class PriceListEntriesHive extends HiveObject with EquatableMixin {
   @override
   List<Object?> get props {
     return [
+      itemID,
       rate,
       priceListID,
       timestamp,

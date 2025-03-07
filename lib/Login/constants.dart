@@ -139,12 +139,9 @@ class HiveTagNames {
 
   static String get Config_Hive_Tag => 'ConfigValues';
 
-  static String get Default_Server_IP => '192.168.1.99';
-  static String get Default_DB => 'gmdb24';
+  static String get Default_Server_IP => '192.168.31.99';
+  static String get Default_DB => 'gmresto';
   static String get Default_endpoint => 'tab_app';
-  
-
-
 }
 
 class Config_Tag_Names {

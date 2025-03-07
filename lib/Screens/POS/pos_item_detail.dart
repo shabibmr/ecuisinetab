@@ -1,17 +1,18 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:ecuisinetab/Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 import 'package:ecuisinetab/Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
 import 'package:ecuisinetab/Login/constants.dart';
 import 'package:ecuisinetab/Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
 import 'package:ecuisinetab/widgets/Basic/MNumText.dart';
-import 'package:ecuisinetab/widgets/Basic/MStringText.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:input_quantity/input_quantity.dart';
 
 import '../../Transactions/InventoryItem/bloc/inventory_item_detail_bloc.dart';
-import '../../widgets/Basic/MMultiLineText.dart';
+
 import '../../widgets/Basic/MText.dart';
 
 class POSItemDetailPage extends StatefulWidget {
@@ -352,6 +353,7 @@ class ItemRateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Box conf = Hive.box(HiveTagNames.Config_Hive_Tag);
+    Box<InventoryItemHive> itemBox = Hive.box(HiveTagNames.Items_Hive_Tag);
     conf.keys.forEach((element) {
       print('$element : ${conf.get(element)}');
     });
@@ -359,8 +361,15 @@ class ItemRateWidget extends StatelessWidget {
         conf.get(Config_Tag_Names.Rate_Editable_Tag, defaultValue: false);
     print('Allowd : $allowRateEdit');
     return Builder(builder: (context) {
+      final InventoryItemDataModel item = context
+          .select((InventoryItemDetailBloc element) => element.state.item!);
       double rate = context.select(
           (InventoryItemDetailBloc element) => element.state.item!.rate!);
+      int priceID = context.select(
+          (VoucherBloc element) => element.state.voucher?.priceListId ?? 0);
+      if (priceID != 0) {
+        rate = itemBox.get(item.ItemID)?.prices?[priceID]?.rate ?? rate;
+      }
       return Card(
         child: MNumField(
           label: 'Rate',

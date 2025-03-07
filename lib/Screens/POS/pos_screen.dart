@@ -186,6 +186,7 @@ class _POSScreenState extends State<POSScreen> {
       context: context,
       delegate: InvItemSearchDelegate(
         Hive.box<InventoryItemHive>(HiveTagNames.Items_Hive_Tag),
+        context.read<VoucherBloc>(),
       ),
     );
     if (inv != null) {

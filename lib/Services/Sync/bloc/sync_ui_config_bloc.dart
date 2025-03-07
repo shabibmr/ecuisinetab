@@ -1,3 +1,4 @@
+import 'package:ecuisinetab/Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
 import 'package:ecuisinetab/Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
 
 import '../../../Datamodels/HiveModels/AccountGroups/AccountGroupHiveModel.dart';
@@ -147,6 +148,9 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
 
       Box<InventoryItemHive> box = Hive.box(HiveTagNames.Items_Hive_Tag);
       await box.clear();
+      Box<PriceListEntriesHive> pbox =
+          Hive.box(HiveTagNames.PriceListsEntries_Hive_Tag);
+      await pbox.clear();
 
       dataResponse.forEach((element) async {
         // print('${element}');
@@ -154,6 +158,13 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
           // print('Type ele : ${element.runtimeType}');
           InventoryItemHive item = InventoryItemHive.fromMap(element);
           await box.put(item.Item_ID, item);
+          final pMap = element['PriceLists'];
+          print('Price Map : $pMap');
+          pMap.forEach((element2) async {
+            print('Price List : $element2');
+            PriceListEntriesHive price = PriceListEntriesHive.fromMap(element2);
+            await pbox.put(item.Item_ID, price);
+          });
         } catch (e) {
           print('Conv error : ${e.toString()}');
           return false;
@@ -413,16 +424,21 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
     String qry = "";
     DateTime last = DateTime(2021);
     Box<PriceListMasterHive> box = Hive.box(HiveTagNames.PriceLists_Hive_Tag);
+    // Box<PriceListMasterHive> pricelistBox =
+    //     Hive.box(HiveTagNames.PriceListsEntries_Hive_Tag);
+
     try {
       final List dataResponse =
           await WebservicePHPHelper.getAllPriceList(lastUpdated: last);
 
       await box.clear();
+      // await pricelistBox.clear();
 
       dataResponse.forEach((element) async {
-        // print('>> ${element}');
+        print('>> ${element}');
         final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
         // print('Name : ${p.priceListName}');
+
         print(element['Price_List_ID'].runtimeType);
         await box.put(element['Price_List_ID'], p);
       });
@@ -435,9 +451,6 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
   }
 
   Future<bool> checkServer(event, emit) async {
-
-    
-
     return true;
   }
 }

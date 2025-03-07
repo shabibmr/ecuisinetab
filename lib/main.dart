@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:ecuisinetab/auth/bloc/authentication_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -18,6 +19,9 @@ import 'Login/constants.dart';
 import 'Services/Sync/bloc/sync_ui_config_bloc.dart';
 
 Future<void> main() async {
+  if (kIsWeb) {
+    // Enable performance optimizations for web
+  }
   // HiveTagNames.setDB('cake_studio_mukkam');
   HttpOverrides.global = MyHttpOverrides();
   await initSettings();

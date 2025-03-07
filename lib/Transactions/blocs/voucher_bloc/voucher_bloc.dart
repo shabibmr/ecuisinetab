@@ -83,6 +83,14 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     on<SetPriceList>((event, emit) {
       resetPrices(event, emit);
     });
+
+    on<SetDefaultPriceList>((event, emit) async {
+      Box sett = Hive.box(HiveTagNames.Settings_Hive_Tag);
+      int defPriceId = event.priceListID;
+      await sett.put(Config_Tag_Names.Default_PriceList_Tag, defPriceId);
+      // resetPrices(event, emit);
+    });
+
     on<SetNarration>((event, emit) => emit(state.copyWith(
             voucher: state.voucher?.copyWith(
           narration: event.narration,
@@ -458,6 +466,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   void resetPrices(SetPriceList event, emit) {
+    emit(state.copyWith(status: VoucherEditorStatus.loading));
     Box<InventoryItemHive> itemsBox = Hive.box(HiveTagNames.Items_Hive_Tag);
     Box<PriceListEntriesHive> pbox =
         Hive.box(HiveTagNames.PriceListsEntries_Hive_Tag);
@@ -465,7 +474,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     final voucher = state.voucher!.copyWith(
         priceListId: event.priceListID, ModeOfService: event.priceListID);
 
-    for (int i = 0; i < voucher.InventoryItems!.length; i++) {
+    for(int i = 0; i < voucher.InventoryItems!.length; i++) {
       print(itemsBox.get(voucher.InventoryItems![i].BaseItem.ItemID)?.prices);
       final double? pRate = itemsBox
           .get(voucher.InventoryItems![i].BaseItem.ItemID)
@@ -479,6 +488,6 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
       }
     }
     voucher.calculateVoucherSales();
-    emit(state.copyWith(voucher: voucher));
+    emit(state.copyWith(voucher: voucher,status: VoucherEditorStatus.loaded));
   }
 }

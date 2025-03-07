@@ -117,9 +117,23 @@ class _PosTableSelectorState extends State<PosTableSelector> {
                           child: Card(
                             child: ListTile(
                               title: Text(e.priceListName!),
-                              onTap: () {
+                              onLongPress: () {
+                                context.read<VoucherBloc>().add(
+                                    SetDefaultPriceList(
+                                        priceListID: e.priceListID!));
                                 context.read<VoucherBloc>().add(
                                     SetPriceList(priceListID: e.priceListID!));
+
+                                Navigator.of(context).pop();
+                              },
+                              onTap: () {
+                                context.read<VoucherBloc>().add(
+                                    SetDefaultPriceList(
+                                        priceListID: e.priceListID!));
+
+                                context.read<VoucherBloc>().add(
+                                    SetPriceList(priceListID: e.priceListID!));
+
                                 Navigator.of(context).pop();
                               },
                             ),

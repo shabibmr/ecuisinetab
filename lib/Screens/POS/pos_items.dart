@@ -1,13 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:ecuisinetab/Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
 import 'package:ecuisinetab/Utils/extensions/double_extension.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+// import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:input_quantity/input_quantity.dart';
+// import 'package:input_quantity/input_quantity.dart';
 
 import '../../Datamodels/HiveModels/InventoryGroups/InventorygroupHiveModel.dart';
 import '../../Datamodels/Masters/Inventory/InventoryItemDataModel.dart';
@@ -41,54 +41,63 @@ class _POSItemsListWidgetState extends State<POSItemsListWidget> {
         if (items.isEmpty) {
           return const Center(child: Text('No Items Found'));
         } else {
-          return ListView.builder(
-            // shrinkWrap: true,
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () async {
-                  await openItemDetail(items[index]);
-                },
-                child: Card(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        flex: 65,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                items[index].Item_Name ?? '',
-                                style: GoogleFonts.roboto(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+          return Builder(builder: (context) {
+            int pId = context.select(
+                (VoucherBloc bloc) => bloc.state.voucher?.priceListId ?? 0);
+            return ListView.builder(
+              // shrinkWrap: true,
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                double rate = items[index].Price ?? 0;
+                if (pId != 0) {
+                  rate = items[index].prices?[pId]?.rate ?? rate;
+                }
+
+                return InkWell(
+                  onTap: () async {
+                    await openItemDetail(items[index]);
+                  },
+                  child: Card(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 65,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  items[index].Item_Name ?? '',
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                ' ${((items[index].Price) ?? 0).inCurrencySmall}',
-                                style: const TextStyle(
-                                    fontStyle: FontStyle.italic),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  ' ${rate.inCurrencySmall}',
+                                  style: const TextStyle(
+                                      fontStyle: FontStyle.italic),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                          flex: 35, child: InvQtyWidget(item: items[index])),
-                    ],
+                        Expanded(
+                            flex: 35, child: InvQtyWidget(item: items[index])),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
+                );
+              },
+            );
+          });
         }
       }
     });

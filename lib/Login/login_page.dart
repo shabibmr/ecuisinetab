@@ -117,6 +117,7 @@ class UserNameWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        initialValue: "user",
         onChanged: (value) => context.read<AuthenticationBloc>().add(
               AuthSetUser(username: value),
             ),
@@ -137,6 +138,10 @@ class PasswordWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        initialValue: "123456",
+        onFieldSubmitted: (value) {
+          context.read<AuthenticationBloc>().add(AuthenticationStarted());
+        },
         onChanged: (value) => context.read<AuthenticationBloc>().add(
               AuthSetPass(password: value),
             ),

@@ -37,6 +37,8 @@ extension RoundOffExtension on double {
 
   String get inCurrencySmall {
     try {
+      print('inCurrencySmall : ${Platform.localeName}');
+
       var format = NumberFormat.simpleCurrency(
         locale: Platform.localeName,
         decimalDigits: 0,

@@ -252,6 +252,12 @@ class InventoryItemHive extends HiveObject with EquatableMixin {
           : map['uomObject'] != null
               ? [UOMHiveMOdel.fromMap(map['uomObject'])]
               : [],
+      prices: {
+        for (var e in map['PriceLists'] as List<dynamic>)
+          int.tryParse(
+                  (e as Map<String, dynamic>)['Price_List_ID'].toString())!:
+              PriceListEntriesHive.fromMap(e)
+      },
       // prices: map['PriceLists'] ??
       //     (map['PriceLists'] as List<dynamic>)
       //         .map((e) => {int.parse(e['Price_List_ID']), e}),

@@ -92,6 +92,15 @@ class SetPriceList extends VoucherEvent {
   List<Object> get props => [priceListID];
 }
 
+class SetDefaultPriceList extends VoucherEvent {
+  final int priceListID;
+
+  const SetDefaultPriceList({required this.priceListID});
+
+  @override
+  List<Object> get props => [priceListID];
+}
+
 class SetNarration extends VoucherEvent {
   final String narration;
 
