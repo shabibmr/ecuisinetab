@@ -15,6 +15,7 @@ import 'Datamodels/HiveModels/Ledgers/LedMasterHiveModel.dart';
 import 'Datamodels/HiveModels/PriceList/PriceListEntriesHive.dart';
 import 'Datamodels/HiveModels/PriceList/PriceListMasterHive.dart';
 import 'Datamodels/HiveModels/UOM/UOMHiveModel.dart';
+import 'Datamodels/HiveModels/address_book/contacts_data_model.dart';
 import 'Login/constants.dart';
 import 'Services/Sync/bloc/sync_ui_config_bloc.dart';
 
@@ -94,6 +95,7 @@ Future<void> initHiveBoxes() async {
   Hive.registerAdapter<PriceListEntriesHive>(PriceListEntriesHiveAdapter());
   Hive.registerAdapter<PriceListMasterHive>(PriceListMasterHiveAdapter());
   Hive.registerAdapter<LedgerMasterHiveModel>(LedgerMasterHiveModelAdapter());
+  Hive.registerAdapter<ContactsDataModel>(ContactsDataModelAdapter());
 
   // Hive.registerAdapter<UserGroupDataModel>(UserGroupDataModelAdapter());
   // Hive.registerAdapter<ContactsDataModel>(ContactsDataModelAdapter());
@@ -123,6 +125,8 @@ Future<void> initHiveBoxes() async {
       await Hive.openBox(HiveTagNames.PriceListsEntries_Hive_Tag);
   Box<LedgerMasterHiveModel> ledgers =
       await Hive.openBox(HiveTagNames.Ledgers_Hive_Tag);
+  Box<ContactsDataModel> contacts =
+      await Hive.openBox(HiveTagNames.Contacts_Hive_Tag);
   // Box<AccountGroupHiveModel> groups =
   //     await Hive.openBox(HiveTagNames.AccountGroups_Hive_Tag);
   // Box<GodownHiveModel> godowns =

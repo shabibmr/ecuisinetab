@@ -10,6 +10,7 @@ import '../../../Datamodels/HiveModels/Ledgers/LedMasterHiveModel.dart';
 import '../../../Datamodels/HiveModels/UOM/UOMHiveModel.dart';
 import '../../../Datamodels/HiveModels/UserGroup/user_group_datamodel.dart';
 
+import '../../../Datamodels/HiveModels/address_book/contacts_data_model.dart';
 import '../../../Login/constants.dart';
 import '../../../Webservices/webservicePHP.dart';
 import 'package:bloc/bloc.dart';
@@ -71,6 +72,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
         await syncEmployees();
         await syncPrices();
         await readConfigs();
+        await syncContacts();
       } catch (e) {
         emit(state.copyWith(status: SyncUiConfigStatus.error));
         print('Error : $e');
@@ -435,7 +437,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
       // await pricelistBox.clear();
 
       dataResponse.forEach((element) async {
-        print('>> ${element}');
+        // print('>> ${element}');
         final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
         // print('Name : ${p.priceListName}');
 
@@ -452,5 +454,32 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
 
   Future<bool> checkServer(event, emit) async {
     return true;
+  }
+
+  Future<bool> syncContacts() async {
+    print('Fetching Contacts');
+    bool flag = false;
+    DateTime last = DateTime(2021);
+    Box<ContactsDataModel> box = Hive.box(HiveTagNames.Contacts_Hive_Tag);
+    await box.clear();
+
+    try {
+      final dataResponse =
+          await WebservicePHPHelper.getAllContacts(lastUpdated: last);
+      if (dataResponse == false) {
+        print('Fetch Eroor');
+      } else {
+        print('Contacts Fetched');
+        dataResponse.forEach((element) async {
+          ContactsDataModel contact = ContactsDataModel.fromMap(element);
+          await box.put(element['Contact_ID'], contact);
+        });
+        flag = true;
+      }
+    } catch (e) {
+      print('Error : $e');
+    }
+    print('Contacts : ${box.length}');
+    return flag;
   }
 }

@@ -21,6 +21,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 
 import '../../Transactions/blocs/pos/pos_bloc.dart';
+import 'contacts_button.dart';
 import 'pos_item_detail.dart';
 
 class POSScreen extends StatefulWidget {
@@ -112,7 +113,11 @@ class _POSScreenState extends State<POSScreen> {
       drawer: const GroupsDrawer(),
       appBar: AppBar(
         title: const Text('eCuisineTab'),
-        actions: const [TableButton()],
+        actions: const [
+          ContactsButton(),
+          TableButton(),
+          
+        ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

@@ -50,3 +50,7 @@ class FetchPricesEvent extends SyncServiceEvent {
 class CheckServer extends SyncServiceEvent {
   const CheckServer();
 }
+
+class FetchContactsEvent extends SyncServiceEvent {
+  const FetchContactsEvent();
+}
