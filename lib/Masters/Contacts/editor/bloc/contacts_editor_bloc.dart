@@ -1,6 +1,6 @@
 import '../../../../Datamodels/HiveModels/address_book/contacts_data_model.dart';
 import '../../../../Webservices/webservicePHP.dart';
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';

@@ -55,3 +55,4 @@ macos/Runner/Release.entitlements
 macos/Runner.xcodeproj/project.pbxproj
 macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
 pubspec.lock
+pubspec.lock

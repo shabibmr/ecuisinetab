@@ -451,7 +451,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
   }
 
   void setContact(event, emit) {
-    print("Add Address Book");
+    print("Add Address Book : ${event.contact.addressId}");
     emit(state.copyWith(status: VoucherEditorStatus.loading));
     emit(
       state.copyWith(
@@ -474,7 +474,7 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
     final voucher = state.voucher!.copyWith(
         priceListId: event.priceListID, ModeOfService: event.priceListID);
 
-    for(int i = 0; i < voucher.InventoryItems!.length; i++) {
+    for (int i = 0; i < voucher.InventoryItems!.length; i++) {
       print(itemsBox.get(voucher.InventoryItems![i].BaseItem.ItemID)?.prices);
       final double? pRate = itemsBox
           .get(voucher.InventoryItems![i].BaseItem.ItemID)
@@ -488,6 +488,6 @@ class VoucherBloc extends Bloc<VoucherEvent, VoucherState> {
       }
     }
     voucher.calculateVoucherSales();
-    emit(state.copyWith(voucher: voucher,status: VoucherEditorStatus.loaded));
+    emit(state.copyWith(voucher: voucher, status: VoucherEditorStatus.loaded));
   }
 }

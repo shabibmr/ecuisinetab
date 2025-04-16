@@ -5,6 +5,7 @@ import 'package:ecuisinetab/Screens/POS/pos_items.dart';
 import 'package:ecuisinetab/Screens/POS/pos_table_selector.dart';
 import 'package:ecuisinetab/Screens/POS/voucher_editor.dart';
 import 'package:ecuisinetab/Screens/POS/widgets/common/gm_progress_indicator.dart';
+import 'package:ecuisinetab/Screens/address_book/selector/bloc/contactlist_bloc.dart';
 import 'package:ecuisinetab/Services/Sync/bloc/sync_ui_config_bloc.dart';
 
 import '../../Datamodels/HiveModels/InventoryItems/InvetoryItemDataModel.dart';
@@ -113,10 +114,12 @@ class _POSScreenState extends State<POSScreen> {
       drawer: const GroupsDrawer(),
       appBar: AppBar(
         title: const Text('eCuisineTab'),
-        actions: const [
-          ContactsButton(),
+        actions: [
           TableButton(),
-          
+          BlocProvider.value(
+            value: context.read<VoucherBloc>(),
+            child: ContactsButton(),
+          ),
         ],
       ),
       floatingActionButton: Column(

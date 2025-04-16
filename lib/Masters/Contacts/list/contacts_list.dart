@@ -90,7 +90,7 @@ class _ContactsListWidgetState extends State<ContactsListWidget> {
                         builder: (context) => MultiBlocProvider(providers: [
                           BlocProvider(
                             create: (context) => ContactsEditorBloc()
-                              ..add(SetContact(contacts[index]!)),
+                              ..add(SetContact(contact: contacts[index]!)),
                           )
                         ], child: const ContactEditorWidget()),
                       ));

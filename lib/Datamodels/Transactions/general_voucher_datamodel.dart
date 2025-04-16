@@ -1179,6 +1179,7 @@ class GeneralVoucherDataModel extends Equatable {
       'RequirementVoucherNo': RequirementVoucherNo,
       'isHidden': (QuotationDropped ?? false) ? 1 : 0,
       'Contact': Contact?.toJson(),
+      'Contact_ID': Contact?.addressId,
       'Request_Print': requestPrint ?? false,
     };
   }
@@ -1242,7 +1243,11 @@ class GeneralVoucherDataModel extends Equatable {
             ),
       toGodownID: map['toGodownID'] ?? '',
       fromGodownID: map['fromGodownID'] ?? 'GODOWN',
-      Contact: ContactsDataModel.fromMap(map['Contact'] ?? {}),
+      Contact: ContactsDataModel.fromMap(map['Contact'] ?? {})
+        ..copyWith(
+          addressId: map['Contact_ID'],
+        ),
+
       // isHidden: int.parse(map['isHidden']) == 1 ? true : false,
 
       reference: map['reference'] ?? '',

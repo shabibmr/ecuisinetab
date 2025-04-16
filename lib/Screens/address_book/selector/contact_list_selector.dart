@@ -1,19 +1,17 @@
+import 'package:ecuisinetab/Masters/Contacts/editor/bloc/contacts_editor_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../Datamodels/HiveModels/address_book/contacts_data_model.dart';
+import '../../../Masters/Contacts/editor/contacts_editor_widget.dart';
 import 'bloc/contactlist_bloc.dart';
 
 class ContactListSelector extends StatefulWidget {
   final Function(ContactsDataModel) onContactSelected;
-  final Function() onCreateNew;
-  final Function(ContactsDataModel) onEditContact;
 
   const ContactListSelector({
-    Key? key,
+    super.key,
     required this.onContactSelected,
-    required this.onCreateNew,
-    required this.onEditContact,
-  }) : super(key: key);
+  });
 
   @override
   State<ContactListSelector> createState() => _ContactListSelectorState();
@@ -71,7 +69,7 @@ class _ContactListSelectorState extends State<ContactListSelector> {
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Create New Contact',
-            onPressed: widget.onCreateNew,
+            onPressed: () async => await createContact(),
           ),
         ],
       ),
@@ -100,6 +98,7 @@ class _ContactListSelectorState extends State<ContactListSelector> {
 
           if (state is ContactlistSuccess) {
             if (state.contacts.isEmpty) {
+              print('No contacts found');
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -117,7 +116,7 @@ class _ContactListSelectorState extends State<ContactListSelector> {
                     ElevatedButton.icon(
                       icon: const Icon(Icons.add),
                       label: const Text('Create New Contact'),
-                      onPressed: widget.onCreateNew,
+                      onPressed: () async => await createContact(),
                     ),
                   ],
                 ),
@@ -139,9 +138,21 @@ class _ContactListSelectorState extends State<ContactListSelector> {
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
                     tooltip: 'Edit Contact',
-                    onPressed: () => widget.onEditContact(contact),
+                    onPressed: () => onEditContact(contact),
                   ),
-                  onTap: () => widget.onContactSelected(contact),
+                  onTap: () {
+                    if (contact.ContactName != null &&
+                        contact.PhoneNumber != null) {
+                      // Show visual feedback
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Selected ${contact.ContactName}'),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                      widget.onContactSelected(contact);
+                    }
+                  },
                 );
               },
             );
@@ -151,5 +162,32 @@ class _ContactListSelectorState extends State<ContactListSelector> {
         },
       ),
     );
+  }
+
+  Future<void> createContact() async {
+    // Open Dialog ContactEditorScreen for creating a new contact
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BlocProvider(
+          create: (context) => ContactsEditorBloc()
+            ..add(SetContactPhone(_searchController.text)),
+          child: ContactsEditorPage(),
+        );
+      },
+    );
+  }
+
+  void onEditContact(ContactsDataModel contact) {
+    // Open Dialog ContactEditorScreen for editing an existing contact
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return BlocProvider(
+            create: (context) =>
+                ContactsEditorBloc()..add(SetContact(contact: contact)),
+            child: ContactsEditorPage(),
+          );
+        });
   }
 }

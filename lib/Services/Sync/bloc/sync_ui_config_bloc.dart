@@ -161,9 +161,9 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
           InventoryItemHive item = InventoryItemHive.fromMap(element);
           await box.put(item.Item_ID, item);
           final pMap = element['PriceLists'];
-          print('Price Map : $pMap');
+          // print('Price Map : $pMap');
           pMap.forEach((element2) async {
-            print('Price List : $element2');
+            // print('Price List : $element2');
             PriceListEntriesHive price = PriceListEntriesHive.fromMap(element2);
             await pbox.put(item.Item_ID, price);
           });
@@ -441,7 +441,7 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
         final PriceListMasterHive p = PriceListMasterHive.fromMap(element);
         // print('Name : ${p.priceListName}');
 
-        print(element['Price_List_ID'].runtimeType);
+        // print(element['Price_List_ID'].runtimeType);
         await box.put(element['Price_List_ID'], p);
       });
     } catch (e) {
@@ -470,16 +470,21 @@ class SyncServiceBloc extends Bloc<SyncServiceEvent, SyncServiceState> {
         print('Fetch Eroor');
       } else {
         print('Contacts Fetched');
-        dataResponse.forEach((element) async {
+
+        final List conList = dataResponse['data'];
+        // print('Conlist size : ${conList.length}');
+        conList.forEach((element) async {
           ContactsDataModel contact = ContactsDataModel.fromMap(element);
-          await box.put(element['Contact_ID'], contact);
+          // print('Contact : ${contact.ContactName}');
+          await box.put(element['Address_id'], contact);
+          // print('Box length : ${box.length}');
         });
         flag = true;
       }
     } catch (e) {
       print('Error : $e');
     }
-    print('Contacts : ${box.length}');
+    print('Contacts Added : ${box.length}');
     return flag;
   }
 }

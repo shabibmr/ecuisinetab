@@ -1184,12 +1184,11 @@ class WebservicePHPHelper {
     String dateF = formatter.format(lastUpdated!);
     print("weServicestart");
     var url =
-        "${getBaseURL()}/address_book_webservice.php?action=getAllContacts&lastUpdated=$dateF";
+        "${getBaseURL()}address_book_webservice.php?action=getAllContacts&lastUpdated=$dateF";
     try {
       print("URl : $url");
       String dBName = getDBName();
       Dio dio = Dio();
-
       dio.options.headers['dbname'] = dBName;
       var response = await dio.get(url);
       print('api call started');
@@ -1202,6 +1201,8 @@ class WebservicePHPHelper {
         return false;
       }
     } catch (e) {
+      print('URL : $url');
+      print('Error : $e');
       print(e);
       return false;
     }

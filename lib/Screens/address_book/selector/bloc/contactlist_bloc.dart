@@ -26,7 +26,9 @@ class ContactlistBloc extends Bloc<ContactlistEvent, ContactlistState> {
   ) async {
     try {
       // Load all contacts from Hive
+      print('Getting intitial contacts');
       final contacts = _contactsBox.values.toList();
+      print('At bloc : contacts ${contacts.length}');
       emit(ContactlistSuccess(contacts: contacts, searchQuery: ''));
     } catch (e) {
       emit(ContactlistError(message: e.toString(), searchQuery: ''));

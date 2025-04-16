@@ -4,64 +4,64 @@ import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 part 'contacts_data_model.g.dart';
 
-  @HiveType(typeId: 81)
-  class ContactsDataModel extends HiveObject implements EquatableMixin {
-    @HiveField(0)
-    final int? id = 0;
-    @HiveField(1)
-    final String? addressId;
-    @HiveField(2)
-    final String? ContactName;
-    @HiveField(3)
-    final String? ContactUuid;
-    @HiveField(4)
-    final String? PhoneNumber;
-    @HiveField(5)
-    final String? email;
-    @HiveField(6)
-    final String? address;
-    @HiveField(7)
-    final String? route;
-    @HiveField(8)
-    final String? code;
-    @HiveField(9)
-    final String? city;
-    @HiveField(10)
-    final String? country;
-    @HiveField(11)
-    final String? ledgerId;
-    @HiveField(12)
-    final String? CompanyName;
-    @HiveField(13)
-    final String? location;
-    @HiveField(14)
-    final String? EmployeeId;
-    @HiveField(15)
-    final DateTime? DateOfBirth;
-    @HiveField(16)
-    final String? mobileNumber;
-    @HiveField(17)
-    final String? notes;
-    @HiveField(18)
-    final String? Designation;
-    @HiveField(19)
-    final String? DesignationID;
-    @HiveField(20)
-    final String? Building;
-    @HiveField(21)
-    final bool? isCompanyEmployee;
-    @HiveField(22)
-    final bool? isIndividual;
-    @HiveField(23)
-    final int? Type;
-    @HiveField(24)
-    final String? POBox;
-    @HiveField(25)
-    final String? Street;
-    @HiveField(26)
-    final String? Fax;
-    @HiveField(27)
-    List<String> LocationDetails;
+@HiveType(typeId: 81)
+class ContactsDataModel extends HiveObject implements EquatableMixin {
+  @HiveField(0)
+  final int? id = 0;
+  @HiveField(1)
+  final String? addressId;
+  @HiveField(2)
+  final String? ContactName;
+  @HiveField(3)
+  final String? ContactUuid;
+  @HiveField(4)
+  final String? PhoneNumber;
+  @HiveField(5)
+  final String? email;
+  @HiveField(6)
+  final String? address;
+  @HiveField(7)
+  final String? route;
+  @HiveField(8)
+  final String? code;
+  @HiveField(9)
+  final String? city;
+  @HiveField(10)
+  final String? country;
+  @HiveField(11)
+  final String? ledgerId;
+  @HiveField(12)
+  final String? CompanyName;
+  @HiveField(13)
+  final String? location;
+  @HiveField(14)
+  final String? EmployeeId;
+  @HiveField(15)
+  final DateTime? DateOfBirth;
+  @HiveField(16)
+  final String? mobileNumber;
+  @HiveField(17)
+  final String? notes;
+  @HiveField(18)
+  final String? Designation;
+  @HiveField(19)
+  final String? DesignationID;
+  @HiveField(20)
+  final String? Building;
+  @HiveField(21)
+  final bool? isCompanyEmployee;
+  @HiveField(22)
+  final bool? isIndividual;
+  @HiveField(23)
+  final int? Type;
+  @HiveField(24)
+  final String? POBox;
+  @HiveField(25)
+  final String? Street;
+  @HiveField(26)
+  final String? Fax;
+  @HiveField(27)
+  List<String> LocationDetails;
   ContactsDataModel({
     this.addressId,
     this.ContactName,
@@ -187,6 +187,9 @@ part 'contacts_data_model.g.dart';
   }
 
   factory ContactsDataModel.fromMap(Map<String, dynamic> map) {
+    map.keys.forEach((key) {
+      // print('$key - ${map[key]} - ${map[key].runtimeType}');
+    });
     return ContactsDataModel(
       addressId: map['Address_id'] ?? '',
       ContactName: map['ContactName'] ?? '',

@@ -36,6 +36,7 @@ class PriceListMasterHive extends HiveObject with EquatableMixin {
   }
 
   factory PriceListMasterHive.fromMap(Map<String, dynamic> map) {
+    
     return PriceListMasterHive(
       priceListID: int.parse(map['Price_List_ID'] ?? 0),
       priceListName: map['Price_List_Name'] ?? '',

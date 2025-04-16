@@ -26,7 +26,7 @@ class FetchContactById extends ContactsEditorEvent {
 }
 
 class SetContact extends ContactsEditorEvent {
-  const SetContact(this.contact);
+  const SetContact({required this.contact});
 
   final ContactsDataModel contact;
 

@@ -26,83 +26,90 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('eCuisineTab'),
-        centerTitle: false,
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ConfigurationPage(),
-                ));
-              },
-              icon: const Icon(Icons.settings))
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Flexible(
-              flex: 2,
-              child: SizedBox(
-                width: 250,
-                height: 250,
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(180)),
-                  child: Center(
-                    child: Image.asset(
-                      'assets/algoLogo.png',
-                      height: 150,
-                      width: 150,
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text('eCuisineTab'),
+          centerTitle: false,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ConfigurationPage(),
+                  ));
+                },
+                icon: const Icon(Icons.settings))
+          ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Flexible(
+                flex: 2,
+                child: SizedBox(
+                  width: 250,
+                  height: 250,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(180)),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/algoLogo.png',
+                        height: 150,
+                        width: 150,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const Expanded(
-              flex: 3,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(8, 4.0, 8, 4),
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(0.0),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Login',
-                                    style: TextStyle(fontSize: 20),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(8, 4.0, 8, 4),
+                      child: Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(0.0),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Login',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              UserNameWidget(),
-                              PasswordWidget(),
-                            ],
+                                UserNameWidget(),
+                                PasswordWidget(),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  LoginButton(),
-                ],
+                    LoginButton(
+                      formKey: _formKey,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -117,7 +124,19 @@ class UserNameWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        key: const Key('loginForm_usernameInput_textField'),
         initialValue: "user",
+        onSaved: (newValue) {
+          context
+              .read<AuthenticationBloc>()
+              .add(AuthSetUser(username: newValue!));
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter username';
+          }
+          return null;
+        },
         onChanged: (value) => context.read<AuthenticationBloc>().add(
               AuthSetUser(username: value),
             ),
@@ -138,9 +157,23 @@ class PasswordWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        key: const Key('loginForm_passwordInput_textField'),
         initialValue: "123456",
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter password';
+          }
+          return null;
+        },
+        onSaved: (newValue) {
+          context
+              .read<AuthenticationBloc>()
+              .add(AuthSetPass(password: newValue!));
+        },
         onFieldSubmitted: (value) {
-          context.read<AuthenticationBloc>().add(AuthenticationStarted());
+          if (Form.of(context).validate()) {
+            context.read<AuthenticationBloc>().add(AuthenticationStarted());
+          }
         },
         onChanged: (value) => context.read<AuthenticationBloc>().add(
               AuthSetPass(password: value),
@@ -156,7 +189,8 @@ class PasswordWidget extends StatelessWidget {
 }
 
 class LoginButton extends StatelessWidget {
-  const LoginButton({super.key});
+  const LoginButton({super.key, required this.formKey});
+  final formKey;
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +211,10 @@ class LoginButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          context.read<AuthenticationBloc>().add(AuthenticationStarted());
+          formKey.currentState!.save();
+          if (formKey.currentState!.validate()) {
+            context.read<AuthenticationBloc>().add(AuthenticationStarted());
+          }
         },
       ),
     );

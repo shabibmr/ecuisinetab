@@ -12,6 +12,7 @@ import '../../Login/constants.dart';
 import '../../Transactions/blocs/pos/pos_bloc.dart';
 import '../../Transactions/blocs/voucher_bloc/voucher_bloc.dart';
 
+import 'contacts_button.dart';
 import 'pos_waiter_selector.dart';
 import 'voucher_editor.dart';
 
@@ -142,17 +143,25 @@ class POSCartWidget extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Cart'),
         actions: [
-          Visibility(
-            // visible: false,
-            child: IconButton(
-                onPressed: () {
-                  context
-                      .read<VoucherBloc>()
-                      .add(const VoucherRequestSaveInvoice());
-                },
-                icon: const Icon(
-                  Icons.currency_rupee_rounded,
-                )),
+          Row(
+            children: [
+              BlocProvider.value(
+                value: context.read<VoucherBloc>(),
+                child: ContactsButton(),
+              ),
+              Visibility(
+                visible: false,
+                child: IconButton(
+                    onPressed: () {
+                      context
+                          .read<VoucherBloc>()
+                          .add(const VoucherRequestSaveInvoice());
+                    },
+                    icon: const Icon(
+                      Icons.currency_rupee_rounded,
+                    )),
+              ),
+            ],
           )
         ],
       ),
