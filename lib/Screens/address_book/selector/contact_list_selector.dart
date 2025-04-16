@@ -171,6 +171,7 @@ class _ContactListSelectorState extends State<ContactListSelector> {
       builder: (BuildContext context) {
         return BlocProvider(
           create: (context) => ContactsEditorBloc()
+            ..add(SetEmptyContact())
             ..add(SetContactPhone(_searchController.text)),
           child: ContactsEditorPage(),
         );

@@ -64,10 +64,13 @@ class ContactsEditorBloc
         ));
       }
     });
-    on<SetContact>((event, emit) => emit(state.copyWith(
-          contact: event.contact,
-          status: EditorStatus.loaded,
-        )));
+    on<SetContact>((event, emit) {
+      emit(state.copyWith(
+        contact: event.contact,
+        status: EditorStatus.loaded,
+      ));
+      print('Editing : ${event.contact.ContactName}');
+    });
     on<SetContactName>((event, emit) => emit(state.copyWith(
           contact: state.contact?.copyWith(
             ContactName: event.name,
