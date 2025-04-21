@@ -264,9 +264,7 @@ class _PosTableSelectorState extends State<PosTableSelector> {
             ]),
           );
         } else {
-          return Container(
-            child: Text(state.status.toString()),
-          );
+          return Text(state.status.toString());
         }
       },
     );
@@ -501,15 +499,17 @@ class _RefreshTimeIndicatorState extends State<RefreshTimeIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PosBloc, PosState>(
+    return BlocConsumer<PosBloc, PosState>(
       listener: (context, state) {
         if (state.status == POSStatus.OrdersFetched) {
           val = 0;
         }
       },
-      child: LinearProgressIndicator(
-        value: val,
-      ),
+      builder: (context, state) {
+        return LinearProgressIndicator(
+          value: val,
+        );
+      },
     );
   }
 }

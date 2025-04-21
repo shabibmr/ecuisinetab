@@ -65,6 +65,7 @@ class ContactsEditorBloc
       }
     });
     on<SetContact>((event, emit) {
+      emit(state.copyWith(status: EditorStatus.loading));
       emit(state.copyWith(
         contact: event.contact,
         status: EditorStatus.loaded,
@@ -88,8 +89,7 @@ class ContactsEditorBloc
         )));
     on<SetContactAddress>((event, emit) => emit(state.copyWith(
           contact: state.contact?.copyWith(
-            address: event.address,
-          ),
+              address: event.address, LocationDetails: [event.address]),
         )));
     on<SetContactType>((event, emit) => emit(state.copyWith(
           contact: state.contact?.copyWith(

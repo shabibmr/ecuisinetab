@@ -67,7 +67,9 @@ class _ContactEditorWidgetState extends State<ContactEditorWidget> {
           actions: [
             IconButton(
               onPressed: () {
-                context.read<ContactsEditorBloc>().add(const ContactsRequestSave());
+                context
+                    .read<ContactsEditorBloc>()
+                    .add(const ContactsRequestSave());
               },
               icon: const Icon(Icons.save),
             ),
@@ -167,7 +169,8 @@ class ContactNameWidget extends StatelessWidget {
       return Card(
         child: MTextField(
           label: 'Name',
-          textData: val,
+          // textData: val,
+          controller: TextEditingController()..text = val,
           // controller: TextEditingController()..text = val,
           onChanged: (value) =>
               context.read<ContactsEditorBloc>().add(SetContactName(value)),
@@ -190,8 +193,8 @@ class ContactPhoneWidget extends StatelessWidget {
       return Card(
         child: MTextField(
           label: 'Phone Number',
-          textData: val,
-          // controller: TextEditingController()..text = val,
+          // textData: val,
+          controller: TextEditingController()..text = val,
           onChanged: (value) =>
               context.read<ContactsEditorBloc>().add(SetContactPhone(value)),
         ),
@@ -206,12 +209,13 @@ class ContactAddressWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
-      String val = context.select(
-          (ContactsEditorBloc bloc) => bloc.state.contact?.address ?? '');
+      String val = context.select((ContactsEditorBloc bloc) =>
+          bloc.state.contact?.LocationDetails[0] ?? '');
       return Card(
         child: MMultiLineTextField(
           label: 'Address',
-          textData: val,
+          // textData: val,
+          controller: TextEditingController()..text = val,
           onChanged: (value) =>
               context.read<ContactsEditorBloc>().add(SetContactAddress(val)),
         ),
