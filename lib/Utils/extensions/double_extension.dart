@@ -20,7 +20,8 @@ extension RoundOffExtension on double {
 
   String get inCurrency {
     try {
-      var format = NumberFormat.simpleCurrency(locale: Platform.localeName);
+      var format = currencyFormat;
+      // .simpleCurrency(locale: Platform.localeName);
       print('Format : ${format.format(this)}');
       return format.format(this);
     } catch (e) {
@@ -44,7 +45,7 @@ extension RoundOffExtension on double {
         decimalDigits: 0,
       );
       // print('Format : ${format.format(this)}');
-      return format.format(this);
+      return currencyFormat.format(this);
     } catch (e) {
       print('Error : ${e.toString()}');
     }

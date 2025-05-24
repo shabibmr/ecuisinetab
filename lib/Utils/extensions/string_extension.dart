@@ -17,6 +17,7 @@ extension StringExtension on String {
 
   String get inCurrency {
     double n = double.tryParse(this) ?? 0;
-    return '$currency${n.toStringAsFixed(2)}';
+    return currencyFormat.format(this);
+    // '$currency${n.toStringAsFixed(2)}';
   }
 }

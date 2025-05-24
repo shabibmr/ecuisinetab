@@ -116,9 +116,12 @@ class _POSScreenState extends State<POSScreen> {
         title: const Text('eCuisineTab'),
         actions: [
           TableButton(),
-          BlocProvider.value(
-            value: context.read<VoucherBloc>(),
-            child: ContactsButton(),
+          Visibility(
+            visible: false,
+            child: BlocProvider.value(
+              value: context.read<VoucherBloc>(),
+              child: ContactsButton(),
+            ),
           ),
         ],
       ),

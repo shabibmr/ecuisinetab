@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-const String currency = "Aed.";
+const String currency = "Rs.";
 
 final currencyFormat = NumberFormat.currency(
   locale: "en_IN",
